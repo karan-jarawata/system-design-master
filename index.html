@@ -244,7 +244,9 @@
             background: var(--bg-card); border: 1px solid var(--border);
             border-radius: 12px; padding: 1rem; cursor: pointer;
             transition: all 0.2s ease; display: flex; align-items: center;
-            gap: 12px; position: relative; overflow: hidden; user-select: none;
+            gap: 12px; position: relative; overflow: hidden;
+            /* Allow text selection, but add padding for copy btn */
+            padding-right: 40px; 
         }
 
         .topic-card:hover { transform: translateY(-2px); border-color: var(--accent); box-shadow: var(--shadow); }
@@ -264,8 +266,40 @@
         }
         .topic-card.completed .checkbox::after { transform: rotate(45deg) scale(1); }
 
-        .topic-text { font-size: 0.95rem; font-weight: 500; color: var(--text-primary); transition: color 0.2s; }
+        /* Topic Text Selection Enabled */
+        .topic-text { 
+            font-size: 0.95rem; font-weight: 500; color: var(--text-primary); transition: color 0.2s;
+            user-select: text; /* Allow manual selection */
+        }
         .topic-card.completed .topic-text { color: var(--accent); text-decoration: line-through; opacity: 0.8; }
+
+        /* --- COPY BUTTON --- */
+        .copy-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0; /* Hidden by default */
+            transition: all 0.2s ease;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            z-index: 10;
+        }
+        
+        .topic-card:hover .copy-btn { opacity: 1; }
+        .copy-btn:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
+        
+        /* Copied Tooltip Animation */
+        .copy-btn.copied {
+            background: var(--success); color: white; border-color: var(--success);
+        }
 
         @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .empty-state { text-align: center; padding: 4rem 0; color: var(--text-secondary); }
@@ -571,10 +605,16 @@
                 filteredTopics.forEach(topic => {
                     const safeId = 'card-' + topic.replace(/[^a-zA-Z0-9]/g, ''); 
                     const isDone = state.completed[topic];
+                    // IMPORTANT: Added copy button inside card
                     html += `
                         <div id="${safeId}" class="topic-card ${isDone ? 'completed' : ''}" onclick="handleTopicClick('${topic}', '${safeId}')">
                             <div class="checkbox"></div>
                             <span class="topic-text">${topic}</span>
+                            <div class="copy-btn" onclick="copyText(event, '${topic}', this)" title="Copy topic">
+                                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                                </svg>
+                            </div>
                         </div>`;
                 });
                 html += `</div></div>`;
@@ -620,6 +660,21 @@
                 triggerSectionConfetti();
             }
         }
+    }
+
+    // --- COPY FUNCTIONALITY ---
+    function copyText(e, text, btn) {
+        e.stopPropagation(); // Stop click from triggering card completion
+        navigator.clipboard.writeText(text).then(() => {
+            const originalHTML = btn.innerHTML;
+            btn.classList.add('copied');
+            btn.innerHTML = `<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>`;
+            
+            setTimeout(() => {
+                btn.classList.remove('copied');
+                btn.innerHTML = originalHTML;
+            }, 1500);
+        });
     }
 
     function updateStats() {
