@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Design Master</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --bg-body: #ffffff;
+            --bg-sidebar: #f4f4f5;
+            --bg-card: #ffffff;
+            --bg-header: rgba(255, 255, 255, 0.9);
+            --border: #e4e4e7;
+            --text-primary: #18181b;
+            --text-secondary: #71717a;
+            --accent: #2563eb; /* Blue for LLD */
+            --accent-hover: #1d4ed8;
+            --accent-light: #eff6ff;
+            --success: #16a34a;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --nav-hover: #e4e4e7;
+            --scrollbar-thumb: #d4d4d8;
+        }
+
+        .dark {
+            --bg-body: #09090b;
+            --bg-sidebar: #18181b;
+            --bg-card: #09090b;
+            --bg-header: rgba(9, 9, 11, 0.9);
+            --border: #27272a;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --accent: #3b82f6;
+            --accent-hover: #60a5fa;
+            --accent-light: rgba(59, 130, 246, 0.1);
+            --success: #22c55e;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            --nav-hover: #27272a;
+            --scrollbar-thumb: #3f3f46;
+        }
+
+        /* HLD Theme Override (Purple Vibe) */
+        body[data-mode="HLD"] {
+            --accent: #8b5cf6;
+            --accent-hover: #7c3aed;
+            --accent-light: #f5f3ff;
+        }
+        body[data-mode="HLD"].dark {
+            --accent: #a78bfa;
+            --accent-hover: #c4b5fd;
+            --accent-light: rgba(139, 92, 246, 0.1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* --- SIDEBAR --- */
+        aside {
+            width: 300px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            transition: background 0.3s, border 0.3s;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo-text {
+            font-weight: 900;
+            font-size: 1.4rem;
+            letter-spacing: -0.03em;
+            color: var(--text-primary);
+            margin-bottom: 1.25rem;
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.2s;
+        }
+        
+        .logo-text:active { transform: scale(0.98); }
+
+        .mastery-container { display: flex; flex-direction: column; gap: 6px; }
+
+        .mastery-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .mastery-track {
+            height: 8px;
+            background: var(--border);
+            border-radius: 99px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .mastery-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--success));
+            width: 0%;
+            transition: width 0.5s ease-out;
+            box-shadow: 0 0 10px var(--accent-light);
+        }
+
+        .nav-scroller {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+        
+        .nav-scroller::-webkit-scrollbar { width: 5px; }
+        .nav-scroller::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 10px; }
+
+        .nav-item {
+            padding: 0.85rem 1rem;
+            margin-bottom: 4px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-item:hover { background: var(--nav-hover); color: var(--text-primary); }
+        .nav-item.active { background: var(--accent-light); color: var(--accent); font-weight: 600; }
+        
+        .progress-pill {
+            font-size: 0.7rem;
+            background: var(--border);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--text-secondary);
+            min-width: 35px;
+            text-align: center;
+        }
+        .nav-item.active .progress-pill { background: var(--accent); color: white; }
+
+        /* --- MAIN AREA --- */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        header {
+            padding: 1rem 2rem;
+            background: var(--bg-header);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 50;
+            gap: 20px;
+        }
+
+        .header-left h1 { font-size: 1.1rem; font-weight: 700; margin-bottom: 2px;}
+        .header-left p { font-size: 0.85rem; color: var(--text-secondary); }
+
+        .controls { display: flex; gap: 12px; align-items: center; margin-left: auto; }
+
+        .search-box { position: relative; width: 250px; }
+
+        .search-input {
+            width: 100%;
+            background: var(--bg-body);
+            border: 1px solid var(--border);
+            padding: 8px 12px 8px 35px;
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
+        
+        .search-icon {
+            position: absolute;
+            left: 10px; top: 50%; transform: translateY(-50%);
+            width: 16px; height: 16px;
+            border: 2px solid var(--text-secondary);
+            border-radius: 50%; opacity: 0.5;
+        }
+        .search-icon::after {
+            content: ''; position: absolute; width: 6px; height: 2px;
+            background: var(--text-secondary); bottom: -2px; right: -4px;
+            transform: rotate(45deg);
+        }
+
+        .theme-toggle {
+            background: var(--bg-body);
+            border: 1px solid var(--border);
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            color: var(--text-primary);
+            transition: 0.2s;
+        }
+        .theme-toggle:hover { border-color: var(--text-secondary); }
+
+        .content-scroll { flex: 1; overflow-y: auto; padding: 2rem; scroll-behavior: smooth; }
+        .content-wrapper { max-width: 900px; margin: 0 auto; padding-bottom: 4rem; }
+
+        .group-section { margin-bottom: 3rem; animation: fadeUp 0.4s ease-out; }
+        .group-title {
+            font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;
+            color: var(--text-secondary); font-weight: 700; margin-bottom: 1rem;
+            padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);
+        }
+
+        .topic-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;
+        }
+
+        .topic-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 1rem; cursor: pointer;
+            transition: all 0.2s ease; display: flex; align-items: center;
+            gap: 12px; position: relative; overflow: hidden; user-select: none;
+        }
+
+        .topic-card:hover { transform: translateY(-2px); border-color: var(--accent); box-shadow: var(--shadow); }
+        .topic-card.completed { background: var(--accent-light); border-color: var(--accent-light); }
+        
+        .checkbox {
+            width: 22px; height: 22px; border: 2px solid var(--border);
+            border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+            transition: 0.2s; background: var(--bg-body);
+        }
+
+        .topic-card.completed .checkbox { background: var(--accent); border-color: var(--accent); }
+        .checkbox::after {
+            content: ''; width: 4px; height: 8px; border: solid white;
+            border-width: 0 2px 2px 0; transform: rotate(45deg) scale(0);
+            transition: 0.2s; margin-bottom: 2px;
+        }
+        .topic-card.completed .checkbox::after { transform: rotate(45deg) scale(1); }
+
+        .topic-text { font-size: 0.95rem; font-weight: 500; color: var(--text-primary); transition: color 0.2s; }
+        .topic-card.completed .topic-text { color: var(--accent); text-decoration: line-through; opacity: 0.8; }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .empty-state { text-align: center; padding: 4rem 0; color: var(--text-secondary); }
+
+    </style>
+</head>
+<body data-mode="LLD">
+
+<aside>
+    <div class="sidebar-header">
+        <div class="logo-text" id="logoTitle" title="Click 3 times to switch modes">LLD MASTER</div>
+        <div class="mastery-container">
+            <div class="mastery-label">
+                <span>Total Mastery</span>
+                <span id="masteryPercent">0%</span>
+            </div>
+            <div class="mastery-track">
+                <div class="mastery-fill" id="masteryBar"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="nav-scroller" id="navContainer"></div>
+</aside>
+
+<main>
+    <header>
+        <div class="header-left">
+            <h1 id="headerTitle">Loading...</h1>
+            <p id="headerSubtitle">Select a topic to begin the grind</p>
+        </div>
+        
+        <div class="controls">
+            <div class="search-box">
+                <div class="search-icon"></div>
+                <input type="text" class="search-input" id="searchInput" placeholder="Find topic..." oninput="renderContent()">
+            </div>
+            <div class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+            </div>
+        </div>
+    </header>
+
+    <div class="content-scroll">
+        <div class="content-wrapper" id="contentArea"></div>
+    </div>
+</main>
+
+<script>
+    // ================= DATA REPOSITORIES =================
+
+    // - LLD Data
+    const LLD_DATA = [
+        {
+            id: 1, title: "1. OOP Physics", subtitle: "The Foundation",
+            groups: [
+                { name: "Core Concepts", topics: ["Classes & Objects", "Interfaces", "Inheritance", "Polymorphism", "Abstraction", "Encapsulation", "Access Modifiers", "Object Lifecycle", "Stack vs Heap"] },
+                { name: "Relationships", topics: ["Association", "Aggregation", "Composition", "Composition over Inheritance"] },
+                { name: "Mechanics", topics: ["Diamond Problem", "Dynamic Dispatch", "Immutability", "Abstract Class vs Interface"] }
+            ]
+        },
+        {
+            id: 2, title: "2. Design Principles", subtitle: "The Rules",
+            groups: [
+                { name: "SOLID", topics: ["SRP", "Open/Closed", "Liskov Substitution", "Interface Segregation", "Dependency Inversion"] },
+                { name: "Heuristics", topics: ["DRY", "KISS", "YAGNI", "Law of Demeter", "Fail-Fast", "Method Contracts"] }
+            ]
+        },
+        {
+            id: 3, title: "3. UML Blueprint", subtitle: "Visualizing Code",
+            groups: [
+                { name: "Structural", topics: ["Class Diagram", "UML Modifiers", "Cardinality"] },
+                { name: "Behavioral", topics: ["Use Case", "Sequence Diagram", "Activity Diagram", "State Machine", "System Boundary", "Sync vs Async"] }
+            ]
+        },
+        {
+            id: 4, title: "4. Design Patterns", subtitle: "The Toolkit",
+            groups: [
+                { name: "Creational", topics: ["Singleton", "Factory Method", "Abstract Factory", "Builder", "Prototype"] },
+                { name: "Structural", topics: ["Adapter", "Facade", "Decorator", "Composite", "Proxy", "Bridge", "Flyweight"] },
+                { name: "Behavioral", topics: ["Strategy", "Observer", "Command", "State", "Template Method", "Chain of Resp", "Iterator", "Visitor", "Mediator", "Memento"] }
+            ]
+        },
+        {
+            id: 5, title: "5. Advanced Arch", subtitle: "Technical Depth",
+            groups: [
+                { name: "Error Handling", topics: ["Checked vs Unchecked", "Custom Exceptions", "Propagation", "Optional vs Null"] },
+                { name: "Boundaries", topics: ["DTO vs Domain", "Validation Layer", "Anti-Corruption Layer", "Idempotency"] },
+                { name: "Config", topics: ["Config-Driven Design", "Feature Toggles", "Env Separation"] }
+            ]
+        },
+        {
+            id: 6, title: "6. Concurrency", subtitle: "Multithreading",
+            groups: [
+                { name: "Basics", topics: ["Threads vs Processes", "Thread Lifecycle"] },
+                { name: "Sync", topics: ["Locks", "ReentrantLock", "Volatile", "Atomic Ops"] },
+                { name: "Tools", topics: ["ExecutorService", "Concurrent Collections", "Thread-Safety", "Immutability"] }
+            ]
+        },
+        {
+            id: 7, title: "7. Data Modeling", subtitle: "Persistence",
+            groups: [
+                { name: "Design", topics: ["ER Diagrams", "Normalization", "Entity vs Value Object"] },
+                { name: "ORM", topics: ["ORM Mapping", "Lazy vs Eager", "Schema Evolution"] }
+            ]
+        },
+        {
+            id: 8, title: "8. Observability", subtitle: "Production Ready",
+            groups: [
+                { name: "Time", topics: ["TTL Logic", "Schedulers", "Delayed Tasks", "Clock Abstraction"] },
+                { name: "Logs", topics: ["Logging Levels", "Correlation IDs", "Audit Logs", "Debuggability"] },
+                { name: "Testing", topics: ["Unit Tests", "DI", "Mocking", "Test Seams", "Over-Engineering", "Perf vs Readability"] }
+            ]
+        },
+        {
+            id: 9, title: "9. Machine Coding", subtitle: "The Gauntlet",
+            groups: [
+                { name: "Easy", topics: ["Tic-Tac-Toe", "Snake & Ladder", "LRU Cache", "Parking Lot", "Task Manager"] },
+                { name: "Medium", topics: ["Stack Overflow", "ATM", "Logger", "PubSub", "Elevator", "Splitwise", "Vending Machine", "Car Rental", "Hotel Mgmt", "Digital Wallet", "Airline Mgmt", "Library Mgmt", "Traffic Signal", "Concert Ticket", "Social Network"] },
+                { name: "Hard", topics: ["Spotify", "Amazon", "LinkedIn", "CricInfo", "Chess", "Coffee Vending", "Restaurant Mgmt", "Stock Exchange", "Course Registration", "BookMyShow", "Online Auction", "Food Delivery", "Ride-Sharing"] }
+            ]
+        }
+    ];
+
+    // - HLD Data
+    const HLD_DATA = [
+        {
+            id: 1, title: "1. Foundations", subtitle: "Distributed Systems",
+            groups: [
+                { name: "Architecture", topics: ["Client-Server", "Monolithic vs Microservices", "Serverless (FaaS)"] },
+                { name: "Scaling", topics: ["Vertical vs Horizontal Scaling", "Latency vs Throughput", "Stateless vs Stateful"] },
+                { name: "Comms", topics: ["HTTP/1.1 vs HTTP/2", "TCP vs UDP", "WebSocket", "REST", "GraphQL", "gRPC", "Polling vs SSE"] }
+            ]
+        },
+        {
+            id: 2, title: "2. The Rules", subtitle: "Principles & Theorems",
+            groups: [
+                { name: "Consistency", topics: ["CAP Theorem", "PACELC Theorem", "Strong vs Eventual Consistency", "BASE Properties"] },
+                { name: "Transactions", topics: ["ACID Transactions"] },
+                { name: "Reliability", topics: ["Single Point of Failure", "Fallacies of Distributed Computing", "Amdahl's Law", "Backpressure"] }
+            ]
+        },
+        {
+            id: 3, title: "3. System Toolkit", subtitle: "Components",
+            groups: [
+                { name: "Load Balancing", topics: ["L4 vs L7 LB", "Round Robin", "Consistent Hashing", "Health Checks"] },
+                { name: "Caching", topics: ["Write-through", "Write-back", "Cache-aside", "Eviction (LRU/LFU)", "Redis/Memcached", "CDN"] },
+                { name: "Messaging", topics: ["Pub-Sub vs P2P", "Kafka vs RabbitMQ", "Dead Letter Queues"] },
+                { name: "Proxies", topics: ["Forward vs Reverse Proxy", "API Gateway vs LB"] }
+            ]
+        },
+        {
+            id: 4, title: "4. Data Architecture", subtitle: "Storage",
+            groups: [
+                { name: "DB Types", topics: ["RDBMS (MySQL)", "NoSQL (Mongo, Dynamo)", "Columnar (Cassandra)", "Graph (Neo4j)"] },
+                { name: "Scaling Data", topics: ["Replication (Master-Slave)", "Sharding & Keys", "Federation"] },
+                { name: "Advanced", topics: ["B-Trees vs LSM Trees", "Bloom Filters", "Quorum Consensus", "Paxos & Raft"] }
+            ]
+        },
+        {
+            id: 5, title: "5. Advanced Arch", subtitle: "Resilience & Security",
+            groups: [
+                { name: "Transactions", topics: ["2-Phase Commit", "3-Phase Commit", "Saga Pattern"] },
+                { name: "Resilience", topics: ["Circuit Breaker", "Bulkhead", "Retry & Jitter", "Rate Limiting", "Idempotency"] },
+                { name: "Security", topics: ["OAuth 2.0 / JWT", "SSL/TLS Handshake", "Encryption", "DDoS Mitigation"] }
+            ]
+        },
+        {
+            id: 6, title: "6. Observability", subtitle: "Ops & Metrics",
+            groups: [
+                { name: "Monitoring", topics: ["Metrics (Prometheus)", "Dashboards (Grafana)"] },
+                { name: "Logging", topics: ["ELK Stack", "Structured Logging"] },
+                { name: "Tracing", topics: ["Distributed Tracing", "Span Context"] },
+                { name: "Deploy", topics: ["Blue-Green", "Canary", "Rolling Updates"] }
+            ]
+        },
+        {
+            id: 7, title: "7. Patterns", subtitle: "Architectural Patterns",
+            groups: [
+                { name: "Modern Patterns", topics: ["Sidecar", "Ambassador", "Strangler Fig", "CQRS", "Event Sourcing", "Service Discovery"] }
+            ]
+        },
+        {
+            id: 8, title: "8. The Gauntlet", subtitle: "Interview Questions",
+            groups: [
+                { name: "Easy", topics: ["URL Shortener", "Key-Value Store", "ID Generator", "Pastebin"] },
+                { name: "Medium", topics: ["Chat System", "Social Feed", "Notification Service", "Rate Limiter", "Typeahead/Search", "Web Crawler", "Google Drive"] },
+                { name: "Hard", topics: ["Video Streaming (Netflix)", "Ride Hailing (Uber)", "E-Commerce (Amazon)", "Location Service (Yelp)", "Distributed Search", "Payment System", "Metrics Monitoring", "Live Streaming", "Ticket Booking"] }
+            ]
+        }
+    ];
+
+    // ================= APP LOGIC =================
+
+    // Config
+    const CONFIG = {
+        mode: localStorage.getItem('app_mode') || 'LLD', // 'LLD' or 'HLD'
+    };
+
+    // State Stores (Separate for LLD and HLD)
+    let lldState = JSON.parse(localStorage.getItem('lld_master_state')) || { activeTab: 0, completed: {} };
+    let hldState = JSON.parse(localStorage.getItem('hld_master_state')) || { activeTab: 0, completed: {} };
+
+    // Current Context Helpers
+    function getData() { return CONFIG.mode === 'LLD' ? LLD_DATA : HLD_DATA; }
+    function getState() { return CONFIG.mode === 'LLD' ? lldState : hldState; }
+    function saveState() {
+        if(CONFIG.mode === 'LLD') localStorage.setItem('lld_master_state', JSON.stringify(lldState));
+        else localStorage.setItem('hld_master_state', JSON.stringify(hldState));
+    }
+
+    // --- SECRET SWITCH LOGIC ---
+    let clickCount = 0;
+    let clickTimer = null;
+
+    function initSecretSwitch() {
+        const title = document.getElementById('logoTitle');
+        title.addEventListener('click', () => {
+            clickCount++;
+            
+            // Visual feedback
+            title.style.transform = 'scale(0.95)';
+            setTimeout(() => title.style.transform = 'scale(1)', 100);
+
+            if (clickTimer) clearTimeout(clickTimer);
+            
+            clickTimer = setTimeout(() => {
+                clickCount = 0; // Reset if too slow
+            }, 500);
+
+            if (clickCount === 3) {
+                toggleMode();
+                clickCount = 0;
+            }
+        });
+    }
+
+    function toggleMode() {
+        // Switch Mode
+        CONFIG.mode = CONFIG.mode === 'LLD' ? 'HLD' : 'LLD';
+        localStorage.setItem('app_mode', CONFIG.mode);
+        
+        // Trigger transition effect
+        document.body.style.opacity = '0';
+        setTimeout(() => {
+            initDashboard();
+            document.body.style.opacity = '1';
+            
+            // Celebration confetti for the switch
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.1 }, colors: CONFIG.mode === 'LLD' ? ['#2563eb'] : ['#8b5cf6'] });
+        }, 300);
+    }
+
+    // --- RENDERING ---
+
+    function initDashboard() {
+        // Set Theme Attributes
+        document.body.setAttribute('data-mode', CONFIG.mode);
+        document.getElementById('logoTitle').innerText = `${CONFIG.mode} MASTER`;
+
+        renderNav();
+        renderContent();
+    }
+
+    function renderNav() {
+        const nav = document.getElementById('navContainer');
+        const data = getData();
+        const state = getState();
+        
+        nav.innerHTML = '';
+        data.forEach((section, idx) => {
+            const div = document.createElement('div');
+            div.className = `nav-item ${state.activeTab === idx ? 'active' : ''}`;
+            div.onclick = () => switchTab(idx);
+            div.innerHTML = `<span>${section.title}</span><span class="progress-pill" id="pill-${idx}">0%</span>`;
+            nav.appendChild(div);
+        });
+        updateStats(); 
+    }
+
+    function renderContent() {
+        const state = getState();
+        const data = getData();
+        const idx = state.activeTab;
+        const content = document.getElementById('contentArea');
+        const section = data[idx];
+        const searchVal = document.getElementById('searchInput').value.toLowerCase();
+
+        // Header Text
+        document.getElementById('headerTitle').innerText = section.title;
+        document.getElementById('headerSubtitle').innerText = section.subtitle;
+
+        let html = '';
+        let hasResults = false;
+
+        section.groups.forEach(group => {
+            const filteredTopics = group.topics.filter(t => t.toLowerCase().includes(searchVal));
+            if (filteredTopics.length > 0) {
+                hasResults = true;
+                html += `<div class="group-section"><div class="group-title">${group.name}</div><div class="topic-grid">`;
+                filteredTopics.forEach(topic => {
+                    const safeId = 'card-' + topic.replace(/[^a-zA-Z0-9]/g, ''); 
+                    const isDone = state.completed[topic];
+                    html += `
+                        <div id="${safeId}" class="topic-card ${isDone ? 'completed' : ''}" onclick="handleTopicClick('${topic}', '${safeId}')">
+                            <div class="checkbox"></div>
+                            <span class="topic-text">${topic}</span>
+                        </div>`;
+                });
+                html += `</div></div>`;
+            }
+        });
+
+        if (!hasResults) html = `<div class="empty-state"><h3>No vibes found.</h3><p>Try searching for something else.</p></div>`;
+        content.innerHTML = html;
+    }
+
+    function switchTab(idx) {
+        const state = getState();
+        const navItems = document.querySelectorAll('.nav-item');
+        if(navItems[state.activeTab]) navItems[state.activeTab].classList.remove('active');
+        if(navItems[idx]) navItems[idx].classList.add('active');
+
+        state.activeTab = idx;
+        document.getElementById('searchInput').value = ''; 
+        saveState();
+        renderContent(); 
+    }
+
+    function handleTopicClick(topicName, elementId) {
+        const state = getState();
+        state.completed[topicName] = !state.completed[topicName];
+        saveState();
+
+        const card = document.getElementById(elementId);
+        if(card) card.classList.toggle('completed');
+
+        const stats = updateStats();
+        
+        // Celebration Logic
+        if (state.completed[topicName]) {
+            const data = getData();
+            const currentSection = data[state.activeTab];
+            const sectionTopics = currentSection.groups.flatMap(g => g.topics);
+            const sectionDone = sectionTopics.filter(t => state.completed[t]).length;
+
+            if (stats.globalPercent === 100) {
+                triggerGrandCelebration();
+            } else if (sectionDone === sectionTopics.length) {
+                triggerSectionConfetti();
+            }
+        }
+    }
+
+    function updateStats() {
+        const state = getState();
+        const data = getData();
+        
+        // Calc Globals
+        const allTopics = data.flatMap(s => s.groups.flatMap(g => g.topics));
+        const totalDone = allTopics.filter(t => state.completed[t]).length;
+        const globalPercent = Math.round((totalDone / allTopics.length) * 100) || 0;
+
+        // Update Global Bar
+        document.getElementById('masteryPercent').innerText = `${globalPercent}%`;
+        document.getElementById('masteryBar').style.width = `${globalPercent}%`;
+
+        // Update Section Pills
+        data.forEach((section, idx) => {
+            const sectionTopics = section.groups.flatMap(g => g.topics);
+            const sDone = sectionTopics.filter(t => state.completed[t]).length;
+            const sPer = Math.round((sDone / sectionTopics.length) * 100) || 0;
+            const pill = document.getElementById(`pill-${idx}`);
+            if(pill) pill.innerText = `${sPer}%`;
+        });
+
+        return { globalPercent };
+    }
+
+    // --- UTILS ---
+    function triggerSectionConfetti() {
+        const color = CONFIG.mode === 'LLD' ? '#2563eb' : '#8b5cf6';
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: [color, '#22c55e'] });
+    }
+
+    function triggerGrandCelebration() {
+        const duration = 5 * 1000;
+        const animationEnd = Date.now() + duration;
+        const color = CONFIG.mode === 'LLD' ? '#2563eb' : '#8b5cf6';
+        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0, colors: [color, '#22c55e', '#ffffff'] };
+        const random = (min, max) => Math.random() * (max - min) + min;
+
+        const interval = setInterval(function() {
+            const timeLeft = animationEnd - Date.now();
+            if (timeLeft <= 0) return clearInterval(interval);
+            const particleCount = 50 * (timeLeft / duration);
+            confetti(Object.assign({}, defaults, { particleCount, origin: { x: random(0.1, 0.3), y: Math.random() - 0.2 } }));
+            confetti(Object.assign({}, defaults, { particleCount, origin: { x: random(0.7, 0.9), y: Math.random() - 0.2 } }));
+        }, 250);
+    }
+
+    function toggleTheme() {
+        document.documentElement.classList.toggle('dark');
+    }
+
+    // Boot
+    window.onload = () => {
+        initDashboard();
+        initSecretSwitch();
+    };
+
+</script>
+</body>
+</html>
