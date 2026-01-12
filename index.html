@@ -363,20 +363,21 @@
                 { name: "Mechanics", topics: ["Diamond Problem", "Dynamic Dispatch", "Immutability", "Abstract Class vs Interface"] }
             ]
         },
-        {
-            id: 2, title: "2. Design Principles", subtitle: "The Rules",
-            groups: [
-                { name: "SOLID", topics: ["SRP", "Open/Closed", "Liskov Substitution", "Interface Segregation", "Dependency Inversion"] },
-                { name: "Heuristics", topics: ["DRY", "KISS", "YAGNI", "Law of Demeter", "Fail-Fast", "Method Contracts"] }
-            ]
-        },
-        {
-            id: 3, title: "3. UML Blueprint", subtitle: "Visualizing Code",
+		{
+            id: 2, title: "2. UML Blueprint", subtitle: "Visualizing Code",
             groups: [
                 { name: "Structural", topics: ["Class Diagram", "UML Modifiers", "Cardinality"] },
                 { name: "Behavioral", topics: ["Use Case", "Sequence Diagram", "Activity Diagram", "State Machine", "System Boundary", "Sync vs Async"] }
             ]
         },
+        {
+            id: 3, title: "3. Design Principles", subtitle: "The Rules",
+            groups: [
+                { name: "SOLID", topics: ["SRP", "Open/Closed", "Liskov Substitution", "Interface Segregation", "Dependency Inversion"] },
+                { name: "Heuristics", topics: ["DRY", "KISS", "YAGNI", "Law of Demeter", "Fail-Fast", "Method Contracts"] }
+            ]
+        },
+        
         {
             id: 4, title: "4. Design Patterns", subtitle: "The Toolkit",
             groups: [
@@ -385,15 +386,14 @@
                 { name: "Behavioral", topics: ["Strategy", "Observer", "Command", "State", "Template Method", "Chain of Resp", "Iterator", "Visitor", "Mediator", "Memento"] }
             ]
         },
-        {
-            id: 5, title: "5. Advanced Arch", subtitle: "Technical Depth",
+		{
+            id: 5, title: "5. Data Modeling", subtitle: "Persistence",
             groups: [
-                { name: "Error Handling", topics: ["Checked vs Unchecked", "Custom Exceptions", "Propagation", "Optional vs Null"] },
-                { name: "Boundaries", topics: ["DTO vs Domain", "Validation Layer", "Anti-Corruption Layer", "Idempotency"] },
-                { name: "Config", topics: ["Config-Driven Design", "Feature Toggles", "Env Separation"] }
+                { name: "Design", topics: ["ER Diagrams", "Normalization", "Entity vs Value Object"] },
+                { name: "ORM", topics: ["ORM Mapping", "Lazy vs Eager", "Schema Evolution"] }
             ]
         },
-        {
+		 {
             id: 6, title: "6. Concurrency", subtitle: "Multithreading",
             groups: [
                 { name: "Basics", topics: ["Threads vs Processes", "Thread Lifecycle"] },
@@ -402,10 +402,11 @@
             ]
         },
         {
-            id: 7, title: "7. Data Modeling", subtitle: "Persistence",
+            id: 7, title: "7. Advanced Arch", subtitle: "Technical Depth",
             groups: [
-                { name: "Design", topics: ["ER Diagrams", "Normalization", "Entity vs Value Object"] },
-                { name: "ORM", topics: ["ORM Mapping", "Lazy vs Eager", "Schema Evolution"] }
+                { name: "Error Handling", topics: ["Checked vs Unchecked", "Custom Exceptions", "Propagation", "Optional vs Null"] },
+                { name: "Boundaries", topics: ["DTO vs Domain", "Validation Layer", "Anti-Corruption Layer", "Idempotency"] },
+                { name: "Config", topics: ["Config-Driven Design", "Feature Toggles", "Env Separation"] }
             ]
         },
         {
