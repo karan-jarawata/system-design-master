@@ -1,6 +1,19 @@
 {
   "Classes & Objects": {
-    "text": "<b>Core Concept:</b><br>\n<ul>\n    <li><b>Class:</b> The blueprint or template. It defines the structure (attributes) and capabilities (methods) common to all objects of that type. It does not occupy memory for data (mostly) until instantiated.</li>\n    <li><b>Object:</b> The instance of the class. It is a concrete entity created based on the blueprint that occupies memory and holds specific data values.</li>\n</ul>\n<br><br>\n<b>Why use them?</b><br>\n<ul>\n    <li><b>Modeling:</b> To represent real-world entities (e.g., <code>User</code>, <code>Payment</code>, <code>Button</code>) in code.</li>\n    <li><b>Encapsulation:</b> To bundle data (state) and methods (behavior) together, protecting the internal state from unauthorized access.</li>\n    <li><b>Reusability:</b> You write the code once (Class) and create as many instances (Objects) as needed.</li>\n</ul>\n<br><br>\n<b>Key Components:</b><br>\n<ul>\n    <li><b>State (Fields/Attributes):</b> Variables that hold data (e.g., color, speed).</li>\n    <li><b>Behavior (Methods):</b> Functions that operate on the state (e.g., <code>accelerate()</code>, <code>brake()</code>).</li>\n    <li><b>Identity:</b> Every object has a unique identity (memory address), even if two objects have the exact same data values.</li>\n</ul>\n<br><br>\n<b>Quick Code Snippet:</b>\n<pre><code>// The Blueprint (Class)\npublic class Car {\n    // State\n    String color;\n    int speed;\n\n    // Constructor (Initialization)\n    public Car(String color) {\n        this.color = color;\n        this.speed = 0;\n    }\n\n    // Behavior\n    public void accelerate() {\n        this.speed += 10;\n    }\n}\n\n// The Usage\npublic class Main {\n    public static void main(String[] args) {\n        // 'c1' is a reference variable, 'new Car()' creates the Object in Heap\n        Car c1 = new Car(\"Red\"); \n        c1.accelerate(); \n        \n        Car c2 = new Car(\"Blue\"); // Distinct identity from c1\n    }\n}</code></pre>\n<br><br>\n<b>Important Things to Remember (LLD Perspective):</b><br>\n<ul>\n    <li><b>Memory Allocation:</b>\n        <ul>\n            <li><b>Class:</b> Loaded into Method Area (Metaspace in modern Java).</li>\n            <li><b>Object:</b> Allocated on the <b>Heap</b>.</li>\n            <li><b>Reference:</b> The variable (e.g., <code>c1</code>) is stored on the <b>Stack</b> and points to the Heap address.</li>\n        </ul>\n    </li>\n    <li><b>The <code>this</code> keyword:</b> Refers to the current object instance. It resolves ambiguity between class fields and parameters.</li>\n    <li><b>Object Equality:</b>\n        <ul>\n            <li><code>==</code> checks if two references point to the same memory address (<b>Identity</b>).</li>\n            <li><code>.equals()</code> (if overridden) checks if two objects have the same content (<b>State</b>).</li>\n        </ul>\n    </li>\n    <li><b>Lifecycle:</b> Objects are created via constructors and destroyed by the Garbage Collector (GC) when they are no longer reachable.</li>\n    <li><b>Anemic vs. Rich Domain Models:</b>\n        <ul>\n            <li><b>Anemic:</b> Classes only have data (getters/setters) and no logic. (Common in DTOs).</li>\n            <li><b>Rich:</b> Classes contain both data and the business logic that modifies that data. (Preferred in good OOP/LLD).</li>\n        </ul>\n    </li>\n</ul>",
-    "images": []
+    "blocks": [
+      {
+        "type": "text",
+        "content": "<p><b>Core Concept:</b></p><ul><li><b>Class:</b> The blueprint...</li></ul>"
+      },
+      {
+        "type": "code",
+        "language": "java",
+        "content": "public class Car {\n    String color;\n    // ..."
+      },
+      {
+        "type": "text",
+        "content": "<p><b>Important Things to Remember:</b></p><ul><li>Memory Allocation...</li></ul>"
+      }
+    ]
   }
 }
