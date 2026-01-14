@@ -888,16 +888,31 @@ function copyToClipboard(elementId) {
     function updateStats() {
         const state = getState();
         const data = getData();
+        
+        // 1. Get all topics, but ensure we extract the TITLE string if it's an object
         const allTopics = data.flatMap(s => s.groups.flatMap(g => g.topics));
-        const totalDone = allTopics.filter(t => state.completed[t]).length;
+        
+        // FIX: Check 'typeof' to handle both Strings (HLD) and Objects (LLD)
+        const totalDone = allTopics.filter(t => {
+            const title = (typeof t === 'object' ? t.title : t);
+            return state.completed[title];
+        }).length;
+
         const globalPercent = Math.round((totalDone / allTopics.length) * 100) || 0;
 
         document.getElementById('masteryPercent').innerText = `${globalPercent}%`;
         document.getElementById('masteryBar').style.width = `${globalPercent}%`;
 
+        // 2. Update individual section pills
         data.forEach((section, idx) => {
             const sectionTopics = section.groups.flatMap(g => g.topics);
-            const sDone = sectionTopics.filter(t => state.completed[t]).length;
+            
+            // FIX: Same check here
+            const sDone = sectionTopics.filter(t => {
+                const title = (typeof t === 'object' ? t.title : t);
+                return state.completed[title];
+            }).length;
+
             const sPer = Math.round((sDone / sectionTopics.length) * 100) || 0;
             const pill = document.getElementById(`pill-${idx}`);
             if(pill) pill.innerText = `${sPer}%`;
@@ -962,6 +977,7 @@ function copyToClipboard(elementId) {
 </script>
 </body>
 </html>
+
 
 
 
