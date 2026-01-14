@@ -458,75 +458,123 @@
         .code-comment { color: #808080; font-style: italic; } /* Grey for comments */
 
 
-        /* --- PRIORITY TAGS & NOTES --- */
+       /* --- CLEANER CARD DESIGN --- */
 
-        /* Adjust card layout to stack text and notes */
         .topic-card {
-            /* Keep existing styles, just ensure flex-direction allows stacking if needed */
-            flex-direction: column; 
-            align-items: flex-start;
-            gap: 8px;
-            padding: 12px;
-        }
-        
-        /* The top row: Checkbox + Title + Badge */
-        .card-header-row {
+            /* Layout: Horizontal Flex */
             display: flex;
-            align-items: center;
-            width: 100%;
+            align-items: flex-start; /* Align items to top */
             gap: 12px;
+            padding: 14px;
+            
+            /* Box Styling */
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px; /* Slightly sharper corners */
+            position: relative;
+            transition: all 0.2s ease;
         }
         
-        .card-main {
+        /* Hover Effect: Lift and Border */
+        .topic-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        /* 1. Left: Checkbox Wrapper */
+        .checkbox-wrapper {
+            padding-top: 2px; /* Visual alignment with text */
+            flex-shrink: 0;
+        }
+        
+        /* 2. Middle: Content Column */
+        .card-content {
             flex: 1;
             display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 0; /* Prevents text overflow issues */
+        }
+        
+        /* The Title Row */
+        .card-header-line {
+            display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
+            flex-wrap: wrap;
         }
         
-        /* Priority Badges */
-        .badge {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 4px;
-            letter-spacing: 0.5px;
-            margin-left: auto; /* Push to right of title if space allows */
-        }
-        
-        /* Priority Colors */
-        .badge.high {
-            background: rgba(245, 158, 11, 0.15);
-            color: #f59e0b; /* Amber-500 */
-            border: 1px solid rgba(245, 158, 11, 0.3);
-        }
-        
-        .badge.medium {
-            background: rgba(59, 130, 246, 0.15);
-            color: #3b82f6; /* Blue-500 */
-            border: 1px solid rgba(59, 130, 246, 0.3);
-        }
-        
-        .badge.low {
-            background: rgba(113, 113, 122, 0.15);
-            color: #a1a1aa; /* Zinc-400 */
-            border: 1px solid rgba(113, 113, 122, 0.3);
-        }
-        
-        /* Personal Note Styling */
-        .topic-note {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-left: 34px; /* Align with text (checkbox width + gap) */
-            font-style: italic;
-            opacity: 0.8;
+        .topic-text {
+            font-weight: 600; /* Slightly bolder */
+            font-size: 0.95rem;
+            color: var(--text-primary);
             line-height: 1.2;
         }
         
-        /* Visual cue for High Priority cards */
+        /* The Note Row - Styled like a code comment */
+        .topic-note {
+            font-size: 0.8rem;
+            font-family: 'Consolas', 'Monaco', monospace; /* Monospace for dev feel */
+            color: var(--text-secondary);
+            opacity: 0.7;
+            line-height: 1.3;
+            display: flex;
+            align-items: center;
+        }
+        
+        /* 3. Right: Action Button */
+        .card-actions {
+            flex-shrink: 0;
+            margin-left: 4px;
+        }
+        
+        /* --- BADGES (REFINED) --- */
+        .badge {
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        
+        /* Priority Colors - Subtle Borders/Backgrounds */
+        .badge.high {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+        
+        .badge.medium {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        
+        .badge.low {
+            background: rgba(113, 113, 122, 0.1);
+            color: #a1a1aa;
+            border: 1px solid rgba(113, 113, 122, 0.2);
+        }
+        
+        /* Priority Border Cue (Optional: Left border strip) */
         .topic-card.prio-high {
             border-left: 3px solid #f59e0b;
+        }
+        .topic-card.prio-medium {
+            border-left: 3px solid #3b82f6; /* Optional: Blue border for medium */
+        }
+        
+        /* Completed State Styling */
+        .topic-card.completed .topic-text {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+        .topic-card.completed .badge, 
+        .topic-card.completed .topic-note {
+            opacity: 0.4;
         }
 
         
@@ -703,7 +751,6 @@
         let hasResults = false;
 
         section.groups.forEach(group => {
-            // Filter Logic: Handles both String ("Topic") and Object ({title: "Topic"})
             const filteredTopics = group.topics.filter(item => {
                 const title = (typeof item === 'object' ? item.title : item);
                 return title.toLowerCase().includes(searchVal);
@@ -714,12 +761,11 @@
                 html += `<div class="group-section"><div class="group-title">${group.name}</div><div class="topic-grid">`;
                 
                 filteredTopics.forEach(item => {
-                    // 1. Normalize Data
+                    // Data prep
                     let title, priority, note;
-                    
                     if (typeof item === 'object') {
                         title = item.title;
-                        priority = item.priority || 'none'; // high, medium, low
+                        priority = item.priority || 'none'; 
                         note = item.note || '';
                     } else {
                         title = item; 
@@ -728,34 +774,38 @@
                     }
 
                     const safeId = 'card-' + title.replace(/[^a-zA-Z0-9]/g, ''); 
-                    const isDone = state.completed[title]; // Use title for completion key
-                    
-                    // 2. Badge HTML
+                    const isDone = state.completed[title]; 
+
+                    // Badges
                     let badgeHtml = '';
                     if (priority === 'high') badgeHtml = `<span class="badge high">Most Imp</span>`;
                     else if (priority === 'medium') badgeHtml = `<span class="badge medium">Imp</span>`;
                     else if (priority === 'low') badgeHtml = `<span class="badge low">OK-OK</span>`;
 
-                    // 3. Note HTML
-                    let noteHtml = note ? `<div class="topic-note"><i class="fas fa-sticky-note" style="margin-right:4px"></i>${note}</div>` : '';
+                    // Note with "//" prefix for dev look
+                    let noteHtml = note ? `<div class="topic-note">// ${note}</div>` : '';
 
-                    // 4. Render Card
+                    // === NEW CARD HTML STRUCTURE ===
                     html += `
                     <div id="${safeId}" class="topic-card ${isDone ? 'completed' : ''} prio-${priority}" onclick="handleTopicClick('${title}', '${safeId}')">
                         
-                        <div class="card-header-row">
+                        <div class="checkbox-wrapper">
                             <div class="checkbox"></div>
-                            <span class="topic-text">${title}</span>
-                            ${badgeHtml}
-                            
-                            <div class="card-actions" style="margin-left: auto;">
-                                <div class="btn-action" onclick="openModal(event, '${title}')" title="View Notes">
-                                    <i class="fas fa-book-open"></i>
-                                </div>
-                            </div>
                         </div>
 
-                        ${noteHtml}
+                        <div class="card-content">
+                            <div class="card-header-line">
+                                <span class="topic-text">${title}</span>
+                                ${badgeHtml}
+                            </div>
+                            ${noteHtml}
+                        </div>
+
+                        <div class="card-actions">
+                            <div class="btn-action" onclick="openModal(event, '${title}')" title="View Notes">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                        </div>
 
                     </div>`;
                 });
@@ -977,6 +1027,7 @@ function copyToClipboard(elementId) {
 </script>
 </body>
 </html>
+
 
 
 
