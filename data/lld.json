@@ -102,7 +102,7 @@
         "topics": [
           "Singleton (DD)",
           "Factory Method (DD)",
-          "Builder (DD)",
+          "Builder (DD)"
         ]
       },
       {
@@ -309,5 +309,6 @@
     ]
   }
 ]
+
 
 
