@@ -273,13 +273,15 @@
         }
         .topic-card.completed .checkbox::after { transform: rotate(45deg) scale(1); }
 
+        /* MODIFIED: Enabled selection on topic text */
         .topic-text { 
             font-size: 0.95rem; font-weight: 500; color: var(--text-primary); transition: color 0.2s;
-            user-select: none;
+            user-select: text; /* Allow Selection */
+            cursor: text;     /* Show Text Cursor */
         }
         .topic-card.completed .topic-text { color: var(--accent); text-decoration: line-through; opacity: 0.8; }
 
-        /* Action Buttons (Notes & Copy) */
+        /* Action Buttons (Notes) */
         .card-actions {
             display: flex; gap: 6px;
         }
@@ -300,14 +302,10 @@
             color: var(--accent); border-color: var(--accent); background: var(--accent-light);
         }
 
-        .btn-action.copied {
-            background: var(--success); color: white; border-color: var(--success);
-        }
-
         @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .empty-state { text-align: center; padding: 4rem 0; color: var(--text-secondary); }
 
-        /* ================= MODAL STYLES (NEW) ================= */
+        /* ================= MODAL STYLES ================= */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--modal-overlay);
@@ -549,11 +547,7 @@
                             <div class="btn-action" onclick="openModal(event, '${topic}')" title="View Notes">
                                 <i class="fas fa-book-open"></i>
                             </div>
-
-                            <div class="btn-action" onclick="copyText(event, '${topic}', this)" title="Copy Topic Name">
-                                <i class="fas fa-copy"></i>
                             </div>
-                        </div>
 
                     </div>`;
                 });
@@ -575,6 +569,11 @@
     }
 
     function handleTopicClick(topicName, elementId) {
+        // === SMART SELECTION CHECK ===
+        // If the user has highlighted text (length > 0), DO NOT toggle completion
+        const selection = window.getSelection();
+        if(selection.toString().length > 0) return; 
+
         const state = getState();
         state.completed[topicName] = !state.completed[topicName];
         saveState();
@@ -596,7 +595,7 @@
         }
     }
 
-    // ================= NEW MODAL LOGIC =================
+    // ================= MODAL LOGIC =================
     function openModal(e, key) {
         e.stopPropagation(); // Prevent card completion click
         
@@ -669,14 +668,6 @@
     }
 
     // ================= UTILITIES =================
-    function copyText(e, text, btn) {
-        e.stopPropagation(); 
-        navigator.clipboard.writeText(text).then(() => {
-            btn.classList.add('copied');
-            setTimeout(() => btn.classList.remove('copied'), 1500);
-        });
-    }
-
     function updateStats() {
         const state = getState();
         const data = getData();
