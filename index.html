@@ -444,173 +444,48 @@
 <script>
     // ================= DATA REPOSITORIES =================
 
-    // - LLD Data
-    const LLD_DATA = [
-        {
-            id: 1, title: "1. OOP Physics", subtitle: "The Foundation",
-            groups: [
-                { name: "Core Concepts", topics: ["Classes & Objects", "Interfaces", "Inheritance", "Polymorphism", "Abstraction", "Encapsulation", "Access Modifiers", "Object Lifecycle", "Stack vs Heap"] },
-                { name: "Relationships", topics: ["Association", "Aggregation", "Composition", "Composition over Inheritance"] },
-                { name: "Mechanics", topics: ["Diamond Problem", "Dynamic Dispatch", "Immutability", "Abstract Class vs Interface"] }
-            ]
-        },
-		{
-            id: 2, title: "2. UML Blueprint", subtitle: "Visualizing Code",
-            groups: [
-                { name: "Structural", topics: ["Class Diagram", "UML Modifiers", "Cardinality"] },
-                { name: "Behavioral", topics: ["Use Case", "Sequence Diagram", "Activity Diagram", "State Machine", "System Boundary", "Sync vs Async"] }
-            ]
-        },
-        {
-            id: 3, title: "3. Design Principles", subtitle: "The Rules",
-            groups: [
-                { name: "SOLID", topics: ["SRP", "Open/Closed", "Liskov Substitution", "Interface Segregation", "Dependency Inversion"] },
-                { name: "Heuristics", topics: ["DRY", "KISS", "YAGNI", "Law of Demeter", "Fail-Fast", "Method Contracts"] }
-            ]
-        },
-        
-        {
-            id: 4, title: "4. Design Patterns", subtitle: "The Toolkit",
-            groups: [
-                { name: "Creational", topics: ["Singleton", "Factory Method", "Abstract Factory", "Builder", "Prototype"] },
-                { name: "Structural", topics: ["Adapter", "Facade", "Decorator", "Composite", "Proxy", "Bridge", "Flyweight"] },
-                { name: "Behavioral", topics: ["Strategy", "Observer", "Command", "State", "Template Method", "Chain of Resp", "Iterator", "Visitor", "Mediator", "Memento"] }
-            ]
-        },
-		{
-            id: 5, title: "5. Data Modeling", subtitle: "Persistence",
-            groups: [
-                { name: "Design", topics: ["ER Diagrams", "Normalization", "Entity vs Value Object"] },
-                { name: "ORM", topics: ["ORM Mapping", "Lazy vs Eager", "Schema Evolution"] }
-            ]
-        },
-		 {
-            id: 6, title: "6. Concurrency", subtitle: "Multithreading",
-            groups: [
-                { name: "Basics", topics: ["Threads vs Processes", "Thread Lifecycle"] },
-                { name: "Sync", topics: ["Locks", "ReentrantLock", "Volatile", "Atomic Ops"] },
-                { name: "Tools", topics: ["ExecutorService", "Concurrent Collections", "Thread-Safety", "Immutability"] }
-            ]
-        },
-        {
-            id: 7, title: "7. Advanced Arch", subtitle: "Technical Depth",
-            groups: [
-                { name: "Error Handling", topics: ["Checked vs Unchecked", "Custom Exceptions", "Propagation", "Optional vs Null"] },
-                { name: "Boundaries", topics: ["DTO vs Domain", "Validation Layer", "Anti-Corruption Layer", "Idempotency"] },
-                { name: "Config", topics: ["Config-Driven Design", "Feature Toggles", "Env Separation"] }
-            ]
-        },
-        {
-            id: 8, title: "8. Observability", subtitle: "Production Ready",
-            groups: [
-                { name: "Time", topics: ["TTL Logic", "Schedulers", "Delayed Tasks", "Clock Abstraction"] },
-                { name: "Logs", topics: ["Logging Levels", "Correlation IDs", "Audit Logs", "Debuggability"] },
-                { name: "Testing", topics: ["Unit Tests", "DI", "Mocking", "Test Seams", "Over-Engineering", "Perf vs Readability"] }
-            ]
-        },
-        {
-            id: 9, title: "9. Machine Coding", subtitle: "The Gauntlet",
-            groups: [
-                { name: "Easy", topics: ["Tic-Tac-Toe", "Snake & Ladder", "LRU Cache", "Parking Lot", "Task Manager"] },
-                { name: "Medium", topics: ["Stack Overflow", "ATM", "Logger", "PubSub", "Elevator", "Splitwise", "Vending Machine", "Car Rental", "Hotel Mgmt", "Digital Wallet", "Airline Mgmt", "Library Mgmt", "Traffic Signal", "Concert Ticket", "Social Network"] },
-                { name: "Hard", topics: ["Spotify", "Amazon", "LinkedIn", "CricInfo", "Chess", "Coffee Vending", "Restaurant Mgmt", "Stock Exchange", "Course Registration", "BookMyShow", "Online Auction", "Food Delivery", "Ride-Sharing"] }
-            ]
-        }
-    ];
+    // ================= GLOBAL VARIABLES =================
+    // Initialize as empty; we will fill them via Fetch
+    let LLD_DATA = [];
+    let HLD_DATA = [];
+    let TOPIC_DETAILS = {};
 
-    // - HLD Data
-    const HLD_DATA = [
-        {
-            id: 1, title: "1. Foundations", subtitle: "Distributed Systems",
-            groups: [
-                { name: "Architecture", topics: ["Client-Server", "Monolithic vs Microservices", "Serverless (FaaS)"] },
-                { name: "Scaling", topics: ["Vertical vs Horizontal Scaling", "Latency vs Throughput", "Stateless vs Stateful"] },
-                { name: "Comms", topics: ["HTTP/1.1 vs HTTP/2", "TCP vs UDP", "WebSocket", "REST", "GraphQL", "gRPC", "Polling vs SSE"] }
-            ]
-        },
-        {
-            id: 2, title: "2. The Rules", subtitle: "Principles & Theorems",
-            groups: [
-                { name: "Consistency", topics: ["CAP Theorem", "PACELC Theorem", "Strong vs Eventual Consistency", "BASE Properties"] },
-                { name: "Transactions", topics: ["ACID Transactions"] },
-                { name: "Reliability", topics: ["Single Point of Failure", "Fallacies of Distributed Computing", "Amdahl's Law", "Backpressure"] }
-            ]
-        },
-        {
-            id: 3, title: "3. System Toolkit", subtitle: "Components",
-            groups: [
-                { name: "Load Balancing", topics: ["L4 vs L7 LB", "Round Robin", "Consistent Hashing", "Health Checks"] },
-                { name: "Caching", topics: ["Write-through", "Write-back", "Cache-aside", "Eviction (LRU/LFU)", "Redis/Memcached", "CDN"] },
-                { name: "Messaging", topics: ["Pub-Sub vs P2P", "Kafka vs RabbitMQ", "Dead Letter Queues"] },
-                { name: "Proxies", topics: ["Forward vs Reverse Proxy", "API Gateway vs LB"] }
-            ]
-        },
-        {
-            id: 4, title: "4. Data Architecture", subtitle: "Storage",
-            groups: [
-                { name: "DB Types", topics: ["RDBMS (MySQL)", "NoSQL (Mongo, Dynamo)", "Columnar (Cassandra)", "Graph (Neo4j)"] },
-                { name: "Scaling Data", topics: ["Replication (Master-Slave)", "Sharding & Keys", "Federation"] },
-                { name: "Advanced", topics: ["B-Trees vs LSM Trees", "Bloom Filters", "Quorum Consensus", "Paxos & Raft"] }
-            ]
-        },
-        {
-            id: 5, title: "5. Advanced Arch", subtitle: "Resilience & Security",
-            groups: [
-                { name: "Transactions", topics: ["2-Phase Commit", "3-Phase Commit", "Saga Pattern"] },
-                { name: "Resilience", topics: ["Circuit Breaker", "Bulkhead", "Retry & Jitter", "Rate Limiting", "Idempotency"] },
-                { name: "Security", topics: ["OAuth 2.0 / JWT", "SSL/TLS Handshake", "Encryption", "DDoS Mitigation"] }
-            ]
-        },
-        {
-            id: 6, title: "6. Observability", subtitle: "Ops & Metrics",
-            groups: [
-                { name: "Monitoring", topics: ["Metrics (Prometheus)", "Dashboards (Grafana)"] },
-                { name: "Logging", topics: ["ELK Stack", "Structured Logging"] },
-                { name: "Tracing", topics: ["Distributed Tracing", "Span Context"] },
-                { name: "Deploy", topics: ["Blue-Green", "Canary", "Rolling Updates"] }
-            ]
-        },
-        {
-            id: 7, title: "7. Patterns", subtitle: "Architectural Patterns",
-            groups: [
-                { name: "Modern Patterns", topics: ["Sidecar", "Ambassador", "Strangler Fig", "CQRS", "Event Sourcing", "Service Discovery"] }
-            ]
-        },
-        {
-            id: 8, title: "8. The Gauntlet", subtitle: "Interview Questions",
-            groups: [
-                { name: "Easy", topics: ["URL Shortener", "Key-Value Store", "ID Generator", "Pastebin"] },
-                { name: "Medium", topics: ["Chat System", "Social Feed", "Notification Service", "Rate Limiter", "Typeahead/Search", "Web Crawler", "Google Drive"] },
-                { name: "Hard", topics: ["Video Streaming (Netflix)", "Ride Hailing (Uber)", "E-Commerce (Amazon)", "Location Service (Yelp)", "Distributed Search", "Payment System", "Metrics Monitoring", "Live Streaming", "Ticket Booking"] }
-            ]
-        }
-    ];
-
-	// ================= REVISION CONTENT (KB) =================
-    const TOPIC_DETAILS = {
-        "Singleton": {
-            text: "Ensures a class has only one instance.",
-            // You can now list multiple files here
-            images: ["singleton_class_diagram.png", "singleton_sequence.png"] 
-        },
-        "CAP Theorem": {
-            text: "Pick two: Consistency, Availability, Partition Tolerance.",
-            // It still works if you only put one image in the list
-            images: ["cap_triangle.png"]
-        }
-    };
-
-    // ================= APP LOGIC =================
-
-    // Config
+  // ================= APP LOGIC =================
     const CONFIG = {
-        mode: localStorage.getItem('app_mode') || 'LLD', // 'LLD' or 'HLD'
+        mode: localStorage.getItem('app_mode') || 'LLD',
     };
 
-    // State Stores (Separate for LLD and HLD)
     let lldState = JSON.parse(localStorage.getItem('lld_master_state')) || { activeTab: 0, completed: {} };
     let hldState = JSON.parse(localStorage.getItem('hld_master_state')) || { activeTab: 0, completed: {} };
 
+    // --- DATA FETCHING (NEW) ---
+    async function loadDataAndInit() {
+        try {
+            // Show loading state in header
+            document.getElementById('headerTitle').innerText = "Loading Knowledge Base...";
+            
+            // Fetch all 3 files in parallel
+            const [lldRes, hldRes, detailsRes] = await Promise.all([
+                fetch('data/lld.json'),
+                fetch('data/hld.json'),
+                fetch('data/details.json')
+            ]);
+
+            // Parse JSON
+            LLD_DATA = await lldRes.json();
+            HLD_DATA = await hldRes.json();
+            TOPIC_DETAILS = await detailsRes.json();
+
+            // Data loaded -> Start the App
+            initDashboard();
+            initSecretSwitch();
+
+        } catch (error) {
+            console.error("Error loading data:", error);
+            document.getElementById('headerTitle').innerText = "Error Loading Data";
+            document.getElementById('headerSubtitle').innerText = "Please run this on a Local Server (vs code Live Server)";
+        }
+    }
     // Current Context Helpers
     function getData() { return CONFIG.mode === 'LLD' ? LLD_DATA : HLD_DATA; }
     function getState() { return CONFIG.mode === 'LLD' ? lldState : hldState; }
@@ -904,11 +779,13 @@
     window.onload = () => {
         initDashboard();
         initSecretSwitch();
+		loadDataAndInit();
     };
 
 </script>
 </body>
 </html>
+
 
 
 
