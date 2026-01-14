@@ -95,43 +95,36 @@
   {
     "id": 4,
     "title": "4. Design Patterns",
-    "subtitle": "The Toolkit",
+    "subtitle": "The Toolkit - Daily Drivers(DD)MOST IMP , Framework Architecture(FA) IMP, GOOD TO KNOW(GK) OKOK",
     "groups": [
       {
         "name": "Creational",
         "topics": [
-          "Singleton",
-          "Factory Method",
-          "Abstract Factory",
-          "Builder",
-          "Prototype"
+          "Singleton (DD)",
+          "Factory Method (DD)",
+          "Builder (DD)",
         ]
       },
       {
         "name": "Structural",
         "topics": [
-          "Adapter",
-          "Facade",
-          "Decorator",
-          "Composite",
-          "Proxy",
-          "Bridge",
-          "Flyweight"
+          "Adapter (DD)",
+          "Facade (FA)",
+          "Decorator (FA)",
+          "Composite (GK)",
+          "Proxy (FA)",
         ]
       },
       {
         "name": "Behavioral",
         "topics": [
-          "Strategy",
-          "Observer",
-          "Command",
-          "State",
-          "Template Method",
-          "Chain of Resp",
-          "Iterator",
-          "Visitor",
-          "Mediator",
-          "Memento"
+          "Strategy (DD)",
+          "Observer (DD)",
+          "Command (GK)",
+          "State (GK)",
+          "Template Method (FA)",
+          "Chain of Resp (FA)",
+          "Iterator (GK)",
         ]
       }
     ]
@@ -316,3 +309,4 @@
     ]
   }
 ]
+
