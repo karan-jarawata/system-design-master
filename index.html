@@ -554,19 +554,15 @@
 	// ================= REVISION CONTENT (KB) =================
     const TOPIC_DETAILS = {
         "Singleton": {
-            text: "Ensures a class has only one instance and provides a global point of access to it.",
-            code: "public class Singleton {\n  private static Singleton instance;\n  private Singleton() {}\n  public static Singleton getInstance() {\n    if (instance == null) instance = new Singleton();\n    return instance;\n  }\n}",
-            image: "singleton_diagram.png" // Assumes file is in an 'images' folder
-        },
-        "Factory Method": {
-            text: "Defines an interface for creating an object, but let subclasses decide which class to instantiate.",
-            image: "factory_pattern.png" 
+            text: "Ensures a class has only one instance.",
+            // You can now list multiple files here
+            images: ["singleton_class_diagram.png", "singleton_sequence.png"] 
         },
         "CAP Theorem": {
-            text: "In a distributed system, you can only pick 2 out of 3: Consistency, Availability, Partition Tolerance.",
-            code: "P (Partition Tolerance) is mandatory in distributed systems.\nSo the choice is always between CP (Consistency) or AP (Availability)."
+            text: "Pick two: Consistency, Availability, Partition Tolerance.",
+            // It still works if you only put one image in the list
+            images: ["cap_triangle.png"]
         }
-        // Add more topics here exactly as they appear in your lists
     };
 
     // ================= APP LOGIC =================
@@ -784,18 +780,31 @@
     }
 
 	// --- TOOLTIP LOGIC ---
-    function showTooltip(e, topic) {
+   function showTooltip(e, topic) {
         const details = TOPIC_DETAILS[topic];
-        if (!details) return; // Do nothing if no notes exist
+        if (!details) return; 
 
         const tooltip = document.getElementById('revision-tooltip');
         
         // Build Content
         let content = `<span class="tt-title">${topic}</span>`;
+        
+        // 1. Add Text
         if (details.text) content += `<div class="tt-body">${details.text}</div>`;
+        
+        // 2. Add Code
         if (details.code) content += `<div class="tt-code">${details.code}</div>`;
-        // Looks for images in an 'images/' folder relative to the index.html
-        if (details.image) content += `<img src="images/${details.image}" class="tt-img" onerror="this.style.display='none'">`;
+        
+        // 3. Add Multiple Images
+        if (details.images && Array.isArray(details.images)) {
+            details.images.forEach(img => {
+                content += `<img src="images/${img}" class="tt-img" onerror="this.style.display='none'">`;
+            });
+        } 
+        // Fallback: Support old single 'image' property just in case
+        else if (details.image) {
+            content += `<img src="images/${details.image}" class="tt-img" onerror="this.style.display='none'">`;
+        }
 
         tooltip.innerHTML = content;
         tooltip.classList.add('visible');
@@ -865,4 +874,5 @@
 </script>
 </body>
 </html>
+
 
