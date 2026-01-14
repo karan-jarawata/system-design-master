@@ -1,12 +1,17 @@
 {
-        "Singleton": {
-            text: "Ensures a class has only one instance.",
-            // You can now list multiple files here
-            images: ["singleton_class_diagram.png", "singleton_sequence.png"] 
-        },
-        "CAP Theorem": {
-            text: "Pick two: Consistency, Availability, Partition Tolerance.",
-            // It still works if you only put one image in the list
-            images: ["cap_triangle.png"]
-        }
-    }
+  "Singleton Pattern": {
+    "text": "Ensures a class has only one instance and provides a global point of access to it.",
+    "images": [
+      "singleton_class_diagram.png",
+      "singleton_thread_safe_example.png"
+    ],
+    "code": "public class Singleton { private static Singleton instance; private Singleton(){} public static Singleton getInstance() { if (instance == null) instance = new Singleton(); return instance; } }"
+  },
+  "CAP Theorem": {
+    "text": "In a distributed computer system, you can only provide two of the following three guarantees: Consistency, Availability, and Partition Tolerance.",
+    "images": [
+      "cap_triangle_diagram.png"
+    ],
+    "code": null
+  }
+}
