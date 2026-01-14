@@ -1,0 +1,12 @@
+{
+        "Singleton": {
+            text: "Ensures a class has only one instance.",
+            // You can now list multiple files here
+            images: ["singleton_class_diagram.png", "singleton_sequence.png"] 
+        },
+        "CAP Theorem": {
+            text: "Pick two: Consistency, Availability, Partition Tolerance.",
+            // It still works if you only put one image in the list
+            images: ["cap_triangle.png"]
+        }
+    }
