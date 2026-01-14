@@ -304,6 +304,60 @@
         @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .empty-state { text-align: center; padding: 4rem 0; color: var(--text-secondary); }
 
+
+		/* --- REVISION TOOLTIP --- */
+        #revision-tooltip {
+            position: fixed;
+            z-index: 1000;
+            width: 380px;
+            max-height: 500px;
+            overflow-y: auto;
+            background: var(--bg-card);
+            border: 1px solid var(--accent);
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, transform 0.2s;
+            pointer-events: none; /* Prevents flickering */
+            transform: translateY(10px);
+            font-size: 0.9rem;
+        }
+
+        #revision-tooltip.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        /* Tooltip Content Styling */
+        .tt-title { font-weight: 700; color: var(--accent); margin-bottom: 0.5rem; display: block; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+        .tt-body { color: var(--text-secondary); line-height: 1.5; }
+        
+        /* Images inside tooltip */
+        .tt-img { 
+            width: 100%; 
+            height: auto; 
+            border-radius: 6px; 
+            margin: 10px 0; 
+            border: 1px solid var(--border); 
+        }
+
+        /* Code Blocks inside tooltip */
+        .tt-code {
+            background: var(--bg-sidebar);
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.8rem;
+            color: var(--text-primary);
+            margin: 10px 0;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
     </style>
 </head>
 <body data-mode="LLD">
@@ -349,6 +403,8 @@
         <div class="content-wrapper" id="contentArea"></div>
     </div>
 </main>
+
+	<div id="revision-tooltip"></div>
 
 <script>
     // ================= DATA REPOSITORIES =================
@@ -495,6 +551,24 @@
         }
     ];
 
+	// ================= REVISION CONTENT (KB) =================
+    const TOPIC_DETAILS = {
+        "Singleton": {
+            text: "Ensures a class has only one instance and provides a global point of access to it.",
+            code: "public class Singleton {\n  private static Singleton instance;\n  private Singleton() {}\n  public static Singleton getInstance() {\n    if (instance == null) instance = new Singleton();\n    return instance;\n  }\n}",
+            image: "singleton_diagram.png" // Assumes file is in an 'images' folder
+        },
+        "Factory Method": {
+            text: "Defines an interface for creating an object, but let subclasses decide which class to instantiate.",
+            image: "factory_pattern.png" 
+        },
+        "CAP Theorem": {
+            text: "In a distributed system, you can only pick 2 out of 3: Consistency, Availability, Partition Tolerance.",
+            code: "P (Partition Tolerance) is mandatory in distributed systems.\nSo the choice is always between CP (Consistency) or AP (Availability)."
+        }
+        // Add more topics here exactly as they appear in your lists
+    };
+
     // ================= APP LOGIC =================
 
     // Config
@@ -608,15 +682,21 @@
                     const isDone = state.completed[topic];
                     // IMPORTANT: Added copy button inside card
                     html += `
-                        <div id="${safeId}" class="topic-card ${isDone ? 'completed' : ''}" onclick="handleTopicClick('${topic}', '${safeId}')">
-                            <div class="checkbox"></div>
-                            <span class="topic-text">${topic}</span>
-                            <div class="copy-btn" onclick="copyText(event, '${topic}', this)" title="Copy topic">
-                                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
-                                </svg>
-                            </div>
-                        </div>`;
+					    <div id="${safeId}" 
+					         class="topic-card ${isDone ? 'completed' : ''}" 
+					         onclick="handleTopicClick('${topic}', '${safeId}')"
+					         onmouseenter="showTooltip(event, '${topic}')"
+					         onmouseleave="hideTooltip()">
+					         
+					        <div class="checkbox"></div>
+					        <span class="topic-text">${topic}</span>
+					        
+					        <div class="copy-btn" onclick="copyText(event, '${topic}', this)" title="Copy topic">
+					            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+					            </svg>
+					        </div>
+					    </div>`;
                 });
                 html += `</div></div>`;
             }
@@ -703,6 +783,53 @@
         return { globalPercent };
     }
 
+	// --- TOOLTIP LOGIC ---
+    function showTooltip(e, topic) {
+        const details = TOPIC_DETAILS[topic];
+        if (!details) return; // Do nothing if no notes exist
+
+        const tooltip = document.getElementById('revision-tooltip');
+        
+        // Build Content
+        let content = `<span class="tt-title">${topic}</span>`;
+        if (details.text) content += `<div class="tt-body">${details.text}</div>`;
+        if (details.code) content += `<div class="tt-code">${details.code}</div>`;
+        // Looks for images in an 'images/' folder relative to the index.html
+        if (details.image) content += `<img src="images/${details.image}" class="tt-img" onerror="this.style.display='none'">`;
+
+        tooltip.innerHTML = content;
+        tooltip.classList.add('visible');
+
+        positionTooltip(e, tooltip);
+    }
+
+    function hideTooltip() {
+        const tooltip = document.getElementById('revision-tooltip');
+        tooltip.classList.remove('visible');
+    }
+
+    function positionTooltip(e, tooltip) {
+        const x = e.clientX + 20; // 20px right of cursor
+        const y = e.clientY + 20; // 20px below cursor
+        
+        // Basic boundary check (prevent going off screen)
+        const rect = tooltip.getBoundingClientRect();
+        const winWidth = window.innerWidth;
+        const winHeight = window.innerHeight;
+
+        let finalX = x;
+        let finalY = y;
+
+        // If clips right, move to left of cursor
+        if (x + rect.width > winWidth) finalX = e.clientX - rect.width - 20;
+        
+        // If clips bottom, move up
+        if (y + rect.height > winHeight) finalY = e.clientY - rect.height - 20;
+
+        tooltip.style.left = `${finalX}px`;
+        tooltip.style.top = `${finalY}px`;
+    }
+
     // --- UTILS ---
     function triggerSectionConfetti() {
         const color = CONFIG.mode === 'LLD' ? '#2563eb' : '#8b5cf6';
@@ -738,3 +865,4 @@
 </script>
 </body>
 </html>
+
