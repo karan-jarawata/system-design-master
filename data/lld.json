@@ -112,7 +112,7 @@
           "Facade (FA)",
           "Decorator (FA)",
           "Composite (GK)",
-          "Proxy (FA)",
+          "Proxy (FA)"
         ]
       },
       {
@@ -124,7 +124,7 @@
           "State (GK)",
           "Template Method (FA)",
           "Chain of Resp (FA)",
-          "Iterator (GK)",
+          "Iterator (GK)"
         ]
       }
     ]
@@ -309,4 +309,5 @@
     ]
   }
 ]
+
 
