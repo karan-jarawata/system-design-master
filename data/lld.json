@@ -7,33 +7,33 @@
       {
         "name": "Core Concepts",
         "topics": [
-          "Classes & Objects",
-          "Interfaces",
-          "Inheritance",
-          "Polymorphism",
-          "Abstraction",
-          "Encapsulation",
-          "Access Modifiers",
-          "Object Lifecycle",
-          "Stack vs Heap"
+          { "title": "Classes & Objects", "priority": "high", "note": "The atom of OOP. Know memory layout." },
+          { "title": "Interfaces", "priority": "high", "note": "Contracts over implementation. Essential for decoupling." },
+          { "title": "Inheritance", "priority": "medium", "note": "Don't overuse. Can lead to tight coupling." },
+          { "title": "Polymorphism", "priority": "high", "note": "Runtime magic. The basis of all flexible code." },
+          { "title": "Abstraction", "priority": "high", "note": "Hiding complexity. API design 101." },
+          { "title": "Encapsulation", "priority": "high", "note": "Protecting state. Getters/Setters are just the start." },
+          { "title": "Access Modifiers", "priority": "medium", "note": "Package-private vs Protected plays a big role in library design." },
+          { "title": "Object Lifecycle", "priority": "low", "note": "Creation to Garbage Collection." },
+          { "title": "Stack vs Heap", "priority": "high", "note": "Crucial for debugging OOM errors and performance." }
         ]
       },
       {
         "name": "Relationships",
         "topics": [
-          "Association",
-          "Aggregation",
-          "Composition",
-          "Composition over Inheritance"
+          { "title": "Association", "priority": "low", "note": "General link between objects." },
+          { "title": "Aggregation", "priority": "low", "note": "Has-a relationship (weak)." },
+          { "title": "Composition", "priority": "high", "note": "Has-a relationship (strong). Owns the lifecycle." },
+          { "title": "Composition over Inheritance", "priority": "high", "note": "The golden rule of modern OOD. Flexible & testable." }
         ]
       },
       {
         "name": "Mechanics",
         "topics": [
-          "Diamond Problem",
-          "Dynamic Dispatch",
-          "Immutability",
-          "Abstract Class vs Interface"
+          { "title": "Diamond Problem", "priority": "medium", "note": "Why Java doesn't have multiple class inheritance." },
+          { "title": "Dynamic Dispatch", "priority": "low", "note": "How the compiler decides which method to call." },
+          { "title": "Immutability", "priority": "high", "note": "Thread-safe by default. Key for caching and DTOs." },
+          { "title": "Abstract Class vs Interface", "priority": "high", "note": "Classic interview question. Know the 'is-a' vs 'can-do' distinction." }
         ]
       }
     ]
@@ -46,20 +46,20 @@
       {
         "name": "Structural",
         "topics": [
-          "Class Diagram",
-          "UML Modifiers",
-          "Cardinality"
+          { "title": "Class Diagram", "priority": "high", "note": "You will draw this in every LLD interview." },
+          { "title": "UML Modifiers", "priority": "low", "note": "+, -, #. Just know the basics." },
+          { "title": "Cardinality", "priority": "medium", "note": "1:1, 1:N. Important for DB schema mapping." }
         ]
       },
       {
         "name": "Behavioral",
         "topics": [
-          "Use Case",
-          "Sequence Diagram",
-          "Activity Diagram",
-          "State Machine",
-          "System Boundary",
-          "Sync vs Async"
+          { "title": "Use Case", "priority": "medium", "note": "Defining scope and actors." },
+          { "title": "Sequence Diagram", "priority": "high", "note": "Vital for showing API flows and async processes." },
+          { "title": "Activity Diagram", "priority": "low", "note": "Flowcharts for algorithms." },
+          { "title": "State Machine", "priority": "medium", "note": "Crucial for payment flows and order management." },
+          { "title": "System Boundary", "priority": "low", "note": "What is inside vs outside your app." },
+          { "title": "Sync vs Async", "priority": "high", "note": "Blocking vs Non-blocking communication." }
         ]
       }
     ]
@@ -72,22 +72,22 @@
       {
         "name": "SOLID",
         "topics": [
-          "SRP",
-          "Open/Closed",
-          "Liskov Substitution",
-          "Interface Segregation",
-          "Dependency Inversion"
+          { "title": "SRP", "priority": "high", "note": "Single Responsibility. One reason to change." },
+          { "title": "Open/Closed", "priority": "high", "note": "Extend functionality without touching existing code." },
+          { "title": "Liskov Substitution", "priority": "medium", "note": "Subtypes must behave like parent types." },
+          { "title": "Interface Segregation", "priority": "high", "note": "No fat interfaces. Clients shouldn't depend on what they don't use." },
+          { "title": "Dependency Inversion", "priority": "high", "note": "Depend on abstractions, not concretions. Basis of DI frameworks." }
         ]
       },
       {
         "name": "Heuristics",
         "topics": [
-          "DRY",
-          "KISS",
-          "YAGNI",
-          "Law of Demeter",
-          "Fail-Fast",
-          "Method Contracts"
+          { "title": "DRY", "priority": "medium", "note": "Don't Repeat Yourself." },
+          { "title": "KISS", "priority": "medium", "note": "Keep It Simple, Stupid. Complexity is the enemy." },
+          { "title": "YAGNI", "priority": "medium", "note": "You Ain't Gonna Need It. Avoid over-engineering." },
+          { "title": "Law of Demeter", "priority": "low", "note": "Don't talk to strangers. a.getB().getC().do() is bad." },
+          { "title": "Fail-Fast", "priority": "high", "note": "Validate inputs early. Throw exceptions immediately." },
+          { "title": "Method Contracts", "priority": "low", "note": "Preconditions and Postconditions." }
         ]
       }
     ]
@@ -95,36 +95,36 @@
   {
     "id": 4,
     "title": "4. Design Patterns",
-    "subtitle": "The Toolkit - Daily Drivers(DD)MOST IMP , Framework Architecture(FA) IMP, GOOD TO KNOW(GK) OKOK",
+    "subtitle": "The Toolkit",
     "groups": [
       {
         "name": "Creational",
         "topics": [
-          "Singleton (DD)",
-          "Factory Method (DD)",
-          "Builder (DD)"
+          { "title": "Singleton (DD)", "priority": "high", "note": "DB Connections, Config Loaders. Watch out for thread safety." },
+          { "title": "Factory Method (DD)", "priority": "high", "note": "Decouples creation logic. heavily used in libraries." },
+          { "title": "Builder (DD)", "priority": "high", "note": "Essential for complex objects (e.g., HTTP Requests)." }
         ]
       },
       {
         "name": "Structural",
         "topics": [
-          "Adapter (DD)",
-          "Facade (FA)",
-          "Decorator (FA)",
-          "Composite (GK)",
-          "Proxy (FA)"
+          { "title": "Adapter (DD)", "priority": "high", "note": "Connecting incompatible interfaces (Legacy code)." },
+          { "title": "Facade (FA)", "priority": "medium", "note": "Simple interface to a complex subsystem." },
+          { "title": "Decorator (FA)", "priority": "medium", "note": "Adding wrappers (e.g., I/O Streams, UI components)." },
+          { "title": "Composite (GK)", "priority": "low", "note": "Tree structures (File systems, UI trees)." },
+          { "title": "Proxy (FA)", "priority": "high", "note": "Lazy loading, Access control, Spring AOP." }
         ]
       },
       {
         "name": "Behavioral",
         "topics": [
-          "Strategy (DD)",
-          "Observer (DD)",
-          "Command (GK)",
-          "State (GK)",
-          "Template Method (FA)",
-          "Chain of Resp (FA)",
-          "Iterator (GK)"
+          { "title": "Strategy (DD)", "priority": "high", "note": "Swappable algorithms (Payment methods, Sort strategies)." },
+          { "title": "Observer (DD)", "priority": "high", "note": "Event listeners, Pub/Sub mechanisms." },
+          { "title": "Command (GK)", "priority": "medium", "note": "Encapsulate requests (Undo/Redo logic)." },
+          { "title": "State (GK)", "priority": "medium", "note": "Managing object states (Order processing)." },
+          { "title": "Template Method (FA)", "priority": "medium", "note": "Skeleton algorithms. Hooks for subclasses." },
+          { "title": "Chain of Resp (FA)", "priority": "medium", "note": "Middleware pipelines, Logging filters." },
+          { "title": "Iterator (GK)", "priority": "low", "note": "Traversing collections without exposing internals." }
         ]
       }
     ]
@@ -137,17 +137,17 @@
       {
         "name": "Design",
         "topics": [
-          "ER Diagrams",
-          "Normalization",
-          "Entity vs Value Object"
+          { "title": "ER Diagrams", "priority": "high", "note": "Visualizing DB tables and relations." },
+          { "title": "Normalization", "priority": "high", "note": "Removing redundancy (1NF, 2NF, 3NF)." },
+          { "title": "Entity vs Value Object", "priority": "medium", "note": "Identity vs Attributes. DDD concept." }
         ]
       },
       {
         "name": "ORM",
         "topics": [
-          "ORM Mapping",
-          "Lazy vs Eager",
-          "Schema Evolution"
+          { "title": "ORM Mapping", "priority": "medium", "note": "Hibernate/JPA annotations." },
+          { "title": "Lazy vs Eager", "priority": "high", "note": "N+1 Problem causes major perf issues." },
+          { "title": "Schema Evolution", "priority": "low", "note": "Handling DB migrations (Liquibase/Flyway)." }
         ]
       }
     ]
@@ -160,26 +160,26 @@
       {
         "name": "Basics",
         "topics": [
-          "Threads vs Processes",
-          "Thread Lifecycle"
+          { "title": "Threads vs Processes", "priority": "medium", "note": "Memory sharing differences." },
+          { "title": "Thread Lifecycle", "priority": "low", "note": "New, Runnable, Blocked, Waiting." }
         ]
       },
       {
         "name": "Sync",
         "topics": [
-          "Locks",
-          "ReentrantLock",
-          "Volatile",
-          "Atomic Ops"
+          { "title": "Locks", "priority": "high", "note": "Synchronized blocks, Deadlocks." },
+          { "title": "ReentrantLock", "priority": "medium", "note": "Advanced locking with fairness policies." },
+          { "title": "Volatile", "priority": "medium", "note": "Visibility guarantee, prevents instruction reordering." },
+          { "title": "Atomic Ops", "priority": "medium", "note": "CAS (Compare-And-Swap). Lock-free programming." }
         ]
       },
       {
         "name": "Tools",
         "topics": [
-          "ExecutorService",
-          "Concurrent Collections",
-          "Thread-Safety",
-          "Immutability"
+          { "title": "ExecutorService", "priority": "high", "note": "Thread pools. Never manually create threads." },
+          { "title": "Concurrent Collections", "priority": "high", "note": "ConcurrentHashMap is asked everywhere." },
+          { "title": "Thread-Safety", "priority": "high", "note": "Statelessness is key." },
+          { "title": "Immutability", "priority": "high", "note": "Simplest way to achieve thread safety." }
         ]
       }
     ]
@@ -192,27 +192,27 @@
       {
         "name": "Error Handling",
         "topics": [
-          "Checked vs Unchecked",
-          "Custom Exceptions",
-          "Propagation",
-          "Optional vs Null"
+          { "title": "Checked vs Unchecked", "priority": "medium", "note": "Compile-time vs Runtime enforcement." },
+          { "title": "Custom Exceptions", "priority": "low", "note": "Meaningful error domain modeling." },
+          { "title": "Propagation", "priority": "medium", "note": "Bubble up or handle?" },
+          { "title": "Optional vs Null", "priority": "medium", "note": "Avoiding NullPointerExceptions." }
         ]
       },
       {
         "name": "Boundaries",
         "topics": [
-          "DTO vs Domain",
-          "Validation Layer",
-          "Anti-Corruption Layer",
-          "Idempotency"
+          { "title": "DTO vs Domain", "priority": "high", "note": "Decoupling API from DB schema." },
+          { "title": "Validation Layer", "priority": "medium", "note": "Input sanitization." },
+          { "title": "Anti-Corruption Layer", "priority": "low", "note": "Isolating legacy systems." },
+          { "title": "Idempotency", "priority": "high", "note": "Retrying safe operations." }
         ]
       },
       {
         "name": "Config",
         "topics": [
-          "Config-Driven Design",
-          "Feature Toggles",
-          "Env Separation"
+          { "title": "Config-Driven Design", "priority": "medium", "note": "Changing behavior without code deploys." },
+          { "title": "Feature Toggles", "priority": "medium", "note": "Canary releases and A/B testing." },
+          { "title": "Env Separation", "priority": "high", "note": "Dev, Stage, Prod configs." }
         ]
       }
     ]
@@ -225,30 +225,30 @@
       {
         "name": "Time",
         "topics": [
-          "TTL Logic",
-          "Schedulers",
-          "Delayed Tasks",
-          "Clock Abstraction"
+          { "title": "TTL Logic", "priority": "medium", "note": "Cache expiry and DB cleanup." },
+          { "title": "Schedulers", "priority": "low", "note": "Cron jobs." },
+          { "title": "Delayed Tasks", "priority": "low", "note": "Exponential backoff queues." },
+          { "title": "Clock Abstraction", "priority": "medium", "note": "Testability for time-dependent code." }
         ]
       },
       {
         "name": "Logs",
         "topics": [
-          "Logging Levels",
-          "Correlation IDs",
-          "Audit Logs",
-          "Debuggability"
+          { "title": "Logging Levels", "priority": "high", "note": "DEBUG vs INFO vs ERROR matters for disk space." },
+          { "title": "Correlation IDs", "priority": "high", "note": "Tracing requests across microservices." },
+          { "title": "Audit Logs", "priority": "medium", "note": "Security and compliance." },
+          { "title": "Debuggability", "priority": "medium", "note": "Writing logs that actually help fix bugs." }
         ]
       },
       {
         "name": "Testing",
         "topics": [
-          "Unit Tests",
-          "DI",
-          "Mocking",
-          "Test Seams",
-          "Over-Engineering",
-          "Perf vs Readability"
+          { "title": "Unit Tests", "priority": "high", "note": "Fast feedback loop. JUnit/Mockito." },
+          { "title": "DI", "priority": "high", "note": "Dependency Injection makes testing possible." },
+          { "title": "Mocking", "priority": "medium", "note": "Fake external dependencies." },
+          { "title": "Test Seams", "priority": "low", "note": "Places to inject mocks." },
+          { "title": "Over-Engineering", "priority": "medium", "note": "YAGNI applies to tests too." },
+          { "title": "Perf vs Readability", "priority": "low", "note": "Clean code vs optimized code." }
         ]
       }
     ]
@@ -261,54 +261,51 @@
       {
         "name": "Easy",
         "topics": [
-          "Tic-Tac-Toe",
-          "Snake & Ladder",
-          "LRU Cache",
-          "Parking Lot",
-          "Task Manager"
+          { "title": "Tic-Tac-Toe", "priority": "medium", "note": "Good for checking Strategy pattern." },
+          { "title": "Snake & Ladder", "priority": "medium", "note": "Basic state management." },
+          { "title": "LRU Cache", "priority": "high", "note": "Classic HashMap + DoublyLinkedList." },
+          { "title": "Parking Lot", "priority": "high", "note": "The 'Hello World' of LLD." },
+          { "title": "Task Manager", "priority": "low", "note": "Basic CRUD + Status tracking." }
         ]
       },
       {
         "name": "Medium",
         "topics": [
-          "Stack Overflow",
-          "ATM",
-          "Logger",
-          "PubSub",
-          "Elevator",
-          "Splitwise",
-          "Vending Machine",
-          "Car Rental",
-          "Hotel Mgmt",
-          "Digital Wallet",
-          "Airline Mgmt",
-          "Library Mgmt",
-          "Traffic Signal",
-          "Concert Ticket",
-          "Social Network"
+          { "title": "Stack Overflow", "priority": "medium", "note": "Tags, Search, Voting logic." },
+          { "title": "ATM", "priority": "high", "note": "State pattern & Transaction handling." },
+          { "title": "Logger", "priority": "medium", "note": "Chain of Responsibility pattern." },
+          { "title": "PubSub", "priority": "high", "note": "Observer pattern & Queue management." },
+          { "title": "Elevator", "priority": "high", "note": "Scheduling algorithms (SCAN/LOOK)." },
+          { "title": "Splitwise", "priority": "high", "note": "Graph simplifications & Strategy pattern." },
+          { "title": "Vending Machine", "priority": "high", "note": "State pattern heavy." },
+          { "title": "Car Rental", "priority": "medium", "note": "Reservation system & Inventory." },
+          { "title": "Hotel Mgmt", "priority": "medium", "note": "Booking dates and Room types." },
+          { "title": "Digital Wallet", "priority": "medium", "note": "Concurrency & Transactions." },
+          { "title": "Airline Mgmt", "priority": "medium", "note": "Complex search & Booking." },
+          { "title": "Library Mgmt", "priority": "low", "note": "Simple inventory tracking." },
+          { "title": "Traffic Signal", "priority": "low", "note": "Observer/State pattern." },
+          { "title": "Concert Ticket", "priority": "medium", "note": "Concurrency (Locking seats)." },
+          { "title": "Social Network", "priority": "medium", "note": "Graph connections & Feeds." }
         ]
       },
       {
         "name": "Hard",
         "topics": [
-          "Spotify",
-          "Amazon",
-          "LinkedIn",
-          "CricInfo",
-          "Chess",
-          "Coffee Vending",
-          "Restaurant Mgmt",
-          "Stock Exchange",
-          "Course Registration",
-          "BookMyShow",
-          "Online Auction",
-          "Food Delivery",
-          "Ride-Sharing"
+          { "title": "Spotify", "priority": "medium", "note": "Streaming logic & Offline mode." },
+          { "title": "Amazon", "priority": "high", "note": "Search, Cart, Order, Inventory." },
+          { "title": "LinkedIn", "priority": "medium", "note": "Connections & Notifications." },
+          { "title": "CricInfo", "priority": "low", "note": "Live score updates." },
+          { "title": "Chess", "priority": "medium", "note": "Complex rules & Move validation." },
+          { "title": "Coffee Vending", "priority": "low", "note": "Decorator pattern." },
+          { "title": "Restaurant Mgmt", "priority": "medium", "note": "Orders, Kitchen, Table mgmt." },
+          { "title": "Stock Exchange", "priority": "high", "note": "Extreme concurrency & Matching engine." },
+          { "title": "Course Registration", "priority": "low", "note": "Constraints & Prerequisites." },
+          { "title": "BookMyShow", "priority": "high", "note": "Concurrency (Seat locking)." },
+          { "title": "Online Auction", "priority": "medium", "note": "Real-time bidding & Timers." },
+          { "title": "Food Delivery", "priority": "high", "note": "Geospatial & Order assignment." },
+          { "title": "Ride-Sharing", "priority": "high", "note": "Driver matching & Location tracking." }
         ]
       }
     ]
   }
 ]
-
-
-
