@@ -386,6 +386,77 @@
         }
         .modal-copy-code:hover { background: rgba(255,255,255,0.2); }
 
+        /* --- GEMINI-STYLE CONTENT --- */
+        .modal-body {
+            font-family: 'Roboto', 'Inter', system-ui, sans-serif; /* Clean, modern font */
+            line-height: 1.6;
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+        
+        /* Proper spacing for lists and paragraphs */
+        .modal-text p { margin-bottom: 1rem; }
+        .modal-text ul, .modal-text ol { 
+            margin-bottom: 1rem; 
+            padding-left: 1.5rem; 
+        }
+        .modal-text li { margin-bottom: 0.5rem; }
+        
+        /* --- THE GEMINI CODE BLOCK --- */
+        .gemini-code-container {
+            margin: 1.5rem 0;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #1e1e1e; /* Dark background */
+            border: 1px solid #333;
+        }
+        
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #2d2d2d; /* Slightly lighter header */
+            padding: 8px 16px;
+            border-bottom: 1px solid #333;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            color: #a1a1aa;
+            user-select: none;
+        }
+        
+        .code-lang { font-weight: 600; text-transform: uppercase; }
+        
+        .copy-btn {
+            background: transparent;
+            border: none;
+            color: #a1a1aa;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            transition: color 0.2s;
+        }
+        .copy-btn:hover { color: #fff; }
+        
+        .code-scroll {
+            overflow-x: auto;
+            padding: 16px;
+        }
+        
+        .code-content {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #e0e0e0; /* Default light text for code */
+            margin: 0;
+        }
+        
+        /* Optional: Simple syntax highlighting simulation (if not using a library) */
+        .code-keyword { color: #cc7832; font-weight: bold; } /* Orange for public, class */
+        .code-string { color: #6a8759; } /* Green for strings */
+        .code-comment { color: #808080; font-style: italic; } /* Grey for comments */
+
     </style>
 </head>
 <body data-mode="LLD">
@@ -597,52 +668,61 @@
 
     // ================= MODAL LOGIC =================
     function openModal(e, key) {
-        e.stopPropagation(); // Prevent card completion click
+    e.stopPropagation();
+    
+    const details = TOPIC_DETAILS[key];
+    const modal = document.getElementById('noteModal');
+    document.getElementById('modalTitle').innerText = key;
+    const modalBody = document.getElementById('modalBody');
+
+    if (!details || !details.blocks) {
+        // Fallback for old format or empty
+        modalBody.innerHTML = `<p class="modal-text">No formatted notes available.</p>`;
+    } else {
+        let html = '';
         
-        const details = TOPIC_DETAILS[key];
-        const modal = document.getElementById('noteModal');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalBody = document.getElementById('modalBody');
+        details.blocks.forEach((block, index) => {
+            if (block.type === 'text') {
+                html += `<div class="modal-text">${block.content}</div>`;
+            } 
+            else if (block.type === 'code') {
+                // We create a unique ID for the copy function
+                const codeId = `code-${index}`;
+                // Simple syntax highlighting regex (optional, adds colors to keywords)
+                let coloredCode = block.content
+                    .replace(/</g, "&lt;").replace(/>/g, "&gt;") // Escape HTML
+                    .replace(/\/\/.*/g, m => `<span class="code-comment">${m}</span>`) // Comments
+                    .replace(/"(.*?)"/g, `<span class="code-string">"$1"</span>`) // Strings
+                    .replace(/\b(public|class|void|int|String|new|return|if|else|static)\b/g, `<span class="code-keyword">$1</span>`); // Keywords
 
-        modalTitle.innerText = key;
-
-        if (!details) {
-            modalBody.innerHTML = `<p class="modal-text" style="color:var(--text-secondary)">No notes available for this topic yet.</p>`;
-        } else {
-            let contentHtml = '';
-
-            // 1. Text
-            if (details.text) {
-                contentHtml += `<p class="modal-text">${details.text}</p>`;
-            }
-
-            // 2. Code
-            if (details.code) {
-                contentHtml += `
-                    <div class="code-container">
-                        <button class="modal-copy-code" onclick="copyCode(this, '${key}')">Copy</button>
-                        <pre class="code-block">${details.code.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</pre>
+                html += `
+                <div class="gemini-code-container">
+                    <div class="code-header">
+                        <span class="code-lang">${block.language}</span>
+                        <button class="copy-btn" onclick="copyToClipboard('${codeId}')">
+                            <i class="fas fa-copy"></i> Copy code
+                        </button>
                     </div>
-                `;
+                    <div class="code-scroll">
+                        <pre class="code-content" id="${codeId}">${coloredCode}</pre>
+                        <textarea id="${codeId}-raw" style="display:none;">${block.content}</textarea>
+                    </div>
+                </div>`;
             }
-
-            // 3. Images (Array or Single)
-            if (details.images && details.images.length > 0) {
-                contentHtml += `<div class="modal-images">`;
-                details.images.forEach(img => {
-                    contentHtml += `<img src="images/${img}" class="modal-img" alt="${key} diagram">`;
-                });
-                contentHtml += `</div>`;
-            } else if (details.image) {
-                // Fallback for old single image format
-                contentHtml += `<div class="modal-images"><img src="images/${details.image}" class="modal-img"></div>`;
-            }
-
-            modalBody.innerHTML = contentHtml;
-        }
-
-        modal.classList.add('active');
+        });
+        modalBody.innerHTML = html;
     }
+    modal.classList.add('active');
+}
+
+// New Copy Function
+function copyToClipboard(elementId) {
+    const rawText = document.getElementById(elementId + '-raw').value;
+    navigator.clipboard.writeText(rawText).then(() => {
+        // Visual feedback could go here (e.g., change icon to checkmark)
+        alert("Copied to clipboard!"); 
+    });
+}
 
     function closeModal(e) {
         const modal = document.getElementById('noteModal');
@@ -745,3 +825,4 @@
 </script>
 </body>
 </html>
+
