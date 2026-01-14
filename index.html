@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System Design Master</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         :root {
@@ -22,6 +23,7 @@
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             --nav-hover: #e4e4e7;
             --scrollbar-thumb: #d4d4d8;
+            --modal-overlay: rgba(0, 0, 0, 0.5);
         }
 
         .dark {
@@ -39,6 +41,7 @@
             --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
             --nav-hover: #27272a;
             --scrollbar-thumb: #3f3f46;
+            --modal-overlay: rgba(0, 0, 0, 0.8);
         }
 
         /* HLD Theme Override (Purple Vibe) */
@@ -244,14 +247,18 @@
             background: var(--bg-card); border: 1px solid var(--border);
             border-radius: 12px; padding: 1rem; cursor: pointer;
             transition: all 0.2s ease; display: flex; align-items: center;
-            gap: 12px; position: relative; overflow: hidden;
-            /* Allow text selection, but add padding for copy btn */
-            padding-right: 40px; 
+            justify-content: space-between; /* Space between content and buttons */
+            gap: 8px; position: relative; overflow: hidden;
         }
 
         .topic-card:hover { transform: translateY(-2px); border-color: var(--accent); box-shadow: var(--shadow); }
         .topic-card.completed { background: var(--accent-light); border-color: var(--accent-light); }
         
+        /* Left side of card (checkbox + text) */
+        .card-main {
+            display: flex; align-items: center; gap: 12px; flex: 1;
+        }
+
         .checkbox {
             width: 22px; height: 22px; border: 2px solid var(--border);
             border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
@@ -266,132 +273,120 @@
         }
         .topic-card.completed .checkbox::after { transform: rotate(45deg) scale(1); }
 
-        /* Topic Text Selection Enabled */
         .topic-text { 
             font-size: 0.95rem; font-weight: 500; color: var(--text-primary); transition: color 0.2s;
-            user-select: text; /* Allow manual selection */
+            user-select: none;
         }
         .topic-card.completed .topic-text { color: var(--accent); text-decoration: line-through; opacity: 0.8; }
 
-        /* --- COPY BUTTON --- */
-        .copy-btn {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0; /* Hidden by default */
-            transition: all 0.2s ease;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-            z-index: 10;
+        /* Action Buttons (Notes & Copy) */
+        .card-actions {
+            display: flex; gap: 6px;
         }
-        
-        .topic-card:hover .copy-btn { opacity: 1; }
-        .copy-btn:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
-        
-        /* Copied Tooltip Animation */
-        .copy-btn.copied {
+
+        .btn-action {
+            width: 32px; height: 32px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--bg-body);
+            color: var(--text-secondary);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .btn-action:hover {
+            color: var(--accent); border-color: var(--accent); background: var(--accent-light);
+        }
+
+        .btn-action.copied {
             background: var(--success); color: white; border-color: var(--success);
         }
 
         @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .empty-state { text-align: center; padding: 4rem 0; color: var(--text-secondary); }
 
+        /* ================= MODAL STYLES (NEW) ================= */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--modal-overlay);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: none; /* Hidden by default */
+            justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.3s ease;
+        }
 
-		/* --- REVISION TOOLTIP --- */
-        #revision-tooltip {
-            position: fixed;
-            z-index: 1000;
-            width: 380px;
-            max-height: 500px;
-            overflow-y: auto;
+        .modal-overlay.active { display: flex; opacity: 1; }
+
+        .modal-content {
             background: var(--bg-card);
-            border: 1px solid var(--accent);
+            width: 700px; max-width: 95%; max-height: 85vh;
             border-radius: 12px;
-            padding: 1.25rem;
-            box-shadow: var(--shadow);
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.2s, transform 0.2s;
-            pointer-events: none; /* Prevents flickering */
-            transform: translateY(10px);
-            font-size: 0.9rem;
-        }
-
-        #revision-tooltip.visible {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        /* Tooltip Content Styling */
-        .tt-title { font-weight: 700; color: var(--accent); margin-bottom: 0.5rem; display: block; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
-        .tt-body { color: var(--text-secondary); line-height: 1.5; }
-        
-        /* Images inside tooltip */
-        .tt-img { 
-            width: 100%; 
-            height: auto; 
-            border-radius: 6px; 
-            margin: 10px 0; 
-            border: 1px solid var(--border); 
-        }
-
-        /* Code Blocks inside tooltip */
-        .tt-code {
-            background: var(--bg-sidebar);
-            padding: 10px;
-            border-radius: 6px;
             border: 1px solid var(--border);
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.8rem;
-            color: var(--text-primary);
-            margin: 10px 0;
-            white-space: pre-wrap;
-            overflow-x: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            animation: scaleIn 0.2s ease;
         }
 
+        @keyframes scaleIn { from { transform: scale(0.95); } to { transform: scale(1); } }
 
+        .modal-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--bg-sidebar);
+        }
 
-		/* Styling for code inside the text description */
-		.tt-body code {
-		    background: rgba(0, 0, 0, 0.1); /* Light grey bg */
-		    padding: 2px 5px;
-		    border-radius: 4px;
-		    font-family: 'Courier New', monospace;
-		    font-size: 0.9em;
-		    color: var(--accent); /* Uses your theme blue/purple */
-		    border: 1px solid var(--border);
-		}
-		
-		.dark .tt-body code {
-		    background: rgba(255, 255, 255, 0.1);
-		}
-		
-		/* If you want a full multi-line block inside the text */
-		.tt-body pre {
-		    background: var(--bg-sidebar);
-		    padding: 10px;
-		    border-radius: 6px;
-		    border: 1px solid var(--border);
-		    overflow-x: auto;
-		    margin: 10px 0;
-		}
-		.tt-body pre code {
-		    background: none;
-		    border: none;
-		    padding: 0;
-		    color: var(--text-primary);
-		}
+        .modal-title {
+            font-weight: 700; font-size: 1.1rem; color: var(--accent);
+            font-family: 'Inter', sans-serif;
+        }
 
-		
+        .modal-close {
+            background: none; border: none; color: var(--text-secondary);
+            font-size: 1.2rem; cursor: pointer; transition: color 0.2s;
+        }
+        .modal-close:hover { color: #ef4444; }
+
+        .modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Modal Elements */
+        .modal-text { font-size: 1rem; margin-bottom: 1.5rem; }
+
+        .modal-images { display: flex; flex-direction: column; gap: 15px; margin-top: 15px; }
+        .modal-img {
+            width: 100%; height: auto; border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .code-container {
+            position: relative; margin: 15px 0;
+            border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+        }
+
+        .code-block {
+            background: #1e1e1e; color: #d4d4d4;
+            padding: 1rem; overflow-x: auto;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.9rem; margin: 0;
+        }
+
+        .modal-copy-code {
+            position: absolute; top: 8px; right: 8px;
+            background: rgba(255,255,255,0.1); color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 4px 8px; font-size: 0.75rem; border-radius: 4px;
+            cursor: pointer; transition: 0.2s;
+        }
+        .modal-copy-code:hover { background: rgba(255,255,255,0.2); }
 
     </style>
 </head>
@@ -427,9 +422,7 @@
                 <input type="text" class="search-input" id="searchInput" placeholder="Find topic..." oninput="renderContent()">
             </div>
             <div class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
-                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
+                <i class="fas fa-moon"></i>
             </div>
         </div>
     </header>
@@ -439,18 +432,25 @@
     </div>
 </main>
 
-	<div id="revision-tooltip"></div>
+<div id="noteModal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="modal-title" id="modalTitle">Topic Name</span>
+            <button class="modal-close" onclick="closeModal(event)">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body" id="modalBody">
+            </div>
+    </div>
+</div>
 
 <script>
-    // ================= DATA REPOSITORIES =================
-
-    // ================= GLOBAL VARIABLES =================
-    // Initialize as empty; we will fill them via Fetch
+    // ================= DATA & GLOBALS =================
     let LLD_DATA = [];
     let HLD_DATA = [];
     let TOPIC_DETAILS = {};
 
-  // ================= APP LOGIC =================
     const CONFIG = {
         mode: localStorage.getItem('app_mode') || 'LLD',
     };
@@ -458,35 +458,31 @@
     let lldState = JSON.parse(localStorage.getItem('lld_master_state')) || { activeTab: 0, completed: {} };
     let hldState = JSON.parse(localStorage.getItem('hld_master_state')) || { activeTab: 0, completed: {} };
 
-    // --- DATA FETCHING (NEW) ---
+    // ================= INIT & FETCH =================
     async function loadDataAndInit() {
         try {
-            // Show loading state in header
             document.getElementById('headerTitle').innerText = "Loading Knowledge Base...";
             
-            // Fetch all 3 files in parallel
             const [lldRes, hldRes, detailsRes] = await Promise.all([
                 fetch('data/lld.json'),
                 fetch('data/hld.json'),
                 fetch('data/details.json')
             ]);
 
-            // Parse JSON
             LLD_DATA = await lldRes.json();
             HLD_DATA = await hldRes.json();
             TOPIC_DETAILS = await detailsRes.json();
 
-            // Data loaded -> Start the App
             initDashboard();
             initSecretSwitch();
 
         } catch (error) {
             console.error("Error loading data:", error);
             document.getElementById('headerTitle').innerText = "Error Loading Data";
-            document.getElementById('headerSubtitle').innerText = "Please run this on a Local Server (vs code Live Server)";
+            document.getElementById('headerSubtitle').innerText = "Please run on Live Server";
         }
     }
-    // Current Context Helpers
+
     function getData() { return CONFIG.mode === 'LLD' ? LLD_DATA : HLD_DATA; }
     function getState() { return CONFIG.mode === 'LLD' ? lldState : hldState; }
     function saveState() {
@@ -494,55 +490,10 @@
         else localStorage.setItem('hld_master_state', JSON.stringify(hldState));
     }
 
-    // --- SECRET SWITCH LOGIC ---
-    let clickCount = 0;
-    let clickTimer = null;
-
-    function initSecretSwitch() {
-        const title = document.getElementById('logoTitle');
-        title.addEventListener('click', () => {
-            clickCount++;
-            
-            // Visual feedback
-            title.style.transform = 'scale(0.95)';
-            setTimeout(() => title.style.transform = 'scale(1)', 100);
-
-            if (clickTimer) clearTimeout(clickTimer);
-            
-            clickTimer = setTimeout(() => {
-                clickCount = 0; // Reset if too slow
-            }, 500);
-
-            if (clickCount === 3) {
-                toggleMode();
-                clickCount = 0;
-            }
-        });
-    }
-
-    function toggleMode() {
-        // Switch Mode
-        CONFIG.mode = CONFIG.mode === 'LLD' ? 'HLD' : 'LLD';
-        localStorage.setItem('app_mode', CONFIG.mode);
-        
-        // Trigger transition effect
-        document.body.style.opacity = '0';
-        setTimeout(() => {
-            initDashboard();
-            document.body.style.opacity = '1';
-            
-            // Celebration confetti for the switch
-            confetti({ particleCount: 100, spread: 70, origin: { y: 0.1 }, colors: CONFIG.mode === 'LLD' ? ['#2563eb'] : ['#8b5cf6'] });
-        }, 300);
-    }
-
-    // --- RENDERING ---
-
+    // ================= DASHBOARD LOGIC =================
     function initDashboard() {
-        // Set Theme Attributes
         document.body.setAttribute('data-mode', CONFIG.mode);
         document.getElementById('logoTitle').innerText = `${CONFIG.mode} MASTER`;
-
         renderNav();
         renderContent();
     }
@@ -571,7 +522,6 @@
         const section = data[idx];
         const searchVal = document.getElementById('searchInput').value.toLowerCase();
 
-        // Header Text
         document.getElementById('headerTitle').innerText = section.title;
         document.getElementById('headerSubtitle').innerText = section.subtitle;
 
@@ -586,23 +536,26 @@
                 filteredTopics.forEach(topic => {
                     const safeId = 'card-' + topic.replace(/[^a-zA-Z0-9]/g, ''); 
                     const isDone = state.completed[topic];
-                    // IMPORTANT: Added copy button inside card
+                    
                     html += `
-					    <div id="${safeId}" 
-					         class="topic-card ${isDone ? 'completed' : ''}" 
-					         onclick="handleTopicClick('${topic}', '${safeId}')"
-					         onmouseenter="showTooltip(event, '${topic}')"
-					         onmouseleave="hideTooltip()">
-					         
-					        <div class="checkbox"></div>
-					        <span class="topic-text">${topic}</span>
-					        
-					        <div class="copy-btn" onclick="copyText(event, '${topic}', this)" title="Copy topic">
-					            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-					                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
-					            </svg>
-					        </div>
-					    </div>`;
+                    <div id="${safeId}" class="topic-card ${isDone ? 'completed' : ''}" onclick="handleTopicClick('${topic}', '${safeId}')">
+                        
+                        <div class="card-main">
+                            <div class="checkbox"></div>
+                            <span class="topic-text">${topic}</span>
+                        </div>
+                        
+                        <div class="card-actions">
+                            <div class="btn-action" onclick="openModal(event, '${topic}')" title="View Notes">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+
+                            <div class="btn-action" onclick="copyText(event, '${topic}', this)" title="Copy Topic Name">
+                                <i class="fas fa-copy"></i>
+                            </div>
+                        </div>
+
+                    </div>`;
                 });
                 html += `</div></div>`;
             }
@@ -614,13 +567,10 @@
 
     function switchTab(idx) {
         const state = getState();
-        const navItems = document.querySelectorAll('.nav-item');
-        if(navItems[state.activeTab]) navItems[state.activeTab].classList.remove('active');
-        if(navItems[idx]) navItems[idx].classList.add('active');
-
         state.activeTab = idx;
         document.getElementById('searchInput').value = ''; 
         saveState();
+        renderNav();
         renderContent(); 
     }
 
@@ -641,43 +591,102 @@
             const sectionTopics = currentSection.groups.flatMap(g => g.topics);
             const sectionDone = sectionTopics.filter(t => state.completed[t]).length;
 
-            if (stats.globalPercent === 100) {
-                triggerGrandCelebration();
-            } else if (sectionDone === sectionTopics.length) {
-                triggerSectionConfetti();
-            }
+            if (stats.globalPercent === 100) triggerGrandCelebration();
+            else if (sectionDone === sectionTopics.length) triggerSectionConfetti();
         }
     }
 
-    // --- COPY FUNCTIONALITY ---
+    // ================= NEW MODAL LOGIC =================
+    function openModal(e, key) {
+        e.stopPropagation(); // Prevent card completion click
+        
+        const details = TOPIC_DETAILS[key];
+        const modal = document.getElementById('noteModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+
+        modalTitle.innerText = key;
+
+        if (!details) {
+            modalBody.innerHTML = `<p class="modal-text" style="color:var(--text-secondary)">No notes available for this topic yet.</p>`;
+        } else {
+            let contentHtml = '';
+
+            // 1. Text
+            if (details.text) {
+                contentHtml += `<p class="modal-text">${details.text}</p>`;
+            }
+
+            // 2. Code
+            if (details.code) {
+                contentHtml += `
+                    <div class="code-container">
+                        <button class="modal-copy-code" onclick="copyCode(this, '${key}')">Copy</button>
+                        <pre class="code-block">${details.code.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</pre>
+                    </div>
+                `;
+            }
+
+            // 3. Images (Array or Single)
+            if (details.images && details.images.length > 0) {
+                contentHtml += `<div class="modal-images">`;
+                details.images.forEach(img => {
+                    contentHtml += `<img src="images/${img}" class="modal-img" alt="${key} diagram">`;
+                });
+                contentHtml += `</div>`;
+            } else if (details.image) {
+                // Fallback for old single image format
+                contentHtml += `<div class="modal-images"><img src="images/${details.image}" class="modal-img"></div>`;
+            }
+
+            modalBody.innerHTML = contentHtml;
+        }
+
+        modal.classList.add('active');
+    }
+
+    function closeModal(e) {
+        const modal = document.getElementById('noteModal');
+        // Close if clicking overlay, close button, or passed explicitly
+        if (!e || e.target === modal || e.target.closest('.modal-close')) {
+            modal.classList.remove('active');
+        }
+    }
+
+    function copyCode(btn, key) {
+        const details = TOPIC_DETAILS[key];
+        if(details && details.code) {
+            navigator.clipboard.writeText(details.code).then(() => {
+                const originalText = btn.innerText;
+                btn.innerText = "Copied!";
+                btn.style.background = "var(--success)";
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.background = "";
+                }, 1500);
+            });
+        }
+    }
+
+    // ================= UTILITIES =================
     function copyText(e, text, btn) {
-        e.stopPropagation(); // Stop click from triggering card completion
+        e.stopPropagation(); 
         navigator.clipboard.writeText(text).then(() => {
-            const originalHTML = btn.innerHTML;
             btn.classList.add('copied');
-            btn.innerHTML = `<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>`;
-            
-            setTimeout(() => {
-                btn.classList.remove('copied');
-                btn.innerHTML = originalHTML;
-            }, 1500);
+            setTimeout(() => btn.classList.remove('copied'), 1500);
         });
     }
 
     function updateStats() {
         const state = getState();
         const data = getData();
-        
-        // Calc Globals
         const allTopics = data.flatMap(s => s.groups.flatMap(g => g.topics));
         const totalDone = allTopics.filter(t => state.completed[t]).length;
         const globalPercent = Math.round((totalDone / allTopics.length) * 100) || 0;
 
-        // Update Global Bar
         document.getElementById('masteryPercent').innerText = `${globalPercent}%`;
         document.getElementById('masteryBar').style.width = `${globalPercent}%`;
 
-        // Update Section Pills
         data.forEach((section, idx) => {
             const sectionTopics = section.groups.flatMap(g => g.topics);
             const sDone = sectionTopics.filter(t => state.completed[t]).length;
@@ -689,104 +698,59 @@
         return { globalPercent };
     }
 
-	// --- TOOLTIP LOGIC ---
-   function showTooltip(e, topic) {
-        const details = TOPIC_DETAILS[topic];
-        if (!details) return; 
-
-        const tooltip = document.getElementById('revision-tooltip');
-        
-        // Build Content
-        let content = `<span class="tt-title">${topic}</span>`;
-        
-        // 1. Add Text
-        if (details.text) content += `<div class="tt-body">${details.text}</div>`;
-        
-        // 2. Add Code
-        if (details.code) content += `<div class="tt-code">${details.code}</div>`;
-        
-        // 3. Add Multiple Images
-        if (details.images && Array.isArray(details.images)) {
-            details.images.forEach(img => {
-                content += `<img src="images/${img}" class="tt-img" onerror="this.style.display='none'">`;
-            });
-        } 
-        // Fallback: Support old single 'image' property just in case
-        else if (details.image) {
-            content += `<img src="images/${details.image}" class="tt-img" onerror="this.style.display='none'">`;
-        }
-
-        tooltip.innerHTML = content;
-        tooltip.classList.add('visible');
-
-        positionTooltip(e, tooltip);
+    function toggleTheme() {
+        document.documentElement.classList.toggle('dark');
+        const isDark = document.documentElement.classList.contains('dark');
+        const icon = document.querySelector('.theme-toggle i');
+        if(icon) icon.className = isDark ? 'fas fa-moon' : 'fas fa-sun';
     }
 
-    function hideTooltip() {
-        const tooltip = document.getElementById('revision-tooltip');
-        tooltip.classList.remove('visible');
+    // --- SECRET SWITCH ---
+    let clickCount = 0;
+    let clickTimer = null;
+    function initSecretSwitch() {
+        const title = document.getElementById('logoTitle');
+        title.addEventListener('click', () => {
+            clickCount++;
+            title.style.transform = 'scale(0.95)';
+            setTimeout(() => title.style.transform = 'scale(1)', 100);
+            if (clickTimer) clearTimeout(clickTimer);
+            clickTimer = setTimeout(() => { clickCount = 0; }, 500);
+            if (clickCount === 3) toggleMode();
+        });
     }
 
-    function positionTooltip(e, tooltip) {
-        const x = e.clientX + 20; // 20px right of cursor
-        const y = e.clientY + 20; // 20px below cursor
-        
-        // Basic boundary check (prevent going off screen)
-        const rect = tooltip.getBoundingClientRect();
-        const winWidth = window.innerWidth;
-        const winHeight = window.innerHeight;
-
-        let finalX = x;
-        let finalY = y;
-
-        // If clips right, move to left of cursor
-        if (x + rect.width > winWidth) finalX = e.clientX - rect.width - 20;
-        
-        // If clips bottom, move up
-        if (y + rect.height > winHeight) finalY = e.clientY - rect.height - 20;
-
-        tooltip.style.left = `${finalX}px`;
-        tooltip.style.top = `${finalY}px`;
+    function toggleMode() {
+        CONFIG.mode = CONFIG.mode === 'LLD' ? 'HLD' : 'LLD';
+        localStorage.setItem('app_mode', CONFIG.mode);
+        document.body.style.opacity = '0';
+        setTimeout(() => {
+            initDashboard();
+            document.body.style.opacity = '1';
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.1 }, colors: CONFIG.mode === 'LLD' ? ['#2563eb'] : ['#8b5cf6'] });
+        }, 300);
+        clickCount = 0;
     }
 
-    // --- UTILS ---
+    // ================= BOOTSTRAP =================
+    // Celebration effects
     function triggerSectionConfetti() {
         const color = CONFIG.mode === 'LLD' ? '#2563eb' : '#8b5cf6';
         confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: [color, '#22c55e'] });
     }
 
     function triggerGrandCelebration() {
-        const duration = 5 * 1000;
-        const animationEnd = Date.now() + duration;
+        const duration = 5000;
+        const end = Date.now() + duration;
         const color = CONFIG.mode === 'LLD' ? '#2563eb' : '#8b5cf6';
-        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0, colors: [color, '#22c55e', '#ffffff'] };
-        const random = (min, max) => Math.random() * (max - min) + min;
-
         const interval = setInterval(function() {
-            const timeLeft = animationEnd - Date.now();
-            if (timeLeft <= 0) return clearInterval(interval);
-            const particleCount = 50 * (timeLeft / duration);
-            confetti(Object.assign({}, defaults, { particleCount, origin: { x: random(0.1, 0.3), y: Math.random() - 0.2 } }));
-            confetti(Object.assign({}, defaults, { particleCount, origin: { x: random(0.7, 0.9), y: Math.random() - 0.2 } }));
+            if (Date.now() > end) return clearInterval(interval);
+            confetti({ particleCount: 50, startVelocity: 30, spread: 360, origin: { x: Math.random(), y: Math.random() - 0.2 }, colors: [color, '#22c55e'] });
         }, 250);
     }
 
-    function toggleTheme() {
-        document.documentElement.classList.toggle('dark');
-    }
-
-    // Boot
-    window.onload = () => {
-       // initDashboard();
-       // initSecretSwitch();
-		loadDataAndInit();
-    };
+    window.onload = loadDataAndInit;
 
 </script>
 </body>
 </html>
-
-
-
-
-
