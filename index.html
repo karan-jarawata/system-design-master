@@ -458,6 +458,78 @@
         .code-comment { color: #808080; font-style: italic; } /* Grey for comments */
 
 
+        /* --- PRIORITY TAGS & NOTES --- */
+
+        /* Adjust card layout to stack text and notes */
+        .topic-card {
+            /* Keep existing styles, just ensure flex-direction allows stacking if needed */
+            flex-direction: column; 
+            align-items: flex-start;
+            gap: 8px;
+            padding: 12px;
+        }
+        
+        /* The top row: Checkbox + Title + Badge */
+        .card-header-row {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            gap: 12px;
+        }
+        
+        .card-main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        /* Priority Badges */
+        .badge {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+            margin-left: auto; /* Push to right of title if space allows */
+        }
+        
+        /* Priority Colors */
+        .badge.high {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b; /* Amber-500 */
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        
+        .badge.medium {
+            background: rgba(59, 130, 246, 0.15);
+            color: #3b82f6; /* Blue-500 */
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+        
+        .badge.low {
+            background: rgba(113, 113, 122, 0.15);
+            color: #a1a1aa; /* Zinc-400 */
+            border: 1px solid rgba(113, 113, 122, 0.3);
+        }
+        
+        /* Personal Note Styling */
+        .topic-note {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-left: 34px; /* Align with text (checkbox width + gap) */
+            font-style: italic;
+            opacity: 0.8;
+            line-height: 1.2;
+        }
+        
+        /* Visual cue for High Priority cards */
+        .topic-card.prio-high {
+            border-left: 3px solid #f59e0b;
+        }
+
+        
         /* ================= CUSTOM SCROLLBARS ================= */
 
         /* 1. Global Scrollbar Styling (for Body and all scrollable areas) */
@@ -623,6 +695,7 @@
         const section = data[idx];
         const searchVal = document.getElementById('searchInput').value.toLowerCase();
 
+        // Update Header
         document.getElementById('headerTitle').innerText = section.title;
         document.getElementById('headerSubtitle').innerText = section.subtitle;
 
@@ -630,27 +703,59 @@
         let hasResults = false;
 
         section.groups.forEach(group => {
-            const filteredTopics = group.topics.filter(t => t.toLowerCase().includes(searchVal));
+            // Filter Logic: Handles both String ("Topic") and Object ({title: "Topic"})
+            const filteredTopics = group.topics.filter(item => {
+                const title = (typeof item === 'object' ? item.title : item);
+                return title.toLowerCase().includes(searchVal);
+            });
+
             if (filteredTopics.length > 0) {
                 hasResults = true;
                 html += `<div class="group-section"><div class="group-title">${group.name}</div><div class="topic-grid">`;
-                filteredTopics.forEach(topic => {
-                    const safeId = 'card-' + topic.replace(/[^a-zA-Z0-9]/g, ''); 
-                    const isDone = state.completed[topic];
+                
+                filteredTopics.forEach(item => {
+                    // 1. Normalize Data
+                    let title, priority, note;
                     
+                    if (typeof item === 'object') {
+                        title = item.title;
+                        priority = item.priority || 'none'; // high, medium, low
+                        note = item.note || '';
+                    } else {
+                        title = item; 
+                        priority = 'none';
+                        note = '';
+                    }
+
+                    const safeId = 'card-' + title.replace(/[^a-zA-Z0-9]/g, ''); 
+                    const isDone = state.completed[title]; // Use title for completion key
+                    
+                    // 2. Badge HTML
+                    let badgeHtml = '';
+                    if (priority === 'high') badgeHtml = `<span class="badge high">Most Imp</span>`;
+                    else if (priority === 'medium') badgeHtml = `<span class="badge medium">Imp</span>`;
+                    else if (priority === 'low') badgeHtml = `<span class="badge low">OK-OK</span>`;
+
+                    // 3. Note HTML
+                    let noteHtml = note ? `<div class="topic-note"><i class="fas fa-sticky-note" style="margin-right:4px"></i>${note}</div>` : '';
+
+                    // 4. Render Card
                     html += `
-                    <div id="${safeId}" class="topic-card ${isDone ? 'completed' : ''}" onclick="handleTopicClick('${topic}', '${safeId}')">
+                    <div id="${safeId}" class="topic-card ${isDone ? 'completed' : ''} prio-${priority}" onclick="handleTopicClick('${title}', '${safeId}')">
                         
-                        <div class="card-main">
+                        <div class="card-header-row">
                             <div class="checkbox"></div>
-                            <span class="topic-text">${topic}</span>
+                            <span class="topic-text">${title}</span>
+                            ${badgeHtml}
+                            
+                            <div class="card-actions" style="margin-left: auto;">
+                                <div class="btn-action" onclick="openModal(event, '${title}')" title="View Notes">
+                                    <i class="fas fa-book-open"></i>
+                                </div>
+                            </div>
                         </div>
-                        
-                        <div class="card-actions">
-                            <div class="btn-action" onclick="openModal(event, '${topic}')" title="View Notes">
-                                <i class="fas fa-book-open"></i>
-                            </div>
-                            </div>
+
+                        ${noteHtml}
 
                     </div>`;
                 });
@@ -857,5 +962,6 @@ function copyToClipboard(elementId) {
 </script>
 </body>
 </html>
+
 
 
