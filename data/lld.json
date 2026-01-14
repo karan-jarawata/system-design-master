@@ -1,0 +1,72 @@
+[
+        {
+            id: 1, title: "1. OOP Physics", subtitle: "The Foundation",
+            groups: [
+                { name: "Core Concepts", topics: ["Classes & Objects", "Interfaces", "Inheritance", "Polymorphism", "Abstraction", "Encapsulation", "Access Modifiers", "Object Lifecycle", "Stack vs Heap"] },
+                { name: "Relationships", topics: ["Association", "Aggregation", "Composition", "Composition over Inheritance"] },
+                { name: "Mechanics", topics: ["Diamond Problem", "Dynamic Dispatch", "Immutability", "Abstract Class vs Interface"] }
+            ]
+        },
+		{
+            id: 2, title: "2. UML Blueprint", subtitle: "Visualizing Code",
+            groups: [
+                { name: "Structural", topics: ["Class Diagram", "UML Modifiers", "Cardinality"] },
+                { name: "Behavioral", topics: ["Use Case", "Sequence Diagram", "Activity Diagram", "State Machine", "System Boundary", "Sync vs Async"] }
+            ]
+        },
+        {
+            id: 3, title: "3. Design Principles", subtitle: "The Rules",
+            groups: [
+                { name: "SOLID", topics: ["SRP", "Open/Closed", "Liskov Substitution", "Interface Segregation", "Dependency Inversion"] },
+                { name: "Heuristics", topics: ["DRY", "KISS", "YAGNI", "Law of Demeter", "Fail-Fast", "Method Contracts"] }
+            ]
+        },
+        
+        {
+            id: 4, title: "4. Design Patterns", subtitle: "The Toolkit",
+            groups: [
+                { name: "Creational", topics: ["Singleton", "Factory Method", "Abstract Factory", "Builder", "Prototype"] },
+                { name: "Structural", topics: ["Adapter", "Facade", "Decorator", "Composite", "Proxy", "Bridge", "Flyweight"] },
+                { name: "Behavioral", topics: ["Strategy", "Observer", "Command", "State", "Template Method", "Chain of Resp", "Iterator", "Visitor", "Mediator", "Memento"] }
+            ]
+        },
+		{
+            id: 5, title: "5. Data Modeling", subtitle: "Persistence",
+            groups: [
+                { name: "Design", topics: ["ER Diagrams", "Normalization", "Entity vs Value Object"] },
+                { name: "ORM", topics: ["ORM Mapping", "Lazy vs Eager", "Schema Evolution"] }
+            ]
+        },
+		 {
+            id: 6, title: "6. Concurrency", subtitle: "Multithreading",
+            groups: [
+                { name: "Basics", topics: ["Threads vs Processes", "Thread Lifecycle"] },
+                { name: "Sync", topics: ["Locks", "ReentrantLock", "Volatile", "Atomic Ops"] },
+                { name: "Tools", topics: ["ExecutorService", "Concurrent Collections", "Thread-Safety", "Immutability"] }
+            ]
+        },
+        {
+            id: 7, title: "7. Advanced Arch", subtitle: "Technical Depth",
+            groups: [
+                { name: "Error Handling", topics: ["Checked vs Unchecked", "Custom Exceptions", "Propagation", "Optional vs Null"] },
+                { name: "Boundaries", topics: ["DTO vs Domain", "Validation Layer", "Anti-Corruption Layer", "Idempotency"] },
+                { name: "Config", topics: ["Config-Driven Design", "Feature Toggles", "Env Separation"] }
+            ]
+        },
+        {
+            id: 8, title: "8. Observability", subtitle: "Production Ready",
+            groups: [
+                { name: "Time", topics: ["TTL Logic", "Schedulers", "Delayed Tasks", "Clock Abstraction"] },
+                { name: "Logs", topics: ["Logging Levels", "Correlation IDs", "Audit Logs", "Debuggability"] },
+                { name: "Testing", topics: ["Unit Tests", "DI", "Mocking", "Test Seams", "Over-Engineering", "Perf vs Readability"] }
+            ]
+        },
+        {
+            id: 9, title: "9. Machine Coding", subtitle: "The Gauntlet",
+            groups: [
+                { name: "Easy", topics: ["Tic-Tac-Toe", "Snake & Ladder", "LRU Cache", "Parking Lot", "Task Manager"] },
+                { name: "Medium", topics: ["Stack Overflow", "ATM", "Logger", "PubSub", "Elevator", "Splitwise", "Vending Machine", "Car Rental", "Hotel Mgmt", "Digital Wallet", "Airline Mgmt", "Library Mgmt", "Traffic Signal", "Concert Ticket", "Social Network"] },
+                { name: "Hard", topics: ["Spotify", "Amazon", "LinkedIn", "CricInfo", "Chess", "Coffee Vending", "Restaurant Mgmt", "Stock Exchange", "Course Registration", "BookMyShow", "Online Auction", "Food Delivery", "Ride-Sharing"] }
+            ]
+        }
+    ]
