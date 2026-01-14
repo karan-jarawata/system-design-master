@@ -1,0 +1,66 @@
+[
+        {
+            id: 1, title: "1. Foundations", subtitle: "Distributed Systems",
+            groups: [
+                { name: "Architecture", topics: ["Client-Server", "Monolithic vs Microservices", "Serverless (FaaS)"] },
+                { name: "Scaling", topics: ["Vertical vs Horizontal Scaling", "Latency vs Throughput", "Stateless vs Stateful"] },
+                { name: "Comms", topics: ["HTTP/1.1 vs HTTP/2", "TCP vs UDP", "WebSocket", "REST", "GraphQL", "gRPC", "Polling vs SSE"] }
+            ]
+        },
+        {
+            id: 2, title: "2. The Rules", subtitle: "Principles & Theorems",
+            groups: [
+                { name: "Consistency", topics: ["CAP Theorem", "PACELC Theorem", "Strong vs Eventual Consistency", "BASE Properties"] },
+                { name: "Transactions", topics: ["ACID Transactions"] },
+                { name: "Reliability", topics: ["Single Point of Failure", "Fallacies of Distributed Computing", "Amdahl's Law", "Backpressure"] }
+            ]
+        },
+        {
+            id: 3, title: "3. System Toolkit", subtitle: "Components",
+            groups: [
+                { name: "Load Balancing", topics: ["L4 vs L7 LB", "Round Robin", "Consistent Hashing", "Health Checks"] },
+                { name: "Caching", topics: ["Write-through", "Write-back", "Cache-aside", "Eviction (LRU/LFU)", "Redis/Memcached", "CDN"] },
+                { name: "Messaging", topics: ["Pub-Sub vs P2P", "Kafka vs RabbitMQ", "Dead Letter Queues"] },
+                { name: "Proxies", topics: ["Forward vs Reverse Proxy", "API Gateway vs LB"] }
+            ]
+        },
+        {
+            id: 4, title: "4. Data Architecture", subtitle: "Storage",
+            groups: [
+                { name: "DB Types", topics: ["RDBMS (MySQL)", "NoSQL (Mongo, Dynamo)", "Columnar (Cassandra)", "Graph (Neo4j)"] },
+                { name: "Scaling Data", topics: ["Replication (Master-Slave)", "Sharding & Keys", "Federation"] },
+                { name: "Advanced", topics: ["B-Trees vs LSM Trees", "Bloom Filters", "Quorum Consensus", "Paxos & Raft"] }
+            ]
+        },
+        {
+            id: 5, title: "5. Advanced Arch", subtitle: "Resilience & Security",
+            groups: [
+                { name: "Transactions", topics: ["2-Phase Commit", "3-Phase Commit", "Saga Pattern"] },
+                { name: "Resilience", topics: ["Circuit Breaker", "Bulkhead", "Retry & Jitter", "Rate Limiting", "Idempotency"] },
+                { name: "Security", topics: ["OAuth 2.0 / JWT", "SSL/TLS Handshake", "Encryption", "DDoS Mitigation"] }
+            ]
+        },
+        {
+            id: 6, title: "6. Observability", subtitle: "Ops & Metrics",
+            groups: [
+                { name: "Monitoring", topics: ["Metrics (Prometheus)", "Dashboards (Grafana)"] },
+                { name: "Logging", topics: ["ELK Stack", "Structured Logging"] },
+                { name: "Tracing", topics: ["Distributed Tracing", "Span Context"] },
+                { name: "Deploy", topics: ["Blue-Green", "Canary", "Rolling Updates"] }
+            ]
+        },
+        {
+            id: 7, title: "7. Patterns", subtitle: "Architectural Patterns",
+            groups: [
+                { name: "Modern Patterns", topics: ["Sidecar", "Ambassador", "Strangler Fig", "CQRS", "Event Sourcing", "Service Discovery"] }
+            ]
+        },
+        {
+            id: 8, title: "8. The Gauntlet", subtitle: "Interview Questions",
+            groups: [
+                { name: "Easy", topics: ["URL Shortener", "Key-Value Store", "ID Generator", "Pastebin"] },
+                { name: "Medium", topics: ["Chat System", "Social Feed", "Notification Service", "Rate Limiter", "Typeahead/Search", "Web Crawler", "Google Drive"] },
+                { name: "Hard", topics: ["Video Streaming (Netflix)", "Ride Hailing (Uber)", "E-Commerce (Amazon)", "Location Service (Yelp)", "Distributed Search", "Payment System", "Metrics Monitoring", "Live Streaming", "Ticket Booking"] }
+            ]
+        }
+    ]
