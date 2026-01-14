@@ -358,6 +358,41 @@
             overflow-x: auto;
         }
 
+
+
+		/* Styling for code inside the text description */
+		.tt-body code {
+		    background: rgba(0, 0, 0, 0.1); /* Light grey bg */
+		    padding: 2px 5px;
+		    border-radius: 4px;
+		    font-family: 'Courier New', monospace;
+		    font-size: 0.9em;
+		    color: var(--accent); /* Uses your theme blue/purple */
+		    border: 1px solid var(--border);
+		}
+		
+		.dark .tt-body code {
+		    background: rgba(255, 255, 255, 0.1);
+		}
+		
+		/* If you want a full multi-line block inside the text */
+		.tt-body pre {
+		    background: var(--bg-sidebar);
+		    padding: 10px;
+		    border-radius: 6px;
+		    border: 1px solid var(--border);
+		    overflow-x: auto;
+		    margin: 10px 0;
+		}
+		.tt-body pre code {
+		    background: none;
+		    border: none;
+		    padding: 0;
+		    color: var(--text-primary);
+		}
+
+		
+
     </style>
 </head>
 <body data-mode="LLD">
@@ -874,5 +909,6 @@
 </script>
 </body>
 </html>
+
 
 
