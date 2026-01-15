@@ -15,5 +15,158 @@
         "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>Memory Allocation:</b><ul><li><b>Class:</b> Loaded into Method Area (Metaspace in modern Java).</li><li><b>Object:</b> Allocated on the <b>Heap</b>.</li><li><b>Reference:</b> The variable (e.g., <code>c1</code>) is stored on the <b>Stack</b> and points to the Heap address.</li></ul></li><li><b>The <code>this</code> keyword:</b> Refers to the current object instance. It resolves ambiguity between class fields and parameters.</li><li><b>Object Equality:</b><ul><li><code>==</code> checks if two references point to the same memory address (<b>Identity</b>).</li><li><code>.equals()</code> (if overridden) checks if two objects have the same content (<b>State</b>).</li></ul></li><li><b>Lifecycle:</b> Objects are created via constructors and destroyed by the Garbage Collector (GC) when they are no longer reachable.</li><li><b>Anemic vs. Rich Domain Models:</b><ul><li><b>Anemic:</b> Classes only have data (getters/setters) and no logic. (Common in DTOs).</li><li><b>Rich:</b> Classes contain both data and the business logic that modifies that data. (Preferred in good OOP/LLD).</li></ul></li></ul>"
       }
     ]
+  },
+  {
+  "Interfaces": {
+    "blocks": [
+      {
+        "type": "text",
+        "content": "<p><b>Core Concept:</b></p><ul><li><b>An Interface is a contract:</b> It defines <i>what</i> a class can do, without specifying <i>how</i> it does it. It is a collection of abstract methods (mostly) and constants that a class must implement.</li></ul><br><p><b>Why use it?</b></p><ul><li><b>Abstraction:</b> It hides implementation details and exposes only the capability.</li><li><b>Decoupling:</b> You can change the implementation without changing the code that uses it (<i>Dependency Inversion Principle</i>).</li><li><b>Multiple Inheritance:</b> Java classes cannot extend multiple classes, but they can implement multiple interfaces.</li><li><b>Polymorphism:</b> You can treat different objects (e.g., <code>Dog</code>, <code>Cat</code>) as the same type (e.g., <code>Animal</code>) if they implement the same interface.</li></ul><br><p><b>Key Components:</b></p><ul><li><b>Abstract Methods:</b> Methods without a body (implicitly <code>public abstract</code>).</li><li><b>Constants:</b> Variables are implicitly <code>public static final</code>.</li><li><b>Java 8+ Evolution:</b><ul><li><b>Default Methods:</b> Methods with a body (using <code>default</code> keyword) to allow adding new methods without breaking existing implementations.</li><li><b>Static Methods:</b> Utility methods related to the interface.</li></ul></li></ul>"
+      },
+      {
+        "type": "code",
+        "language": "java",
+        "content": "// The Contract\ninterface PaymentProcessor {\n    void processPayment(double amount); // Abstract method\n    \n    // Java 8 Default method (Backward compatibility)\n    default void logTransaction() {\n        System.out.println(\"Logging tx...\");\n    }\n}\n\n// The Implementation A\nclass PaypalProcessor implements PaymentProcessor {\n    public void processPayment(double amount) {\n        System.out.println(\"Paid via PayPal: \" + amount);\n    }\n}\n\n// The Implementation B\nclass StripeProcessor implements PaymentProcessor {\n    public void processPayment(double amount) {\n        System.out.println(\"Paid via Stripe: \" + amount);\n    }\n}\n\n// Usage (Polymorphism)\nclass CheckoutService {\n    // We program to the Interface, not the implementation\n    PaymentProcessor processor; \n\n    public CheckoutService(PaymentProcessor processor) {\n        this.processor = processor;\n    }\n}"
+      },
+      {
+        "type": "text",
+        "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>\"Program to an Interface, not an Implementation\":</b> This is a golden rule in design patterns. Always use the interface type for variable references (e.g., <code>List&lt;String&gt; list = new ArrayList&lt;&gt;();</code>).</li><li><b>Interface Segregation Principle (ISP):</b> Clients should not be forced to depend on interfaces they do not use. It's better to have many specific interfaces (e.g., <code>Readable</code>, <code>Writable</code>) than one general-purpose interface (e.g., <code>FileHandler</code>).</li><li><b>Interface vs. Abstract Class:</b><ul><li><b>Interface:</b> Defines \"Can-Do\" capability (e.g., <code>Runnable</code>, <code>Serializable</code>). Supports multiple implementations.</li><li><b>Abstract Class:</b> Defines \"Is-A\" relationship (e.g., <code>Vehicle</code>, <code>Mammal</code>). Shares code/state among related classes.</li></ul></li><li><b>Marker Interfaces:</b> Interfaces with no methods (e.g., <code>Serializable</code>, <code>Cloneable</code>). They provide metadata to the compiler or runtime that the class is special.</li><li><b>Functional Interface:</b> An interface with exactly one abstract method. Used heavily in Lambda expressions (e.g., <code>Runnable</code>, <code>Comparator</code>).</li></ul>"
+      }
+    ]
+  }
+},
+{
+  "Inheritance": {
+    "blocks": [
+      {
+        "type": "text",
+        "content": "<p><b>Core Concept:</b></p><ul><li><b>Inheritance</b> is the mechanism by which one class (Child/Subclass) acquires the properties (fields) and behaviors (methods) of another class (Parent/Superclass). It establishes an \"Is-A\" relationship.</li></ul><br><p><b>Why use it?</b></p><ul><li><b>Code Reusability:</b> Write common code once in the parent class and reuse it in multiple child classes.</li><li><b>Extensibility:</b> You can extend existing logic without modifying the original class (<i>Open/Closed Principle</i>).</li><li><b>Method Overriding:</b> Child classes can provide a specific implementation of a method already defined in the parent class.</li></ul><br><p><b>Key Components:</b></p><ul><li><b>Superclass (Parent/Base):</b> The class whose features are inherited.</li><li><b>Subclass (Child/Derived):</b> The class that inherits the other class.</li><li><b><code>extends</code> Keyword:</b> Used in Java to inherit from a class.</li><li><b><code>super</code> Keyword:</b> Used to access members (methods/constructors) of the immediate parent class.</li></ul>"
+      },
+      {
+        "type": "code",
+        "language": "java",
+        "content": "// Parent Class\nclass Vehicle {\n    protected String brand = \"Ford\"; // protected: accessible to subclasses\n    public void honk() {\n        System.out.println(\"Tuut, tuut!\");\n    }\n}\n\n// Child Class\nclass Car extends Vehicle {\n    private String modelName = \"Mustang\";\n    \n    // Overriding parent behavior\n    @Override \n    public void honk() {\n        super.honk(); // Calls parent's honk first\n        System.out.println(\"Honk from \" + modelName);\n    }\n}\n\nclass Main {\n    public static void main(String[] args) {\n        Car myCar = new Car();\n        myCar.honk(); // OUTPUT: Tuut, tuut! \\n Honk from Mustang\n        // myCar.brand is accessible here only if Main is in same package or subclass\n    }\n}"
+      },
+      {
+        "type": "text",
+        "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>The Diamond Problem:</b> Java does not support Multiple Inheritance with Classes (inheriting from two classes that have the same method). It solves this via Interfaces.</li><li><b>Liskov Substitution Principle (LSP):</b> A child class must be substitutable for its parent class without breaking the application. If <code>Dog</code> extends <code>Animal</code>, you should be able to use <code>Dog</code> anywhere <code>Animal</code> is expected.</li><li><b>Constructors are NOT inherited:</b> But the child class constructor must call the parent constructor (implicitly or explicitly via <code>super()</code>) as the first statement.</li><li><b><code>final</code> Class:</b> If a class is marked <code>final</code>, it cannot be inherited (e.g., <code>String</code> class in Java).</li><li><b>Composition over Inheritance:</b> In modern LLD, prefer Composition (\"Has-A\") over Inheritance (\"Is-A\") if the relationship is not strictly hierarchical. Inheritance creates tight coupling; composition is more flexible.</li></ul>"
+      }
+    ]
+  }
+},
+{
+  "Polymorphism": {
+    "blocks": [
+      {
+        "type": "text",
+        "content": "<p><b>Core Concept:</b></p><ul><li><b>Polymorphism</b> (Greek for \"many forms\") is the ability of a single interface or method name to support different underlying forms (types or implementations). It allows objects of different classes to be treated as objects of a common superclass.</li></ul><br><p><b>Why use it?</b></p><ul><li><b>Flexibility:</b> You can write code that works with a general type (e.g., <code>Shape</code>) and it will automatically work with any new specific types you add later (e.g., <code>Pentagon</code>) without changing the code.</li><li><b>Clean Code:</b> Reduces <code>if-else</code> or <code>switch</code> statements checking for types.</li><li><b>Decoupling:</b> The caller doesn't need to know the specific class of the object it's working with.</li></ul><br><p><b>Key Components:</b></p><ul><li><b>Compile-time Polymorphism (Static Binding):</b><ul><li>Achieved via <b>Method Overloading</b>.</li><li>Same method name, different parameters (signature) within the same class.</li><li>Resolved by the compiler.</li></ul></li><li><b>Runtime Polymorphism (Dynamic Binding):</b><ul><li>Achieved via <b>Method Overriding</b>.</li><li>Same method name and parameters in a Parent and Child class.</li><li>Resolved at runtime based on the actual object created.</li></ul></li></ul>"
+      },
+      {
+        "type": "code",
+        "language": "java",
+        "content": "// 1. Compile-time (Overloading)\nclass Calculator {\n    int add(int a, int b) { return a + b; }\n    double add(double a, double b) { return a + b; }\n}\n\n// 2. Runtime (Overriding)\nclass Animal {\n    void speak() { System.out.println(\"Animal makes a sound\"); }\n}\n\nclass Dog extends Animal {\n    @Override\n    void speak() { System.out.println(\"Woof\"); }\n}\n\nclass Cat extends Animal {\n    @Override\n    void speak() { System.out.println(\"Meow\"); }\n}\n\nclass Main {\n    public static void main(String[] args) {\n        // Upcasting: Parent Reference -> Child Object\n        Animal myPet = new Dog(); \n        \n        // The method called depends on the OBJECT (Dog), not the reference (Animal)\n        myPet.speak(); // Output: Woof\n        \n        myPet = new Cat();\n        myPet.speak(); // Output: Meow\n    }\n}"
+      },
+      {
+        "type": "text",
+        "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>Upcasting:</b> Assigning a Child object to a Parent reference (e.g., <code>Animal a = new Dog()</code>). This is safe and implicit.</li><li><b>Downcasting:</b> Assigning a Parent reference back to a Child reference (e.g., <code>Dog d = (Dog) a</code>). This requires an explicit cast and an <code>instanceof</code> check to avoid <code>ClassCastException</code>.</li><li><b>Dynamic Method Dispatch:</b> This is the mechanism Java uses at runtime to figure out which version of an overridden method to call.</li><li><b>Static methods are NOT polymorphic:</b> If you define a static method with the same name in Parent and Child, the Child hides the Parent's method (<i>Method Hiding</i>), but it does not override it. The method called depends on the reference type, not the object.</li><li><b>Fields are NOT polymorphic:</b> If a Child defines a variable with the same name as the Parent, the variable accessed depends on the reference type.</li></ul>"
+      }
+    ]
+  }
+},
+{
+  "Abstraction": {
+    "blocks": [
+      {
+        "type": "text",
+        "content": "<p><b>Core Concept:</b></p><ul><li><b>Abstraction</b> is the process of hiding the complex implementation details and showing only the essential features of an object. It focuses on <i>what</i> an object does instead of <i>how</i> it does it.</li><li><b>Analogy:</b> Think of a car. You use the steering wheel and pedals (<b>Abstraction/Interface</b>) to drive. You don't need to know how the fuel injection or combustion engine (<b>Implementation</b>) works to operate it.</li></ul><br><p><b>Why use it?</b></p><ul><li><b>Reduces Complexity:</b> It simplifies the interaction for the user (or client code) by filtering out unnecessary details.</li><li><b>Security:</b> Hides internal data and logic that shouldn't be touched directly.</li><li><b>Maintainability:</b> You can change the complex internal logic (e.g., upgrade the engine) without changing the simple interface (the steering wheel), so client code doesn't break.</li></ul><br><p><b>Key Components:</b></p><ul><li><b>Abstract Class:</b> A class that cannot be instantiated on its own (0-100% abstraction). It can have both abstract methods (no body) and concrete methods (with body).</li><li><b>Interface:</b> A pure template (100% abstraction prior to Java 8). Defines only method signatures.</li><li><b>Access Modifiers:</b> Keywords like <code>private</code> and <code>protected</code> help enforce abstraction by hiding internal members.</li></ul>"
+      },
+      {
+        "type": "code",
+        "language": "java",
+        "content": "// Abstract Class - partial abstraction\nabstract class BankService {\n    // Abstract method: Logic hidden, must be defined by child\n    abstract void calculateInterest(); \n\n    // Concrete method: Common logic shared by all\n    void login() {\n        System.out.println(\"User Logged in\");\n    }\n}\n\nclass SavingsAccount extends BankService {\n    @Override\n    void calculateInterest() {\n        System.out.println(\"Interest is 4%\");\n    }\n}\n\nclass CurrentAccount extends BankService {\n    @Override\n    void calculateInterest() {\n        System.out.println(\"Interest is 0%\");\n    }\n}\n\nclass Main {\n    public static void main(String[] args) {\n        // BankService b = new BankService(); // ERROR: Cannot instantiate abstract class\n        \n        BankService myBank = new SavingsAccount();\n        myBank.login();             // Shared logic\n        myBank.calculateInterest(); // Specific logic\n    }\n}"
+      },
+      {
+        "type": "text",
+        "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>Encapsulation vs. Abstraction:</b><ul><li><b>Encapsulation</b> is about hiding data (bundling data + methods).</li><li><b>Abstraction</b> is about hiding implementation complexity (design level).</li></ul></li><li><b>\"Is-A\" Relationship:</b> Abstract classes are still classes. Use them when child classes share a lot of code but also need specific behavior (e.g., <code>Bird</code> is an abstract class, <code>Sparrow</code> and <code>Penguin</code> extend it).</li><li><b>The 100% Rule:</b> Before Java 8, Interfaces provided 100% abstraction. Now, with default methods, this line is slightly blurred, but conceptually they are still pure contracts.</li><li><b>Design Decision:</b> If you need to add a new method in the future:<ul><li><b>Abstract Class:</b> You can add a concrete method with a default implementation, and existing child classes will work fine.</li><li><b>Interface:</b> Adding a new abstract method breaks all implementing classes (unless you use a <code>default</code> method).</li></ul></li></ul>"
+      }
+    ]
+  }
+},
+{
+  "Encapsulation": {
+    "blocks": [
+      {
+        "type": "text",
+        "content": "<p><b>Core Concept:</b></p><ul><li><b>Encapsulation</b> is the bundling of data (variables) and methods (functions) that operate on that data into a single unit (Class). Crucially, it involves restricting direct access to some of an object's components, often referred to as \"<i>Data Hiding</i>\".</li><li><b>Analogy:</b> Think of a medical capsule: The medicine (data) is enclosed inside the capsule shell (methods), preventing it from being consumed directly or contaminated.</li></ul><br><p><b>Why use it?</b></p><ul><li><b>Control & Validation:</b> You can validate data before assigning it. For example, preventing a generic age variable from being set to -5.</li><li><b>Security:</b> Hides internal implementation details and protects the object's integrity.</li><li><b>Flexibility (Loose Coupling):</b> You can change the internal data structure (e.g., changing a variable from <code>String</code> to <code>StringBuilder</code>) without breaking the code that uses the class, as long as the public methods remain the same.</li></ul><br><p><b>Key Components:</b></p><ul><li><b>Access Modifiers:</b> The tools used to enforce encapsulation.<ul><li><code>private</code>: Visible only within the class (Best for state).</li><li><code>protected</code>: Visible to package + subclasses.</li><li><code>public</code>: Visible to everyone (Best for methods/interface).</li><li><code>(default/package-private)</code>: Visible only within the package.</li></ul></li><li><b>Getters (Accessors):</b> Public methods to read private data.</li><li><b>Setters (Mutators):</b> Public methods to modify private data (usually with validation logic).</li></ul>"
+      },
+      {
+        "type": "code",
+        "language": "java",
+        "content": "public class User {\n    // 1. Data is Private (Hidden)\n    private String username;\n    private int age;\n\n    // 2. Public Constructor\n    public User(String username, int age) {\n        this.username = username;\n        setAge(age); // Use setter to enforce logic even during creation\n    }\n\n    // 3. Public Getters (Read-only access)\n    public String getUsername() {\n        return username;\n    }\n\n    // 4. Public Setters (Controlled Write access)\n    public void setAge(int age) {\n        if (age > 0 && age < 120) {\n            this.age = age;\n        } else {\n            System.out.println(\"Invalid age provided\");\n            // Optionally throw exception\n        }\n    }\n}\n\nclass Main {\n    public static void main(String[] args) {\n        User u = new User(\"John\", 25);\n        // u.age = -5; // ERROR: usage of private field\n        u.setAge(-5);  // Output: Invalid age provided. Data remains safe.\n    }\n}"
+      },
+      {
+        "type": "text",
+        "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>Getters/Setters are NOT mandatory:</b> Pure encapsulation isn't just generating getters and setters for every field (that makes it anemic). True encapsulation often involves methods that do things (e.g., <code>activateAccount()</code> instead of <code>setStatus(\"Active\")</code>).</li><li><b>Immutability:</b> A powerful form of encapsulation. If you make all fields <code>private final</code> and provide no setters, the object state cannot change once created. This makes the code thread-safe and predictable (e.g., <code>String</code> class).</li><li><b>\"Tell, Don't Ask\":</b> A design principle related to encapsulation. Instead of asking an object for its data to perform a calculation (if <code>user.getAge() > 18</code>), tell the object to do it (if <code>user.isAdult()</code>).</li><li><b>Encapsulation vs. Abstraction:</b><ul><li><b>Encapsulation:</b> Hiding Information (State).</li><li><b>Abstraction:</b> Hiding Complexity (Implementation).</li></ul></li></ul>"
+      }
+    ]
+  }
+},
+{
+  "Access Modifiers": {
+    "blocks": [
+      {
+        "type": "text",
+        "content": "<p><b>Core Concept:</b></p><ul><li><b>Access modifiers</b> are keywords that define the scope and visibility of a class, constructor, variable, method, or data member. They determine who can see and use a specific part of your code.</li></ul><br><p><b>Why use it?</b></p><ul><li><b>Encapsulation:</b> They are the primary tool to implement encapsulation (hiding internal state).</li><li><b>Security:</b> Prevents sensitive data or critical logic from being tampered with by external classes.</li><li><b>Maintainability:</b> By restricting access, you limit the \"blast radius\" of changes. If a method is private, you can change it freely knowing no other class relies on it.</li></ul><br><p><b>Key Components (The 4 Levels):</b></p><ul><li><b>Private (<code>private</code>):</b> Only within the Same Class. <br><i>Analogy: Your diary. Only you can read it.</i></li><li><b>Default (none):</b> Within the Same Package only. (Package-Private). <br><i>Analogy: Family fridge. Accessible to everyone in the house.</i></li><li><b>Protected (<code>protected</code>):</b> Same Package + Subclasses (even in different packages). <br><i>Analogy: Family inheritance. Kids get it even if they move out.</i></li><li><b>Public (<code>public</code>):</b> Everywhere (Global). <br><i>Analogy: A billboard. Visible to the world.</i></li></ul>"
+      },
+      {
+        "type": "code",
+        "language": "java",
+        "content": "// PACKAGE A\npackage com.test.a;\npublic class Parent {\n    public int publicVar = 1;\n    protected int protectedVar = 2;\n    int defaultVar = 3;   // No keyword = Default\n    private int privateVar = 4;\n    \n    public void show() {\n        // All accessible here\n        System.out.println(privateVar); \n    }\n}\n\n// PACKAGE B\npackage com.test.b;\nimport com.test.a.Parent;\n\nclass Child extends Parent {\n    void accessTest() {\n        System.out.println(publicVar);    // OK\n        System.out.println(protectedVar); // OK (Child Class)\n        // System.out.println(defaultVar);   // ERROR: Diff Package\n        // System.out.println(privateVar);   // ERROR: Private\n    }\n}\n\nclass Stranger {\n    void accessTest() {\n        Parent p = new Parent();\n        System.out.println(p.publicVar);  // OK\n        // System.out.println(p.protectedVar); // ERROR: Not a child\n    }\n}"
+      },
+      {
+        "type": "text",
+        "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>Principle of Least Privilege:</b> Always start with the most restrictive modifier (<code>private</code>) and open it up (<code>protected</code> -> <code>public</code>) only when absolutely necessary. This reduces coupling.</li><li><b>Class vs. Member:</b><ul><li>Top-level classes can only be <code>public</code> or <code>default</code> (package-private). They cannot be <code>private</code> or <code>protected</code>.</li><li>Nested/Inner classes can be all four.</li></ul></li><li><b>Method Overriding Rule:</b> When overriding a method in a child class, you cannot reduce the visibility. If Parent is <code>protected</code>, Child must be <code>protected</code> or <code>public</code>. It cannot be <code>private</code>.</li><li><b>Interface Members:</b><ul><li>Variables in interfaces are implicitly <code>public static final</code>.</li><li>Methods in interfaces are implicitly <code>public</code> (unless <code>private</code> in Java 9+).</li></ul></li></ul>"
+      }
+    ]
+  }
+},
+{
+  "Object Lifecycle": {
+    "blocks": [
+      {
+        "type": "text",
+        "content": "<p><b>Core Concept:</b></p><ul><li><b>The Object Lifecycle</b> describes the series of states an object goes through from its <b>Creation</b> (instantiation), to its <b>Usage</b> (performing actions), and finally to its <b>Destruction</b> (garbage collection/memory deallocation).</li></ul><br><p><b>Why use it?</b></p><ul><li><b>Memory Management:</b> Understanding the lifecycle helps prevent <i>Memory Leaks</i> (objects staying in memory when no longer needed).</li><li><b>Resource Management:</b> Ensures external resources (file handles, database connections) are opened and closed correctly.</li><li><b>Performance:</b> Knowing how objects are promoted (e.g., from Young to Old Generation in Java) helps in tuning application performance.</li></ul><br><p><b>Key Components (The 3 Stages):</b></p><ul><li><b>Creation (Initialization):</b><ul><li><b>Loading:</b> The <code>.class</code> file is loaded into the Method Area.</li><li><b>Allocation:</b> Memory is allocated on the <b>Heap</b> for the object.</li><li><b>Initialization:</b> The constructor is called to initialize the state.</li></ul></li><li><b>Usage (Live):</b> The object is referenced by a variable on the <b>Stack</b> or by another live object. It actively performs tasks.</li><li><b>Destruction (Death):</b><ul><li><b>Unreachable:</b> All references to the object are removed (e.g., set to <code>null</code> or out of scope).</li><li><b>Garbage Collection (GC):</b> The GC identifies the object as unreachable and reclaims the memory.</li></ul></li></ul>"
+      },
+      {
+        "type": "code",
+        "language": "java",
+        "content": "class Report {\n    String data;\n    \n    public Report() {\n        System.out.println(\"1. Object Created (Constructor)\");\n    }\n    \n    public void print() {\n        System.out.println(\"2. Object in Use\");\n    }\n\n    // Deprecated in modern Java, but good for understanding lifecycle concepts\n    @Override\n    protected void finalize() { \n        System.out.println(\"3. Object Destroyed/GC'd\");\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        // Step 1: Creation\n        Report r = new Report(); \n        \n        // Step 2: Usage\n        r.print();\n        \n        // Step 3: Making Eligible for Destruction\n        r = null; // Reference broken. Object is now \"Unreachable\"\n        \n        // Requesting GC (Note: This is just a request, not a command)\n        System.gc(); \n    }\n}"
+      },
+      {
+        "type": "text",
+        "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>Stack vs. Heap:</b><ul><li><b>Local Variables</b> (references) live on the <b>Stack</b>.</li><li><b>Objects</b> (actual data) live on the <b>Heap</b>.</li><li>When a stack frame (method) ends, the references pop off, leaving the heap objects eligible for GC if no other references exist.</li></ul></li><li><b>Reachability:</b> An object is only garbage collected if there is no chain of references leading to it from a \"GC Root\" (active thread, static variable, local variable).</li><li><b>Generational GC:</b><ul><li><b>Eden Space:</b> Where new objects are born.</li><li><b>Survivor Space:</b> Objects that survive a GC cycle.</li><li><b>Old/Tenured Gen:</b> Long-lived objects (caches, singletons) move here.</li></ul></li><li><b><code>finalize()</code> is Deprecated:</b> Never rely on <code>finalize()</code> for cleanup (it's unpredictable). Use <code>try-with-resources</code> (<code>AutoCloseable</code> interface) for deterministic cleanup of resources like streams or connections.</li><li><b>Static Variables:</b> These live for the entire life of the application (Class Lifecycle), effectively acting as GC Roots. Be careful—they are a common source of memory leaks.</li></ul>"
+      }
+    ]
+  }
+},
+{
+  "Stack vs Heap": {
+    "blocks": [
+      {
+        "type": "text",
+        "content": "<p><b>Core Concept:</b></p>These are the two main areas of memory used by a program.<br><ul><li><b>Stack:</b> A structured, temporary scratchpad for method execution. It stores local primitives and reference variables. It follows the <b>LIFO</b> (Last-In, First-Out) order.</li><li><b>Heap:</b> A large, unstructured pool for dynamic data storage. It stores actual <b>Objects</b> and JRE classes. Memory here is managed by the Garbage Collector.</li></ul><br><p><b>Why use them? (The Roles)</b></p><ul><li><b>Stack (Control Flow):</b> Used to track \"where am I in the code?\". It manages function calls, parameters, and return addresses automatically. When a method finishes, its block is instantly cleared.</li><li><b>Heap (Data Persistence):</b> Used when data needs to live longer than a single function call or when the size of data isn't known at compile time (e.g., a list that grows based on user input).</li></ul><br><p><b>Key Components (Comparison):</b></p><ul><li><b>Structure:</b> Stack is Linear (LIFO); Heap is Hierarchical/Complex (Young/Old Gen).</li><li><b>Visibility:</b> Stack is <b>Thread-safe</b> (private to each thread). Heap is <b>Shared</b> (all threads share the same Heap, requires synchronization).</li><li><b>Speed:</b> Stack has extremely fast access. Heap is slower due to complex allocation and lookup.</li><li><b>Life Span:</b> Stack is short-lived (method execution). Heap is long-lived (until GC).</li></ul>"
+      },
+      {
+        "type": "code",
+        "language": "java",
+        "content": "public class MemoryDemo {\n    public static void main(String[] args) { // Main Stack Frame starts\n        int x = 10;           // 'x' (primitive) stored directly on Stack\n        int y = 20;           // 'y' (primitive) stored directly on Stack\n        \n        Person p = new Person(\"Alice\"); \n        // 1. 'new Person(\"Alice\")' -> Creates Object in HEAP\n        // 2. 'p' (reference variable) -> Stored on STACK, pointing to Heap address\n        \n        print(p); \n    } // Main Stack Frame pops off (x, y, p are gone). Heap object becomes eligible for GC.\n\n    public static void print(Person p) { // New Stack Frame created\n        // 'p' here is a copy of the reference, pointing to same Heap Object\n        System.out.println(p.name);\n    }\n}"
+      },
+      {
+        "type": "text",
+        "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>The References Rule:</b><ul><li><b>Primitives (int, boolean):</b> Value sits directly on the <b>Stack</b> (if local).</li><li><b>Objects (String, List, Car):</b> The <b>Reference</b> sits on the Stack, but the <b>Actual Data</b> sits in the <b>Heap</b>.</li></ul></li><li><b>The Errors:</b><ul><li><b>StackOverflowError:</b> Happens due to deep/infinite recursion. The stack runs out of space for new frames.</li><li><b>OutOfMemoryError (Java Heap Space):</b> Happens when you create too many objects and the GC cannot free up enough space.</li></ul></li><li><b>String Pool:</b> A special area inside the Heap to store String literals for reusability.</li><li><b>Thread Safety:</b> Since Stack is private to a thread, local variables are inherently thread-safe. Heap objects are shared, so if multiple threads modify the same object, you need <b>Locks/Synchronization</b>.</li></ul>"
+      }
+    ]
   }
 }
+}
+
