@@ -928,7 +928,19 @@
                         <textarea id="${codeId}-raw" style="display:none;">${block.content}</textarea>
                     </div>
                 </div>`;
-            }
+            }else if (block.type === 'gallery') {
+                    html += `<div class="modal-images">`;
+                    
+                    block.urls.forEach(url => {
+                        html += `<img src="${url}" class="modal-img" alt="Topic Diagram" loading="lazy">`;
+                    });
+            
+                    if (block.caption) {
+                        html += `<p class="modal-text" style="text-align: center; font-size: 0.85rem; color: var(--text-secondary); margin-top: 5px;">${block.caption}</p>`;
+                    }
+                    
+                    html += `</div>`;
+                }
         });
         modalBody.innerHTML = html;
     }
@@ -1164,6 +1176,7 @@ function copyToClipboard(elementId) {
 </script>
 </body>
 </html>
+
 
 
 
