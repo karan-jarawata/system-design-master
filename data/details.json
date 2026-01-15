@@ -390,7 +390,14 @@
     {
       "type": "text",
       "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>The N+1 Problem (Performance Killer):</b><ul><li><b>Scenario:</b> You fetch 100 <code>Department</code> objects. Then you loop through them and call <code>dept.getEmployees()</code> for each one.</li><li><b>What happens:</b> 1 Query to get Departments + 100 Queries (one per department) to get their employees = 101 Queries.</li><li><b>Fix:</b> Use \"Join Fetch\" (eagerly load data in the initial query using a JOIN) or Entity Graphs.</li></ul></li><li><b>Lazy vs. Eager Loading:</b><ul><li><b>Eager:</b> \"Bring the Jungle.\" When you fetch the User, the ORM effectively does a JOIN and fetches all their Orders immediately.</li><li><b>Lazy:</b> \"Bring the Banana.\" When you fetch User, the Orders list is just a proxy (empty placeholder). The DB query fires only when you touch <code>user.getOrders()</code>. <b>Best Practice:</b> Prefer Lazy loading.</li></ul></li><li><b>Caching (L1 vs L2):</b><ul><li><b>Level 1 (Session Cache):</b> Default. Within a single transaction, if you ask for User ID #1 twice, the ORM returns it from memory the second time.</li><li><b>Level 2 (Global Cache):</b> Optional (e.g., Redis). Shared across all users/sessions. Good for read-heavy, static data.</li></ul></li><li><b>Dirty Checking:</b> You don't always need to call <code>repository.save(user)</code>. If you modify a fetched object inside a <code>@Transactional</code> block, the ORM automatically detects the change and fires the UPDATE query when the transaction ends.</li></ul>"
-    }
+    },
+    {
+        "type": "gallery",
+        "urls": [
+          "images/ormmapping.png"
+        ],
+        "caption": ""
+      }
   ]
 }
 
@@ -398,6 +405,7 @@
 
   
 }
+
 
 
 
