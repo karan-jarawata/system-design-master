@@ -899,6 +899,8 @@
     document.getElementById('modalTitle').innerText = key;
     const modalBody = document.getElementById('modalBody');
 
+        modalBody.scrollTop = 0;
+        
     if (!details || !details.blocks) {
         // Fallback for old format or empty
         modalBody.innerHTML = `<p class="modal-text">No formatted notes available.</p>`;
@@ -1162,6 +1164,7 @@ function copyToClipboard(elementId) {
 </script>
 </body>
 </html>
+
 
 
 
