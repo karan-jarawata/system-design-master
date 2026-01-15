@@ -304,26 +304,29 @@
       "content": "<p><b>Cardinality & Participation (The Rules):</b></p><ul><li><b>Cardinality (Maximums):</b><ul><li><b>1:1 (One-to-One):</b> CEO manages Company.</li><li><b>1:N (One-to-Many):</b> Customer places Orders.</li><li><b>M:N (Many-to-Many):</b> Actor acts in Movies.</li></ul></li><li><b>Participation (Minimums):</b><ul><li><b>Total (Mandatory):</b> Every entity must be involved (e.g., Every Loan must belong to a Bank). Symbol: Double Line.</li><li><b>Partial (Optional):</b> Not every entity needs to be involved (e.g., Not every Employee manages a Department). Symbol: Single Line.</li></ul></li></ul>"
     },
     {
-      "type": "code",
-      "language": "sql",
-      "content": "-- Crow's Foot Notation Cheat Sheet (Industrial Standard)\n-- ||   -> Mandatory One (Exactly one)\n-- |<-  -> Mandatory Many (At least one)\n-- 0|   -> Optional One (Zero or one)\n-- 0<-  -> Optional Many (Zero or many)\n\n-- The M:N Trap Solution (Physical DB Implementation)\n-- Problem: You cannot do [Student] <---> [Course] directly.\n-- Solution: Create a Junction Table (Associative Entity).\n\n[Student] 1 <---- * [Enrollment] * ----> 1 [Course]\n\n-- Table Structure:\n-- Enrollment {\n--   student_id (FK),\n--   course_id (FK),\n--   grade,\n--   date\n-- }"
-    },
+        "type": "gallery",
+        "urls": [
+          "images/erdiagram3.png"
+        ],
+        "caption": ""
+      },
     {
       "type": "text",
       "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>The M:N Trap:</b> You cannot implement a Many-to-Many relationship in a physical SQL database. You <i>must</i> create a \"Join Table\" (or Junction Table) to break it into two 1:N relationships.</li><li><b>Identifying Weak Entities:</b> Ask: \"If I delete the Parent, does this child disappear entirely and lose its identity?\" If yes, it's a Weak Entity (e.g., <code>InvoiceLineItem</code> inside <code>Invoice</code>).</li><li><b>Normalization:</b> ER Diagrams should typically reflect <b>3rd Normal Form (3NF)</b>. Avoid storing attributes in the wrong entity (e.g., <code>SupplierAddress</code> should be in <code>Supplier</code>, not <code>Product</code>).</li><li><b>Naming Convention:</b> Use <b>Singular Nouns</b> for Entities (<code>User</code>, not <code>Users</code>) and <b>Verbs</b> for Relationships (<code>Owns</code>, <code>Completes</code>).</li></ul>"
     },
     {
-  "type": "gallery",
-  "urls": [
-    "images/erdiagram.png",
-    "images/erdiagram2.png"
-  ],
-  "caption": ""
-}
+        "type": "gallery",
+        "urls": [
+          "images/erdiagram.png",
+          "images/erdiagram2.png"
+        ],
+        "caption": ""
+      }
   ]
 }
 
 }
+
 
 
 
