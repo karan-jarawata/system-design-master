@@ -323,9 +323,42 @@
         "caption": ""
       }
   ]
+},
+
+  "Normalization": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Core Concept:</b></p><ul><li><b>Normalization</b> is the process of organizing columns and tables in a database to reduce data redundancy (duplication) and improve data integrity.</li><li>It is essentially \"Clean Code\" for Data. You break large, messy tables into smaller, focused tables and link them using relationships.</li></ul><br><p><b>Why use it? (The 3 Anomalies)</b></p>We normalize to avoid \"Anomalies\"—logical errors that happen when data is duplicated.<br><i>Imagine a single table: <code>Student_Course_Table</code> storing Student Name, Course Name, and Instructor Name.</i><ul><li><b>Update Anomaly:</b> If \"Professor Snape\" changes his phone number, and he teaches 100 students, you have to update 100 rows. If you miss one, your data is inconsistent.</li><li><b>Insertion Anomaly:</b> You cannot add a new Course (e.g., \"Defense Against Dark Arts\") unless a student enrolls in it, because the Primary Key includes <code>Student_ID</code>. No student = No course record.</li><li><b>Deletion Anomaly:</b> If the only student in \"History of Magic\" drops the class, you delete the row. Poof! You just lost the information that \"History of Magic\" exists as a course.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Normal Forms (The Steps):</b></p>There is a famous mnemonic by database pioneer Bill Kent to remember the first three rules:<br><i>\"The data depends on the Key (1NF), the Whole Key (2NF), and Nothing But the Key (3NF)... so help me Codd.\"</i><br><br><ul><li><b>First Normal Form (1NF) - \"Atomic Values\":</b><ul><li><b>Rule:</b> Every cell must hold a single value. No lists, arrays, or comma-separated strings.</li><li><b>Bad:</b> A column <code>Skills</code> containing \"Java, Python, C++\".</li><li><b>Good:</b> A separate table <code>User_Skills</code> with one row per skill.</li></ul></li><li><b>Second Normal Form (2NF) - \"No Partial Dependency\":</b><ul><li><b>Pre-requisite:</b> Must be in 1NF.</li><li><b>The Issue:</b> This usually applies when you have a <b>Composite Primary Key</b> (a key made of 2+ columns).</li><li><b>Rule:</b> Non-key columns must depend on the <i>entire</i> primary key, not just part of it.</li></ul></li><li><b>Third Normal Form (3NF) - \"No Transitive Dependency\":</b><ul><li><b>Pre-requisite:</b> Must be in 2NF.</li><li><b>The Issue:</b> A non-key column depends on another non-key column.</li><li><b>Rule:</b> A column should depend <i>only</i> on the Primary Key.</li></ul></li><li><b>Boyce-Codd Normal Form (BCNF):</b> A stricter version of 3NF. It handles rare cases where a Primary Key column depends on a Non-Key column.</li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "sql",
+      "content": "-- 2NF Example: Fix Partial Dependency\n-- Scenario: Composite PK is (Student_ID, Course_ID)\n\n-- BAD (Violation): Student_Name depends ONLY on Student_ID, not Course_ID.\nTable Grades {\n    Student_ID (PK),\n    Course_ID (PK),\n    Student_Name, -- Partial Dependency!\n    Grade\n}\n\n-- GOOD (Normalized):\nTable Students {\n    Student_ID (PK),\n    Student_Name\n}\nTable Grades {\n    Student_ID (FK),\n    Course_ID (FK),\n    Grade\n}\n\n-- 3NF Example: Fix Transitive Dependency\n-- Scenario: PK is Order_ID\n\n-- BAD (Violation): City depends on Zip_Code, which depends on Order_ID.\n-- Chain: Order_ID -> Zip_Code -> City\nTable Orders {\n    Order_ID (PK),\n    Total_Amount,\n    Zip_Code,\n    City -- Transitive Dependency!\n}\n\n-- GOOD (Normalized):\nTable Locations {\n    Zip_Code (PK),\n    City\n}\nTable Orders {\n    Order_ID (PK),\n    Total_Amount,\n    Zip_Code (FK)\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Denormalization (The Reality Check):</b></p><ul><li>In LLD and System Design, we sometimes intentionally break these rules. This is called <b>Denormalization</b>.</li><li><b>Why?</b> Normalization requires <b>JOINS</b>. To get a User's profile, address, and recent orders in 3NF, you might need 3-4 Joins. This is slow for reading.</li><li><b>Trade-off:</b><ul><li><b>Normalized:</b> Fast Writes (no duplication to update), Slow Reads (Joins), Consistent Data.</li><li><b>Denormalized:</b> Fast Reads (Pre-joined data), Slow Writes (update everywhere), Risk of Inconsistency.</li></ul></li></ul><br><p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>3NF is the Gold Standard:</b> For most generic backend interviews and \"clean\" designs, aim for 3NF. Going to 4NF or 5NF is usually academic overkill.</li><li><b>Identifying dependencies is key:</b> Ask \"Does knowing X tell me Y?\" If knowing <code>ZipCode</code> tells you the <code>City</code>, then City is dependent on ZipCode. If ZipCode is not the Primary Key, move City out!</li><li><b>NoSQL is often Denormalized:</b> In MongoDB or Cassandra, we often store the Address object inside the User document (breaking 1NF/3NF). We accept the redundancy to avoid Joins.</li></ul>"
+    },
+    {
+        "type": "gallery",
+        "urls": [
+          "images/Normalization.png",
+        ],
+        "caption": ""
+      }
+  ]
 }
 
+
+
+  
 }
+
 
 
 
