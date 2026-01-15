@@ -311,11 +311,20 @@
     {
       "type": "text",
       "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>The M:N Trap:</b> You cannot implement a Many-to-Many relationship in a physical SQL database. You <i>must</i> create a \"Join Table\" (or Junction Table) to break it into two 1:N relationships.</li><li><b>Identifying Weak Entities:</b> Ask: \"If I delete the Parent, does this child disappear entirely and lose its identity?\" If yes, it's a Weak Entity (e.g., <code>InvoiceLineItem</code> inside <code>Invoice</code>).</li><li><b>Normalization:</b> ER Diagrams should typically reflect <b>3rd Normal Form (3NF)</b>. Avoid storing attributes in the wrong entity (e.g., <code>SupplierAddress</code> should be in <code>Supplier</code>, not <code>Product</code>).</li><li><b>Naming Convention:</b> Use <b>Singular Nouns</b> for Entities (<code>User</code>, not <code>Users</code>) and <b>Verbs</b> for Relationships (<code>Owns</code>, <code>Completes</code>).</li></ul>"
-    }
+    },
+    {
+  "type": "gallery",
+  "urls": [
+    "images/erdiagram.png",
+    "images/erdiagram2.png"
+  ],
+  "caption": ""
+}
   ]
 }
 
 }
+
 
 
 
