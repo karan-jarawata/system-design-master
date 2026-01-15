@@ -646,11 +646,35 @@
 
         /* ================= MOBILE RESPONSIVENESS ================= */
             @media (max-width: 768px) {
-                
-                /* 1. Layout Reset */
+
+
+                /* 1. Unlock the body scroll */
                 body {
-                    flex-direction: column; /* Stack things if needed, though we use fixed positioning below */
+                    overflow: auto !important; /* Allow scrolling */
+                    height: auto !important;
+                    display: block; /* Remove flex constraint on body */
                 }
+            
+                /* 2. Make content flow naturally */
+                main {
+                    height: auto;
+                    overflow: visible; 
+                }
+            
+                /* 3. Ensure the scroll container doesn't trap scrolls */
+                .content-scroll {
+                    overflow: visible !important;
+                    padding-bottom: 80px; /* Extra space at bottom for scrolling */
+                }
+                
+                /* 4. Ensure Header stays at top */
+                header {
+                    position: sticky;
+                    top: 0;
+                    z-index: 50; /* Below sidebar, above content */
+                }
+                
+                
             
                 /* 2. Sidebar transforms into a Slide-out Drawer */
                 aside {
@@ -670,19 +694,8 @@
                     transform: translateX(-100%); /* Move it off-screen for better performance */
                 }
             
-                /* 3. Main Content takes full width */
-                main {
-                    width: 100%;
-                    flex: 1;
-                }
-            
-                /* 4. Header Adjustments */
-                header {
-                    padding: 1rem; /* Less padding */
-                    flex-direction: column; /* Stack Title and Controls */
-                    align-items: flex-start;
-                    gap: 1rem;
-                }
+               
+               
             
                 .header-left {
                     width: 100%;
@@ -701,10 +714,7 @@
                     flex: 1;
                 }
             
-                /* 5. Content Grid Fixes */
-                .content-scroll {
-                    padding: 1rem; /* Less padding around content */
-                }
+              
             
                 .topic-grid {
                     /* Force 1 column on phones */
@@ -742,12 +752,31 @@
                 }
             }
 
+        @media (max-width: 768px) {
+    /* Show on Mobile */
+    .mobile-close-btn {
+        display: block;
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+        cursor: pointer;
+    }
+    
+    /* Fix Sidebar Z-Index to be definitely on top */
+    aside {
+        z-index: 9999 !important;
+    }
+}
+
     </style>
 </head>
 <body data-mode="LLD">
 
 <aside>
     <div class="sidebar-header">
+        <div class="mobile-close-btn" onclick="toggleSidebar()">
+            <i class="fas fa-arrow-left"></i>
+        </div>
         <div class="logo-text" id="logoTitle" title="Click 3 times to switch modes">LLD MASTER</div>
         <div class="mastery-container">
             <div class="mastery-label">
@@ -1330,6 +1359,7 @@ function copyToClipboard(elementId) {
 </script>
 </body>
 </html>
+
 
 
 
