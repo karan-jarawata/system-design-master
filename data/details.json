@@ -347,7 +347,7 @@
     {
         "type": "gallery",
         "urls": [
-          "images/Normalization.png",
+          "images/Normalization.png"
         ],
         "caption": ""
       }
@@ -376,6 +376,7 @@
 
   
 }
+
 
 
 
