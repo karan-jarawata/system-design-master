@@ -399,12 +399,52 @@
         "caption": ""
       }
   ]
+},
+  "Lazy vs Eager": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Core Concept:</b></p><ul><li>This concept dictates <i>when</i> related data is fetched from the database.</li><li><b>Eager Loading:</b> Fetches the main entity and its related entities immediately in a single go (usually via a massive JOIN).</li><li><b>Lazy Loading:</b> Fetches only the main entity. The related entities are fetched on-demand, only when you explicitly access them in your code.</li></ul><br><p><b>The Analogy: \"Moving Houses\"</b></p><ul><li><b>Eager Loading (The Over-Packer):</b> You move to a new house and pack everything you own (winter coats, old yearbooks, kitchen sink) into the truck immediately.<br><i>Pros:</i> Everything is there if you need it.<br><i>Cons:</i> The truck is heavy, slow, and you might not look at those old yearbooks for 5 years. Wasted effort.</li><li><b>Lazy Loading (The Minimalist):</b> You move with just your essentials (bed, clothes). You leave the rest in storage.<br><i>Pros:</i> The move is fast and light.<br><i>Cons:</i> If you suddenly decide you need your \"High School Yearbook,\" you have to drive back to storage (make another DB trip) to get it.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Mechanics: How it works (The Proxy)</b></p><ul><li>How does Java know to fetch data later? <b>Proxies.</b></li><li>When you Lazy load a User's orders, Hibernate doesn't give you a <code>List&lt;Order&gt;</code>. It gives you a <b>Proxy Object</b> (a placeholder/stub).</li><li>This Proxy looks like a list, but it's empty.</li><li><b>The Trigger:</b> The moment you call <code>user.getOrders().size()</code> or access the data, the Proxy \"wakes up,\" fires a SQL query to the database, fills itself with real data, and then gives it to you.</li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "@Entity\npublic class User {\n    @Id\n    private Long id;\n\n    // EAGER: \"I want the Profile immediately when I get the User\"\n    // Result: SELECT * FROM User LEFT JOIN Profile ...\n    @OneToOne(fetch = FetchType.EAGER)\n    private Profile profile;\n\n    // LAZY: \"Don't fetch Orders yet. Just give me a placeholder.\"\n    // Result: SELECT * FROM User ... (No Orders yet)\n    @OneToMany(fetch = FetchType.LAZY) \n    private List<Order> orders;\n}\n\n// Usage\nclass Main {\n    void test(EntityManager em) {\n        User u = em.find(User.class, 1L); // Query 1 fires here (User + Profile)\n        \n        System.out.println(u.getProfile().getBio()); // No new query (Already loaded)\n        \n        System.out.println(\"Wait for it...\");\n        \n        // Query 2 fires HERE (The \"Lazy Initialization\")\n        System.out.println(u.getOrders().size()); \n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>The Defaults (Memorize this):</b> JPA has default settings based on cardinality.<ul><li><code>@OneToOne</code>, <code>@ManyToOne</code> (Single Association) -> Default is <b>EAGER</b>.</li><li><code>@OneToMany</code>, <code>@ManyToMany</code> (Collection Association) -> Default is <b>LAZY</b>.</li><li><i>Tip:</i> Always explicitly set <code>@ManyToOne(fetch = FetchType.LAZY)</code>. Eager loading is almost always a performance trap in large apps.</li></ul></li><li><b>LazyInitializationException:</b> This is the most common error in Hibernate.<ul><li><b>Cause:</b> You fetched a Lazy entity, closed the Database Session (Transaction ended), and <i>then</i> tried to access the lazy data.</li><li><b>Result:</b> The Proxy tries to go back to the DB, finds the connection closed, and crashes.</li><li><b>Fix:</b> Keep the transaction open (using <code>@Transactional</code>) or use \"Join Fetch\".</li></ul></li><li><b>When to use which?</b><ul><li><b>Use Eager:</b> When you are 100% sure you will use the related data every single time you load the parent (e.g., User and UserPreferences).</li><li><b>Use Lazy:</b> For everything else. Especially for Lists/Collections. Loading 5000 Orders just to check a User's name is a disaster.</li></ul></li></ul>"
+    }
+  ]
+},
+
+  "Schema Evolution": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Core Concept:</b></p><ul><li><b>Schema Evolution</b> is the process of managing changes to your database structure (tables, columns, types) over time as your application requirements change.</li><li>It is the art of \"Changing the tires on a moving car.\" You need to upgrade the database without crashing the application or losing data.</li></ul><br><p><b>Why use it? (The Challenge)</b></p><ul><li><b>Agile Development:</b> Requirements change. You need a new <code>is_verified</code> column today that you didn't need yesterday.</li><li><b>Zero Downtime:</b> In modern systems, you cannot just shut down the server. The old code and the new database schema must often coexist during deployment.</li><li><b>Compatibility:</b> You must ensure Backward Compatibility (New DB works with Old Code) and Forward Compatibility (Old DB works with New Code).</li></ul><br><p><b>The Strategy: Expand and Contract (Parallel Change)</b></p><ul><li>This is the Gold Standard pattern for safe schema evolution without downtime. It involves multiple small steps instead of one big \"Rename\" or \"Delete\".</li><li><b>Scenario:</b> Rename <code>full_name</code> to <code>display_name</code>.</li><li><b>Steps:</b><ol><li><b>Expand (Add):</b> Add <code>display_name</code> (nullable). DB has both.</li><li><b>Dual Write:</b> Deploy code that writes to both, but reads from old.</li><li><b>Backfill:</b> Copy data from old to new.</li><li><b>Switch Read:</b> Deploy code that reads from new.</li><li><b>Contract (Remove):</b> Stop writing to old. Remove old column.</li></ol></li></ul><br><p><b>Tools of the Trade:</b></p><ul><li><b>Flyway / Liquibase:</b> Version control tools for your database. They use a hidden table (<code>schema_version</code>) to track which scripts have run.</li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "sql",
+      "content": "-- File: V2__split_name_column.sql\n\n-- 1. Add new columns (Allow NULLs initially to prevent locking/errors)\nALTER TABLE users ADD COLUMN first_name VARCHAR(50);\nALTER TABLE users ADD COLUMN last_name VARCHAR(50);\n\n-- 2. Migrate existing data (The Backfill)\n-- Ideally, do this in batches for large tables to avoid locking\nUPDATE users SET first_name = SPLIT_PART(full_name, ' ', 1),\n    last_name = SPLIT_PART(full_name, ' ', 2);\n\n-- 3. Add constraints (After data is safe)\n-- ALTER TABLE users ALTER COLUMN first_name SET NOT NULL;"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>Never Rename Columns directly:</b> <code>RENAME COLUMN</code> is a destructive action. The code looking for \"old\" will instantly crash. Use Expand & Contract.</li><li><b>Locking & Performance:</b> Adding a column with a <code>DEFAULT</code> value (in older DB versions) can lock the entire table. <b>Fix:</b> Add as <code>NULL</code> first -> Populate -> Add <code>NOT NULL</code> constraint.</li><li><b>Deprecation Phase:</b> If you delete a column, ensure the code has stopped using it for at least one full deployment cycle.</li><li><b>NoSQL is easier (but messier):</b> In MongoDB, you don't need migrations. You can have Document A with <code>name</code> and Document B with <code>firstName</code>. The complexity moves from the Database to the Application Code.</li></ul>"
+    }
+  ]
 }
 
 
 
   
 }
+
 
 
 
