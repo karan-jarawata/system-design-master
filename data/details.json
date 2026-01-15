@@ -1,4 +1,4 @@
-[
+{
   "Classes & Objects": {
     "blocks": [
       {
@@ -16,7 +16,6 @@
       }
     ]
   },
-  {
   "Interfaces": {
     "blocks": [
       {
@@ -33,9 +32,7 @@
         "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>\"Program to an Interface, not an Implementation\":</b> This is a golden rule in design patterns. Always use the interface type for variable references (e.g., <code>List&lt;String&gt; list = new ArrayList&lt;&gt;();</code>).</li><li><b>Interface Segregation Principle (ISP):</b> Clients should not be forced to depend on interfaces they do not use. It's better to have many specific interfaces (e.g., <code>Readable</code>, <code>Writable</code>) than one general-purpose interface (e.g., <code>FileHandler</code>).</li><li><b>Interface vs. Abstract Class:</b><ul><li><b>Interface:</b> Defines \"Can-Do\" capability (e.g., <code>Runnable</code>, <code>Serializable</code>). Supports multiple implementations.</li><li><b>Abstract Class:</b> Defines \"Is-A\" relationship (e.g., <code>Vehicle</code>, <code>Mammal</code>). Shares code/state among related classes.</li></ul></li><li><b>Marker Interfaces:</b> Interfaces with no methods (e.g., <code>Serializable</code>, <code>Cloneable</code>). They provide metadata to the compiler or runtime that the class is special.</li><li><b>Functional Interface:</b> An interface with exactly one abstract method. Used heavily in Lambda expressions (e.g., <code>Runnable</code>, <code>Comparator</code>).</li></ul>"
       }
     ]
-  }
-},
-{
+  },
   "Inheritance": {
     "blocks": [
       {
@@ -52,9 +49,7 @@
         "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>The Diamond Problem:</b> Java does not support Multiple Inheritance with Classes (inheriting from two classes that have the same method). It solves this via Interfaces.</li><li><b>Liskov Substitution Principle (LSP):</b> A child class must be substitutable for its parent class without breaking the application. If <code>Dog</code> extends <code>Animal</code>, you should be able to use <code>Dog</code> anywhere <code>Animal</code> is expected.</li><li><b>Constructors are NOT inherited:</b> But the child class constructor must call the parent constructor (implicitly or explicitly via <code>super()</code>) as the first statement.</li><li><b><code>final</code> Class:</b> If a class is marked <code>final</code>, it cannot be inherited (e.g., <code>String</code> class in Java).</li><li><b>Composition over Inheritance:</b> In modern LLD, prefer Composition (\"Has-A\") over Inheritance (\"Is-A\") if the relationship is not strictly hierarchical. Inheritance creates tight coupling; composition is more flexible.</li></ul>"
       }
     ]
-  }
-},
-{
+  },
   "Polymorphism": {
     "blocks": [
       {
@@ -71,9 +66,7 @@
         "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>Upcasting:</b> Assigning a Child object to a Parent reference (e.g., <code>Animal a = new Dog()</code>). This is safe and implicit.</li><li><b>Downcasting:</b> Assigning a Parent reference back to a Child reference (e.g., <code>Dog d = (Dog) a</code>). This requires an explicit cast and an <code>instanceof</code> check to avoid <code>ClassCastException</code>.</li><li><b>Dynamic Method Dispatch:</b> This is the mechanism Java uses at runtime to figure out which version of an overridden method to call.</li><li><b>Static methods are NOT polymorphic:</b> If you define a static method with the same name in Parent and Child, the Child hides the Parent's method (<i>Method Hiding</i>), but it does not override it. The method called depends on the reference type, not the object.</li><li><b>Fields are NOT polymorphic:</b> If a Child defines a variable with the same name as the Parent, the variable accessed depends on the reference type.</li></ul>"
       }
     ]
-  }
-},
-{
+  },
   "Abstraction": {
     "blocks": [
       {
@@ -90,9 +83,7 @@
         "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>Encapsulation vs. Abstraction:</b><ul><li><b>Encapsulation</b> is about hiding data (bundling data + methods).</li><li><b>Abstraction</b> is about hiding implementation complexity (design level).</li></ul></li><li><b>\"Is-A\" Relationship:</b> Abstract classes are still classes. Use them when child classes share a lot of code but also need specific behavior (e.g., <code>Bird</code> is an abstract class, <code>Sparrow</code> and <code>Penguin</code> extend it).</li><li><b>The 100% Rule:</b> Before Java 8, Interfaces provided 100% abstraction. Now, with default methods, this line is slightly blurred, but conceptually they are still pure contracts.</li><li><b>Design Decision:</b> If you need to add a new method in the future:<ul><li><b>Abstract Class:</b> You can add a concrete method with a default implementation, and existing child classes will work fine.</li><li><b>Interface:</b> Adding a new abstract method breaks all implementing classes (unless you use a <code>default</code> method).</li></ul></li></ul>"
       }
     ]
-  }
-},
-{
+  },
   "Encapsulation": {
     "blocks": [
       {
@@ -109,9 +100,7 @@
         "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>Getters/Setters are NOT mandatory:</b> Pure encapsulation isn't just generating getters and setters for every field (that makes it anemic). True encapsulation often involves methods that do things (e.g., <code>activateAccount()</code> instead of <code>setStatus(\"Active\")</code>).</li><li><b>Immutability:</b> A powerful form of encapsulation. If you make all fields <code>private final</code> and provide no setters, the object state cannot change once created. This makes the code thread-safe and predictable (e.g., <code>String</code> class).</li><li><b>\"Tell, Don't Ask\":</b> A design principle related to encapsulation. Instead of asking an object for its data to perform a calculation (if <code>user.getAge() > 18</code>), tell the object to do it (if <code>user.isAdult()</code>).</li><li><b>Encapsulation vs. Abstraction:</b><ul><li><b>Encapsulation:</b> Hiding Information (State).</li><li><b>Abstraction:</b> Hiding Complexity (Implementation).</li></ul></li></ul>"
       }
     ]
-  }
-},
-{
+  },
   "Access Modifiers": {
     "blocks": [
       {
@@ -128,9 +117,7 @@
         "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>Principle of Least Privilege:</b> Always start with the most restrictive modifier (<code>private</code>) and open it up (<code>protected</code> -> <code>public</code>) only when absolutely necessary. This reduces coupling.</li><li><b>Class vs. Member:</b><ul><li>Top-level classes can only be <code>public</code> or <code>default</code> (package-private). They cannot be <code>private</code> or <code>protected</code>.</li><li>Nested/Inner classes can be all four.</li></ul></li><li><b>Method Overriding Rule:</b> When overriding a method in a child class, you cannot reduce the visibility. If Parent is <code>protected</code>, Child must be <code>protected</code> or <code>public</code>. It cannot be <code>private</code>.</li><li><b>Interface Members:</b><ul><li>Variables in interfaces are implicitly <code>public static final</code>.</li><li>Methods in interfaces are implicitly <code>public</code> (unless <code>private</code> in Java 9+).</li></ul></li></ul>"
       }
     ]
-  }
-},
-{
+  },
   "Object Lifecycle": {
     "blocks": [
       {
@@ -147,9 +134,7 @@
         "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>Stack vs. Heap:</b><ul><li><b>Local Variables</b> (references) live on the <b>Stack</b>.</li><li><b>Objects</b> (actual data) live on the <b>Heap</b>.</li><li>When a stack frame (method) ends, the references pop off, leaving the heap objects eligible for GC if no other references exist.</li></ul></li><li><b>Reachability:</b> An object is only garbage collected if there is no chain of references leading to it from a \"GC Root\" (active thread, static variable, local variable).</li><li><b>Generational GC:</b><ul><li><b>Eden Space:</b> Where new objects are born.</li><li><b>Survivor Space:</b> Objects that survive a GC cycle.</li><li><b>Old/Tenured Gen:</b> Long-lived objects (caches, singletons) move here.</li></ul></li><li><b><code>finalize()</code> is Deprecated:</b> Never rely on <code>finalize()</code> for cleanup (it's unpredictable). Use <code>try-with-resources</code> (<code>AutoCloseable</code> interface) for deterministic cleanup of resources like streams or connections.</li><li><b>Static Variables:</b> These live for the entire life of the application (Class Lifecycle), effectively acting as GC Roots. Be careful—they are a common source of memory leaks.</li></ul>"
       }
     ]
-  }
-},
-{
+  },
   "Stack vs Heap": {
     "blocks": [
       {
@@ -167,8 +152,8 @@
       }
     ]
   }
+
 }
 
-]
 
 
