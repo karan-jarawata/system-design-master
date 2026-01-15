@@ -801,7 +801,7 @@
 
                     // === RENDER ===
                     html += `
-                    <div id="${safeId}" class="topic-card ${isDone ? 'completed' : ''} prio-${priority}" onclick="handleTopicClick('${title}', '${safeId}')">
+                    <div id="${safeId}" class="topic-card ${isDone ? 'completed' : ''} prio-${priority}" onclick="handleTopicClick(event, '${title}', '${safeId}')">
                         ${starHtml}
                         
                         <div class="card-top-row">
@@ -838,30 +838,55 @@
         renderContent(); 
     }
 
-    function handleTopicClick(topicName, elementId) {
-        // === SMART SELECTION CHECK ===
-        // If the user has highlighted text (length > 0), DO NOT toggle completion
+    function handleTopicClick(e, topicName, elementId) {
+        // 1. Prevent toggle if selecting text
         const selection = window.getSelection();
         if(selection.toString().length > 0) return; 
 
+        // 2. Toggle State
         const state = getState();
-        state.completed[topicName] = !state.completed[topicName];
+        const wasCompleted = state.completed[topicName];
+        state.completed[topicName] = !wasCompleted;
         saveState();
 
+        // 3. Update UI
         const card = document.getElementById(elementId);
         if(card) card.classList.toggle('completed');
-
-        const stats = updateStats();
         
-        // Celebration Logic
-        if (state.completed[topicName]) {
-            const data = getData();
-            const currentSection = data[state.activeTab];
-            const sectionTopics = currentSection.groups.flatMap(g => g.topics);
-            const sectionDone = sectionTopics.filter(t => state.completed[t]).length;
+        // If unchecking, stop here (no celebration for undoing work)
+        if (wasCompleted) {
+            updateStats();
+            return;
+        }
 
-            if (stats.globalPercent === 100) triggerGrandCelebration();
-            else if (sectionDone === sectionTopics.length) triggerSectionConfetti();
+        // 4. Calculate Progress to decide Celebration Tier
+        const stats = updateStats();
+        const data = getData();
+        const currentSection = data[state.activeTab];
+        
+        // Extract titles correctly (handling Object vs String difference in LLD/HLD)
+        const sectionTopics = currentSection.groups.flatMap(g => g.topics);
+        const totalSectionTopics = sectionTopics.length;
+        const finishedSectionTopics = sectionTopics.filter(t => {
+            const title = (typeof t === 'object' ? t.title : t);
+            return state.completed[title];
+        }).length;
+
+        // === DECISION TREE ===
+        if (stats.globalPercent === 100) {
+            // TIER 3: EXTREME
+            triggerExtremeCelebration();
+        } 
+        else if (finishedSectionTopics === totalSectionTopics) {
+            // TIER 2: SECTION COMPLETE (BIG)
+            triggerSectionComplete();
+        } 
+        else {
+            // TIER 1: SINGLE TOPIC (SMALL)
+            // Pass mouse coordinates normalized (0 to 1)
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            triggerSmallConfetti(x, y);
         }
     }
 
@@ -1018,19 +1043,92 @@ function copyToClipboard(elementId) {
     }
 
     // ================= BOOTSTRAP =================
-    // Celebration effects
-    function triggerSectionConfetti() {
+    // TIER 1: Small Burst at Mouse Position
+    function triggerSmallConfetti(x, y) {
         const color = CONFIG.mode === 'LLD' ? '#2563eb' : '#8b5cf6';
-        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: [color, '#22c55e'] });
+        confetti({
+            particleCount: 40,
+            spread: 60,
+            origin: { x: x, y: y },
+            colors: [color, '#ffffff'],
+            disableForReducedMotion: true,
+            gravity: 1.2,
+            scalar: 0.7 // Make particles slightly smaller
+        });
     }
 
-    function triggerGrandCelebration() {
-        const duration = 5000;
-        const end = Date.now() + duration;
+    // TIER 2: Dual Cannons from Bottom (Section Complete)
+    function triggerSectionComplete() {
         const color = CONFIG.mode === 'LLD' ? '#2563eb' : '#8b5cf6';
+        const end = Date.now() + 1000; // Run for 1 second
+
+        (function frame() {
+            confetti({
+                particleCount: 5,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0, y: 0.8 }, // Bottom Left
+                colors: [color, '#22c55e']
+            });
+            confetti({
+                particleCount: 5,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1, y: 0.8 }, // Bottom Right
+                colors: [color, '#22c55e']
+            });
+
+            if (Date.now() < end) {
+                requestAnimationFrame(frame);
+            }
+        }());
+    }
+
+    // TIER 3: EXTREME CELEBRATION (Global 100%)
+    function triggerExtremeCelebration() {
+        const duration = 8000; // 8 Seconds of chaos
+        const animationEnd = Date.now() + duration;
+        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+        function randomInRange(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
         const interval = setInterval(function() {
-            if (Date.now() > end) return clearInterval(interval);
-            confetti({ particleCount: 50, startVelocity: 30, spread: 360, origin: { x: Math.random(), y: Math.random() - 0.2 }, colors: [color, '#22c55e'] });
+            const timeLeft = animationEnd - Date.now();
+
+            if (timeLeft <= 0) {
+                return clearInterval(interval);
+            }
+
+            const particleCount = 50 * (timeLeft / duration);
+
+            // Random Fireworks
+            confetti(Object.assign({}, defaults, { 
+                particleCount, 
+                origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } 
+            }));
+            confetti(Object.assign({}, defaults, { 
+                particleCount, 
+                origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } 
+            }));
+            
+            // "School Pride" side streams
+            confetti({
+                particleCount: 10,
+                angle: 60,
+                spread: 80,
+                origin: { x: 0 },
+                colors: ['#2563eb', '#ffffff']
+            });
+            confetti({
+                particleCount: 10,
+                angle: 120,
+                spread: 80,
+                origin: { x: 1 },
+                colors: ['#8b5cf6', '#ffffff']
+            });
+            
         }, 250);
     }
 
@@ -1039,6 +1137,7 @@ function copyToClipboard(elementId) {
 </script>
 </body>
 </html>
+
 
 
 
