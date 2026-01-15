@@ -69,14 +69,34 @@
         }
 
         /* --- SIDEBAR --- */
+        /* 2. Update the Sidebar transition */
         aside {
             width: 300px;
             background: var(--bg-sidebar);
             border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; flex-shrink: 0;
+            
+            /* MODIFIED: Add width and transform to transition */
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        opacity 0.2s ease,
+                        background 0.3s, 
+                        border 0.3s;
+            
+            overflow: hidden; /* Important: Hides content when width is 0 */
+            white-space: nowrap; /* Prevents text wrapping while closing */
+        }
+        
+        /* 3. The Closed State */
+        aside.closed {
+            width: 0;
+            opacity: 0;
+            border-right: none; /* Removes the border line when closed */
+        }
+        
+        /* 4. Fix Header Alignment */
+        .header-left {
             display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-            transition: background 0.3s, border 0.3s;
+            align-items: center; /* Vertically center the new button */
         }
 
         .sidebar-header {
@@ -609,6 +629,20 @@
             background: transparent;
         }
 
+
+        /* 1. Style the new Menu Button */
+        .menu-btn {
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 15px; /* Space between btn and title */
+            color: var(--text-secondary);
+            transition: 0.2s;
+        }
+        
+        .menu-btn:hover { background: var(--nav-hover); color: var(--text-primary); }
+
     </style>
 </head>
 <body data-mode="LLD">
@@ -633,6 +667,9 @@
 <main>
     <header>
         <div class="header-left">
+            <div class="menu-btn" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </div>
             <h1 id="headerTitle">Loading...</h1>
             <p id="headerSubtitle">Select a topic to begin the grind</p>
         </div>
@@ -1054,6 +1091,11 @@ function copyToClipboard(elementId) {
         if(icon) icon.className = isDark ? 'fas fa-moon' : 'fas fa-sun';
     }
 
+    function toggleSidebar() {
+    const sidebar = document.querySelector('aside');
+    sidebar.classList.toggle('closed');
+}
+
     // --- SECRET SWITCH ---
     let clickCount = 0;
     let clickTimer = null;
@@ -1176,6 +1218,7 @@ function copyToClipboard(elementId) {
 </script>
 </body>
 </html>
+
 
 
 
