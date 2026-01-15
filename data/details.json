@@ -292,9 +292,31 @@
       "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>Java 8+ Blur:</b> With <code>default</code> and <code>static</code> methods in Interfaces, you can add code to interfaces. However, you still cannot have instance variables (state) in interfaces. State is the main tie-breaker.</li><li><b>Versioning:</b><ul><li>Adding a method to an <b>Interface</b> breaks all implementing classes (unless you make it <code>default</code>).</li><li>Adding a concrete method to an <b>Abstract Class</b> is safe (all children inherit it automatically).</li></ul></li><li><b>Design Rule:</b> \"Favor Interfaces over Abstract Classes\" (Item 20 in <i>Effective Java</i>). Use Abstract Classes only when you explicitly need to share variables or strictly control the hierarchy.</li><li><b>Marker Interface:</b> An interface with no methods (e.g., <code>Serializable</code>) used purely to \"mark\" a class with a specific property.</li></ul>"
     }
   ]
+},
+  "ER Diagrams": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Core Concept:</b></p><ul><li>An <b>ER Diagram</b> is the structural blueprint of a database. It abstracts away technical details to focus on the data and how it connects (the \"Nouns\" and \"Verbs\").</li></ul><br><p><b>Key Components:</b></p><ul><li><b>Entities (The Nouns):</b><ul><li><b>Strong Entity:</b> Has its own Primary Key (Identity). Symbol: Single Rectangle. (e.g., <code>Student</code>).</li><li><b>Weak Entity:</b> Depends on a \"Strong Entity\" for existence. Symbol: Double Rectangle. (e.g., <code>Apartment</code> needs <code>Building</code>).</li><li><b>Associative Entity:</b> Formed by a Many-to-Many relationship (e.g., <code>Enrollment</code> connecting Student and Course).</li></ul></li><li><b>Attributes (The Adjectives):</b><ul><li><b>Key Attribute:</b> Unique ID (Primary Key).</li><li><b>Multivalued:</b> Can have multiple values (e.g., PhoneNumbers). Symbol: Double Oval.</li><li><b>Derived:</b> Calculated from other attributes (e.g., Age from DOB). Symbol: Dashed Oval.</li></ul></li><li><b>Relationships (The Verbs):</b> How entities interact (Unary, Binary, Ternary). Symbol: Diamond.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Cardinality & Participation (The Rules):</b></p><ul><li><b>Cardinality (Maximums):</b><ul><li><b>1:1 (One-to-One):</b> CEO manages Company.</li><li><b>1:N (One-to-Many):</b> Customer places Orders.</li><li><b>M:N (Many-to-Many):</b> Actor acts in Movies.</li></ul></li><li><b>Participation (Minimums):</b><ul><li><b>Total (Mandatory):</b> Every entity must be involved (e.g., Every Loan must belong to a Bank). Symbol: Double Line.</li><li><b>Partial (Optional):</b> Not every entity needs to be involved (e.g., Not every Employee manages a Department). Symbol: Single Line.</li></ul></li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "sql",
+      "content": "-- Crow's Foot Notation Cheat Sheet (Industrial Standard)\n-- ||   -> Mandatory One (Exactly one)\n-- |<-  -> Mandatory Many (At least one)\n-- 0|   -> Optional One (Zero or one)\n-- 0<-  -> Optional Many (Zero or many)\n\n-- The M:N Trap Solution (Physical DB Implementation)\n-- Problem: You cannot do [Student] <---> [Course] directly.\n-- Solution: Create a Junction Table (Associative Entity).\n\n[Student] 1 <---- * [Enrollment] * ----> 1 [Course]\n\n-- Table Structure:\n-- Enrollment {\n--   student_id (FK),\n--   course_id (FK),\n--   grade,\n--   date\n-- }"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>The M:N Trap:</b> You cannot implement a Many-to-Many relationship in a physical SQL database. You <i>must</i> create a \"Join Table\" (or Junction Table) to break it into two 1:N relationships.</li><li><b>Identifying Weak Entities:</b> Ask: \"If I delete the Parent, does this child disappear entirely and lose its identity?\" If yes, it's a Weak Entity (e.g., <code>InvoiceLineItem</code> inside <code>Invoice</code>).</li><li><b>Normalization:</b> ER Diagrams should typically reflect <b>3rd Normal Form (3NF)</b>. Avoid storing attributes in the wrong entity (e.g., <code>SupplierAddress</code> should be in <code>Supplier</code>, not <code>Product</code>).</li><li><b>Naming Convention:</b> Use <b>Singular Nouns</b> for Entities (<code>User</code>, not <code>Users</code>) and <b>Verbs</b> for Relationships (<code>Owns</code>, <code>Completes</code>).</li></ul>"
+    }
+  ]
 }
 
 }
+
 
 
 
