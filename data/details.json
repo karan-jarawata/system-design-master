@@ -370,12 +370,35 @@
       "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>The Swap Test:</b> To decide between Entity vs. Value Object, ask: \"If I replace this object with another one having the exact same values, does it break my system?\"<ul><li><b>If Yes</b> (I need that specific one) -> <b>Entity</b>.</li><li><b>If No</b> (Any identical one works) -> <b>Value Object</b>.</li></ul></li><li><b>Immutability is King:</b> Value Objects should always be immutable. Do not add setters. If you need to change a coordinate (x, y) to (x+1, y), return a new <code>Point</code> object.</li><li><b>Database Mapping:</b><ul><li><b>Entities</b> usually get their own Table (Users, Orders).</li><li><b>Value Objects</b> are usually <b>Embedded</b> in the parent's table (e.g., <code>user_address_city</code>, <code>user_address_zip</code> inside the Users table) or stored as a JSON blob.</li></ul></li><li><b>Code Smell:</b> If you see a Value Object (like <code>Color</code> or <code>Date</code>) with an <code>id</code> field, something is wrong.</li></ul>"
     }
   ]
+},
+
+  "ORM Mapping": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Core Concept:</b></p><ul><li><b>ORM (Object-Relational Mapping)</b> is a technique (and a software layer) that sits between your Object-Oriented code (Java/Python classes) and your Relational Database (SQL tables).</li><li>It acts as a <b>Translator</b>.<br><i>Your Code speaks \"Objects\"</i> (Inheritance, Polymorphism).<br><i>The DB speaks \"Tables\"</i> (Rows, FKs, Joins).</li><li>The ORM automatically translates \"Save User Object\" into <code>INSERT INTO users...</code> and vice versa.</li></ul><br><p><b>Why use it? (The Impedance Mismatch)</b></p>The fundamental problem ORM solves is the friction caused because the two paradigms are conceptually different:<ul><li><b>Granularity:</b> Java has nested classes (<code>Address</code> inside <code>User</code>); SQL has flat columns. ORM maps this.</li><li><b>Inheritance:</b> SQL tables don't support inheritance (e.g., Manager extends Employee). ORM simulates this strategies like Single Table.</li><li><b>Identity:</b> Java uses memory addresses/equals; SQL uses Primary Keys.</li><li><b>Relationships:</b> Java uses references (<code>user.getOrders()</code>); SQL uses Foreign Keys (<code>user_id</code>).</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Key Mapping Annotations (The \"How\" in JPA/Hibernate):</b></p><ul><li><b>Class Level:</b><ul><li><code>@Entity</code>: \"Hey ORM, treat this class as a database table.\"</li><li><code>@Table(name=\"users\")</code>: \"Map this class specifically to the <code>users</code> table.\"</li></ul></li><li><b>Field Level:</b><ul><li><code>@Id</code>: \"This is the Primary Key.\"</li><li><code>@GeneratedValue</code>: \"Auto-increment this ID.\"</li><li><code>@Column(name=\"email_addr\")</code>: \"Map the email field to the <code>email_addr</code> column.\"</li><li><code>@Transient</code>: \"Ignore this field. Do not store it in the DB.\"</li></ul></li><li><b>Relationship Level:</b><ul><li><code>@OneToOne</code>, <code>@OneToMany</code>, <code>@ManyToOne</code>, <code>@ManyToMany</code>: Defines the association logic.</li></ul></li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "@Entity // 1. Mark as ORM Object\n@Table(name = \"employees\")\npublic class Employee {\n\n    @Id // 2. Primary Key\n    @GeneratedValue(strategy = GenerationType.IDENTITY)\n    private Long id;\n\n    @Column(nullable = false)\n    private String name;\n\n    // 3. Mapping a Relationship\n    // \"Many Employees belong to One Department\"\n    @ManyToOne(fetch = FetchType.LAZY) \n    @JoinColumn(name = \"dept_id\") // The Foreign Key column in 'employees' table\n    private Department department;\n\n    // Standard Getters/Setters...\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>The N+1 Problem (Performance Killer):</b><ul><li><b>Scenario:</b> You fetch 100 <code>Department</code> objects. Then you loop through them and call <code>dept.getEmployees()</code> for each one.</li><li><b>What happens:</b> 1 Query to get Departments + 100 Queries (one per department) to get their employees = 101 Queries.</li><li><b>Fix:</b> Use \"Join Fetch\" (eagerly load data in the initial query using a JOIN) or Entity Graphs.</li></ul></li><li><b>Lazy vs. Eager Loading:</b><ul><li><b>Eager:</b> \"Bring the Jungle.\" When you fetch the User, the ORM effectively does a JOIN and fetches all their Orders immediately.</li><li><b>Lazy:</b> \"Bring the Banana.\" When you fetch User, the Orders list is just a proxy (empty placeholder). The DB query fires only when you touch <code>user.getOrders()</code>. <b>Best Practice:</b> Prefer Lazy loading.</li></ul></li><li><b>Caching (L1 vs L2):</b><ul><li><b>Level 1 (Session Cache):</b> Default. Within a single transaction, if you ask for User ID #1 twice, the ORM returns it from memory the second time.</li><li><b>Level 2 (Global Cache):</b> Optional (e.g., Redis). Shared across all users/sessions. Good for read-heavy, static data.</li></ul></li><li><b>Dirty Checking:</b> You don't always need to call <code>repository.save(user)</code>. If you modify a fetched object inside a <code>@Transactional</code> block, the ORM automatically detects the change and fires the UPDATE query when the transaction ends.</li></ul>"
+    }
+  ]
 }
 
 
 
   
 }
+
 
 
 
