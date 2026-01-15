@@ -352,12 +352,31 @@
         "caption": ""
       }
   ]
+},
+
+  "Entity vs Value Object": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Core Concept:</b></p><ul><li>This is a fundamental distinction in Domain-Driven Design (DDD) regarding how we model objects based on their identity and lifecycle.</li><li><b>Entity:</b> An object defined by its <b>Identity</b> (Who it is). It has a unique ID that persists over time, even if its details change.</li><li><b>Value Object:</b> An object defined by its <b>Attributes</b> (What it looks like). It has no unique ID; it is defined strictly by the values it holds.</li></ul><br><p><b>The Analogy: \"The Person vs. The Money\"</b></p><ul><li><b>Entity (The Person):</b> Imagine you meet a friend named John. If John changes his shirt, he is still John. If you meet another person named John who looks exactly like him, they are still two different people. <i>Conclusion: You care about which specific person it is.</i></li><li><b>Value Object (The Money):</b> Imagine you have a $10 bill. If you lend it to a friend and they pay you back with a different $10 bill, do you care? No. You define it by its properties (10 USD), not its serial number.</li></ul><br><p><b>Deep Dive: Key Differences</b></p><ul><li><b>Identity:</b><ul><li><b>Entity:</b> Defined by a Unique ID (Primary Key, UUID).</li><li><b>VO:</b> Defined by its State (All fields combined).</li></ul></li><li><b>Equality Check:</b><ul><li><b>Entity:</b> <code>a == b</code> if their IDs match.</li><li><b>VO:</b> <code>a.equals(b)</code> if all fields match.</li></ul></li><li><b>Mutability:</b><ul><li><b>Entity:</b> Mutable. Its state changes over time (lifecycle).</li><li><b>VO:</b> Immutable. Once created, it never changes. To change it, you create a new one.</li></ul></li><li><b>Lifespan:</b><ul><li><b>Entity:</b> Has a history and lifecycle (Created -> Active -> Deleted).</li><li><b>VO:</b> Ephemeral. Created when needed, discarded when done.</li></ul></li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// Value Object (Money)\n// Notice there is no id. Equality checks the values.\npublic final class Money {\n    private final BigDecimal amount;\n    private final String currency;\n\n    public Money(BigDecimal amount, String currency) {\n        this.amount = amount;\n        this.currency = currency;\n    }\n\n    // VO Logic: Equality depends on content\n    @Override\n    public boolean equals(Object o) {\n        if (this == o) return true;\n        if (o == null || getClass() != o.getClass()) return false;\n        Money money = (Money) o;\n        return amount.equals(money.amount) && \n               currency.equals(money.currency);\n    }\n}\n\n// Entity (Order)\n// Notice the id. Equality checks the ID.\npublic class Order {\n    private final String orderId; // Identity\n    private Money totalCost;      // Has-A Value Object\n    private String status;        // Mutable state\n\n    public Order(String orderId) {\n        this.orderId = orderId;\n    }\n\n    public void changeStatus(String newStatus) {\n        this.status = newStatus; // Can change\n    }\n\n    // Entity Logic: Equality depends ONLY on ID\n    @Override\n    public boolean equals(Object o) {\n        if (this == o) return true;\n        if (o == null || getClass() != o.getClass()) return false;\n        Order order = (Order) o;\n        return orderId.equals(order.orderId);\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>The Swap Test:</b> To decide between Entity vs. Value Object, ask: \"If I replace this object with another one having the exact same values, does it break my system?\"<ul><li><b>If Yes</b> (I need that specific one) -> <b>Entity</b>.</li><li><b>If No</b> (Any identical one works) -> <b>Value Object</b>.</li></ul></li><li><b>Immutability is King:</b> Value Objects should always be immutable. Do not add setters. If you need to change a coordinate (x, y) to (x+1, y), return a new <code>Point</code> object.</li><li><b>Database Mapping:</b><ul><li><b>Entities</b> usually get their own Table (Users, Orders).</li><li><b>Value Objects</b> are usually <b>Embedded</b> in the parent's table (e.g., <code>user_address_city</code>, <code>user_address_zip</code> inside the Users table) or stored as a JSON blob.</li></ul></li><li><b>Code Smell:</b> If you see a Value Object (like <code>Color</code> or <code>Date</code>) with an <code>id</code> field, something is wrong.</li></ul>"
+    }
+  ]
 }
 
 
 
   
 }
+
 
 
 
