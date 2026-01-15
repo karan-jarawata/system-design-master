@@ -913,11 +913,7 @@
                 // We create a unique ID for the copy function
                 const codeId = `code-${index}`;
                 // Simple syntax highlighting regex (optional, adds colors to keywords)
-                let coloredCode = block.content
-                    .replace(/</g, "&lt;").replace(/>/g, "&gt;") // Escape HTML
-                    .replace(/\/\/.*/g, m => `<span class="code-comment">${m}</span>`) // Comments
-                    .replace(/"(.*?)"/g, `<span class="code-string">"$1"</span>`) // Strings
-                    .replace(/\b(public|class|void|int|String|new|return|if|else|static)\b/g, `<span class="code-keyword">$1</span>`); // Keywords
+                let coloredCode = safeSyntaxHighlight(block.content);
 
                 html += `
                 <div class="gemini-code-container">
@@ -970,6 +966,35 @@ function copyToClipboard(elementId) {
             });
         }
     }
+
+    function safeSyntaxHighlight(code) {
+    // 1. Escape HTML special chars first to prevent rendering issues
+    let clean = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+    // 2. Tokenize Strings and Comments 
+    // We replace them with placeholders (###0###) so the keyword regex ignores them.
+    const placeholders = [];
+    const save = (content, type) => {
+        placeholders.push(`<span class="code-${type}">${content}</span>`);
+        return `###${placeholders.length - 1}###`;
+    };
+
+    // Match Strings ("...")
+    clean = clean.replace(/"(.*?)"/g, (match) => save(match, 'string'));
+
+    // Match Comments (// ...)
+    clean = clean.replace(/\/\/.*/g, (match) => save(match, 'comment'));
+
+    // 3. Highlight Keywords
+    // I added 'abstract', 'interface', 'extends', 'implements', 'super', 'this' based on your screenshot
+    clean = clean.replace(/\b(public|class|void|int|String|new|return|if|else|static|abstract|interface|extends|implements|super|this)\b/g,
+        '<span class="code-keyword">$1</span>');
+
+    // 4. Restore placeholders
+    clean = clean.replace(/###(\d+)###/g, (_, index) => placeholders[index]);
+
+    return clean;
+}
 
     // ================= UTILITIES =================
     function updateStats() {
@@ -1137,6 +1162,7 @@ function copyToClipboard(elementId) {
 </script>
 </body>
 </html>
+
 
 
 
