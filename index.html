@@ -898,8 +898,6 @@
     const modal = document.getElementById('noteModal');
     document.getElementById('modalTitle').innerText = key;
     const modalBody = document.getElementById('modalBody');
-
-        modalBody.scrollTop = 0;
         
     if (!details || !details.blocks) {
         // Fallback for old format or empty
@@ -935,6 +933,8 @@
         modalBody.innerHTML = html;
     }
     modal.classList.add('active');
+
+         modalBody.scrollTop = 0;
 }
 
 // New Copy Function
@@ -1164,6 +1164,7 @@ function copyToClipboard(elementId) {
 </script>
 </body>
 </html>
+
 
 
 
