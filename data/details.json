@@ -151,9 +151,151 @@
         "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>The References Rule:</b><ul><li><b>Primitives (int, boolean):</b> Value sits directly on the <b>Stack</b> (if local).</li><li><b>Objects (String, List, Car):</b> The <b>Reference</b> sits on the Stack, but the <b>Actual Data</b> sits in the <b>Heap</b>.</li></ul></li><li><b>The Errors:</b><ul><li><b>StackOverflowError:</b> Happens due to deep/infinite recursion. The stack runs out of space for new frames.</li><li><b>OutOfMemoryError (Java Heap Space):</b> Happens when you create too many objects and the GC cannot free up enough space.</li></ul></li><li><b>String Pool:</b> A special area inside the Heap to store String literals for reusability.</li><li><b>Thread Safety:</b> Since Stack is private to a thread, local variables are inherently thread-safe. Heap objects are shared, so if multiple threads modify the same object, you need <b>Locks/Synchronization</b>.</li></ul>"
       }
     ]
-  }
+  },
+  "Association": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Core Concept:</b></p><ul><li><b>Association</b> is a structural relationship that defines a link between objects of one class and objects of another. It represents a \"Has-A\" or \"Uses-A\" relationship.</li><li>It is the most general term for connection; <b>Aggregation</b> and <b>Composition</b> are specific, stricter types of Association.</li></ul><br><p><b>Why use it?</b></p><ul><li><b>Modularity:</b> It allows classes to be independent but still interact. A <code>Teacher</code> class doesn't need to be inside a <code>Student</code> class, but they need to be associated.</li><li><b>Reusability:</b> You can reuse independent classes in different relationships (e.g., a <code>User</code> class can be associated with <code>Order</code> in one context and <code>Comment</code> in another).</li><li><b>Navigation:</b> It defines the direction of data flow (Unidirectional vs. Bidirectional).</li></ul><br><p><b>Key Components:</b></p><ul><li><b>Cardinality (Multiplicity):</b> Defines \"how many.\"<ul><li><b>One-to-One:</b> One User has one Profile.</li><li><b>One-to-Many:</b> One Teacher teaches multiple Students.</li><li><b>Many-to-Many:</b> Many Students take many Courses.</li></ul></li><li><b>Direction:</b><ul><li><b>Unidirectional:</b> <code>Order</code> knows about <code>Customer</code>, but <code>Customer</code> doesn't strictly need to track every <code>Order</code> object internally.</li><li><b>Bidirectional:</b> Both classes hold references to each other (requires careful management to avoid infinite loops).</li></ul></li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// 1. Unidirectional Association (Bank -> Employee)\nclass Employee {\n    String name;\n    public Employee(String name) { this.name = name; }\n}\n\nclass Bank {\n    String name;\n    // Association: Bank \"Has-Many\" Employees\n    List<Employee> employees; \n\n    public Bank(String name) {\n        this.name = name;\n        this.employees = new ArrayList<>();\n    }\n    \n    public void addEmployee(Employee e) {\n        employees.add(e);\n    }\n}\n\nclass Main {\n    public static void main(String[] args) {\n        Employee e1 = new Employee(\"Alice\");\n        Bank b1 = new Bank(\"HDFC\");\n        \n        // Establishing the link\n        b1.addEmployee(e1); \n        \n        // Note: If Bank is destroyed, Employee CAN exist independently \n        // (This distinguishes generic Association/Aggregation from Composition)\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>Lifecycle dependency is key:</b> In a generic Association, there is no owner. The objects have their own independent lifecycles. If you delete one, the other survives.</li><li><b>Reflexive Association:</b> A class can be associated with itself.<br><i>Example:</i> An <code>Employee</code> class having a field <code>supervisor</code> which is also of type <code>Employee</code>.</li><li><b>Association vs. Dependency:</b><ul><li><b>Association:</b> Stronger. Class A holds a reference to Class B as a field/variable (state).</li><li><b>Dependency:</b> Weaker. Class A uses Class B only as a parameter in a method or a local variable, but doesn't hold onto it.</li></ul></li><li><b>Mapping:</b> In databases (SQL), associations are implemented using Foreign Keys and Join Tables.</li></ul>"
+    }
+  ]
+},
+  "Aggregation": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Core Concept:</b></p><ul><li><b>Aggregation</b> is a specialized form of Association. It represents a \"Whole-Part\" relationship (Has-A), but with <b>Weak Ownership</b>.</li><li>The \"Part\" (Child) can exist independently of the \"Whole\" (Parent). If the Parent is destroyed, the Child survives.</li></ul><br><p><b>Why use it?</b></p><ul><li><b>Shared Resources:</b> Use it when an object needs to be part of a group but might belong to multiple groups or exist on its own.</li><li><b>Decoupled Lifecycles:</b> When destroying the container shouldn't destroy the items inside.</li><li><b>Real-world analogy:</b> A Team and Players. If the Team is dissolved, the Players don't die; they become free agents or join other teams.</li></ul><br><p><b>Key Components:</b></p><ul><li><b>The Container (Whole):</b> Holds the reference to the collection of items.</li><li><b>The Component (Part):</b> The item being held.</li><li><b>Independent Lifecycle:</b> The key differentiator from Composition. The child is usually passed into the parent via the constructor or a setter (external creation).</li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "class Player {\n    String name;\n    public Player(String name) { this.name = name; }\n}\n\nclass Team {\n    String teamName;\n    List<Player> players; // Aggregation\n\n    public Team(String teamName, List<Player> players) {\n        this.teamName = teamName;\n        this.players = players; // Players are created OUTSIDE and passed in\n    }\n}\n\nclass Main {\n    public static void main(String[] args) {\n        // 1. Create Parts independently\n        Player p1 = new Player(\"Dhoni\");\n        Player p2 = new Player(\"Kohli\");\n\n        // 2. Create Whole and add Parts\n        List<Player> squad = new ArrayList<>(Arrays.asList(p1, p2));\n        Team india = new Team(\"India\", squad);\n        \n        // 3. Destruction Scenario\n        india = null; // Team is destroyed\n        \n        // p1 and p2 STILL EXIST. They were not destroyed with the Team.\n        System.out.println(p1.name); // Works fine\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>UML Symbol:</b> Represented by a line with an <b>Empty (White) Diamond</b> on the container side.<br><code>Team &lt;&gt;------- Player</code></li><li><b>Parameter Injection:</b> In Aggregation, objects are usually passed into the class (Dependency Injection) rather than being created inside the class using <code>new</code>.</li><li><b>Vs. Composition:</b> Ask this question: \"If I delete the Parent, does the Child die too?\"<ul><li><b>If No -> Aggregation</b> (e.g., Car and Driver).</li><li><b>If Yes -> Composition</b> (e.g., Car and Engine - conceptually, for that specific car).</li></ul></li></ul>"
+    }
+  ]
+},
+  "Composition": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Core Concept:</b></p><ul><li><b>Composition</b> is a restricted form of Aggregation. It represents a strong \"Whole-Part\" relationship.</li><li><b>Strong Ownership:</b> The \"Part\" (Child) belongs exclusively to the \"Whole\" (Parent).</li><li><b>Dependent Lifecycle:</b> If the Parent is destroyed, the Child is also destroyed. The child cannot exist independently.</li></ul><br><p><b>Why use it?</b></p><ul><li><b>Logical Consistency:</b> Use it when the parts have no meaning outside the whole (e.g., a <code>Room</code> has no identity without a <code>House</code>).</li><li><b>Encapsulation:</b> The parent strictly controls the creation and access of the child components.</li><li><b>Flexibility:</b> It is preferred over Inheritance (\"Composition over Inheritance\") because it allows you to assemble complex behaviors dynamically without the rigidity of class hierarchies.</li></ul><br><p><b>Key Components:</b></p><ul><li><b>The Owner:</b> The class that manages the lifecycle.</li><li><b>Internal Creation:</b> The child objects are usually created inside the parent's constructor using <code>new</code>. They are not passed in from the outside.</li><li><b>Cascading Delete:</b> Logic that ensures cleaning up the parent cleans up the children.</li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "class Room {\n    String type;\n    public Room(String type) { this.type = type; }\n}\n\nclass House {\n    private final List<Room> rooms; // Composition\n\n    public House() {\n        // Rooms are created INSIDE the House. \n        // If House dies, nobody else holds a reference to these specific rooms.\n        this.rooms = new ArrayList<>();\n        this.rooms.add(new Room(\"Bedroom\"));\n        this.rooms.add(new Room(\"Kitchen\"));\n    }\n}\n\nclass Main {\n    public static void main(String[] args) {\n        House myHouse = new House();\n        \n        // 1. Destruction Scenario\n        myHouse = null; \n        \n        // The 'Room' objects created inside myHouse are now unreachable.\n        // They will be Garbage Collected along with the House.\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>UML Symbol:</b> Represented by a line with a <b>Filled (Black) Diamond</b> on the container side.<br><code>House &lt;#&gt;------- Room</code></li><li><b>The \"Death\" Test:</b><ul><li>If you delete the <code>Order</code>, do the <code>LineItems</code> disappear? <b>Yes (Composition)</b>.</li><li>If you delete the <code>School</code>, do the <code>Students</code> disappear? <b>No (Aggregation)</b>.</li></ul></li><li><b>Composition over Inheritance:</b> This is a major design principle.<ul><li><b>Inheritance:</b> You inherit everything (good and bad) and it's static (fixed at compile time).</li><li><b>Composition:</b> You only include what you need, and you can change behavior at runtime (by swapping the composed object).</li></ul></li></ul>"
+    }
+  ]
+},
+  "Composition over Inheritance": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Core Concept:</b></p><ul><li>This is a fundamental design principle (from the \"Gang of Four\" Design Patterns book) that suggests you should favor object composition (\"Has-A\" relationships) over class inheritance (\"Is-A\" relationships) to achieve code reuse and flexibility.</li><li>Instead of inheriting behavior from a superclass, a class should obtain behavior by holding a reference to another object that handles that behavior.</li></ul><br><p><b>Why use it? (The Problem with Inheritance)</b></p><ul><li><b>The Fragile Base Class Problem:</b> Inheritance creates tight coupling. If you change the Parent class, you might inadvertently break the Child class.</li><li><b>Rigidity (Static):</b> Inheritance hierarchies are fixed at compile-time. You cannot change a parent class at runtime.</li><li><b>Explosion of Subclasses:</b> If you rely on inheritance for features (e.g., <code>Car</code>, <code>FlyingCar</code>, <code>SwimmingCar</code>), you end up with a massive, unmanageable tree.</li><li><b>Liskov Violation:</b> Subclasses often inherit methods they don't need (e.g., an Ostrich inheriting <code>fly()</code> from Bird), forcing you to write \"do nothing\" overrides or throw exceptions.</li></ul><br><p><b>Key Components (The Shift):</b></p><ul><li><b>Coupling:</b> Inheritance is <b>Tight</b> (Child knows deep details); Composition is <b>Loose</b> (Class only knows Interface).</li><li><b>Binding:</b> Inheritance is <b>Static</b> (Compile-time); Composition is <b>Dynamic</b> (Runtime).</li><li><b>Reuse:</b> Inheritance is <b>White-box</b> (internals visible); Composition is <b>Black-box</b> (internals hidden).</li><li><b>Changeability:</b> Inheritance is Hard (high ripple effects); Composition is Easy (just swap the component).</li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// The Bad Way (Inheritance)\nclass Bird {\n    void fly() { System.out.println(\"Flying high!\"); }\n}\n\n// PROBLEM: Ostrich is forced to inherit fly(), which is wrong.\nclass Ostrich extends Bird {\n    @Override\n    void fly() { throw new UnsupportedOperationException(\"I can't fly!\"); }\n}"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// The Good Way (Composition + Interfaces)\n\n// 1. Separate the behavior\ninterface FlyingBehavior {\n    void fly();\n}\n\nclass CanFly implements FlyingBehavior {\n    public void fly() { System.out.println(\"Flying high!\"); }\n}\n\nclass CantFly implements FlyingBehavior {\n    public void fly() { System.out.println(\"I stay on the ground.\"); }\n}\n\n// 2. The main class composes the behavior\nclass Bird {\n    private FlyingBehavior flyingBehavior; // Composition (Has-A)\n\n    public Bird(FlyingBehavior fb) {\n        this.flyingBehavior = fb;\n    }\n\n    public void performFly() {\n        flyingBehavior.fly(); // Delegate the task\n    }\n}\n\nclass Main {\n    public static void main(String[] args) {\n        // We can choose behavior at runtime!\n        Bird parrot = new Bird(new CanFly());\n        Bird ostrich = new Bird(new CantFly());\n        \n        parrot.performFly();  // Output: Flying high!\n        ostrich.performFly(); // Output: I stay on the ground.\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>Strategy Pattern:</b> This principle is the foundation of the Strategy Pattern. The \"Behavior\" (Flying) is the Strategy, and the context (Bird) composes it.</li><li><b>Decorator Pattern:</b> Uses composition to dynamically add responsibilities to objects (alternative to subclassing for extra features).</li><li><b>Code Evolution:</b> Start with Composition. Only use Inheritance when there is a true, permanent \"Is-A\" relationship that applies to every subclass (e.g., Integer is a Number).</li><li><b>Delegation:</b> Composition relies on delegation. The wrapper object calls the wrapped object to do the work (<code>flyingBehavior.fly()</code>).</li></ul>"
+    }
+  ]
+},
+  "Diamond Problem": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Core Concept:</b></p><ul><li><b>The Diamond Problem</b> is an ambiguity that arises in Multiple Inheritance when a class inherits from two classes that both descend from the same superclass.</li><li>If the top superclass (\"Grandparent\") has a method, and both intermediate classes (\"Parents\") override it, the final subclass (\"Child\") doesn't know which version of the method to inherit.</li></ul><br><p><b>The Problem (Why is it tricky?)</b></p><ul><li><b>Ambiguity:</b> If Class B and Class C both extend Class A and override method <code>run()</code>, and Class D extends both B and C... when you call <code>d.run()</code>, should it run B's version or C's version? The compiler cannot decide.</li><li><b>Complexity:</b> It complicates method dispatch and memory layout (e.g., in C++, it can lead to multiple copies of the Grandparent class in memory unless \"virtual inheritance\" is used).</li></ul><br><p><b>Key Components (The Shape):</b></p><ul><li>The inheritance hierarchy looks like a diamond:<br><b>A</b> (Top / Grandparent)<br><b>B extends A</b> & <b>C extends A</b> (Middle / Parents)<br><b>D extends B, C</b> (Bottom / Child)</li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "interface A {\n    default void hello() { System.out.println(\"Hello from A\"); }\n}\n\ninterface B extends A {\n    @Override\n    default void hello() { System.out.println(\"Hello from B\"); }\n}\n\ninterface C extends A {\n    @Override\n    default void hello() { System.out.println(\"Hello from C\"); }\n}\n\n// PROBLEM: D implements both B and C. Both have 'hello()'.\n// COMPILER ERROR: \"class D inherits unrelated defaults for hello()...\"\nclass D implements B, C {\n    \n    // RESOLUTION: You MUST override the method to resolve ambiguity.\n    @Override\n    public void hello() {\n        // Option 1: Define new logic\n        // System.out.println(\"Hello from D\"); \n        \n        // Option 2: Explicitly choose a parent using 'super'\n        B.super.hello(); \n    }\n}\n\nclass Main {\n    public static void main(String[] args) {\n        new D().hello(); // Output: Hello from B\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>Why Java banned multiple class inheritance:</b> Specifically to avoid this ambiguity and keep the language simple (simplicity was a major design goal of Java vs. C++).</li><li><b>Interface Resolution Rules:</b> If there is a conflict between interfaces:<ul><li><b>Classes win:</b> If a class extends a Parent and implements an Interface, the Parent's method always wins (Rule of \"Class wins\").</li><li><b>Sub-interfaces win:</b> If B extends A, B is more specific.</li><li><b>Explicit Override:</b> If there is no clear winner (like the code above), the compiler forces you to override and clarify.</li></ul></li><li><b>Composition is the fix:</b> If you genuinely need behavior from two different classes, don't try to inherit from both. Have one class as a field inside your new class (Composition).</li></ul>"
+    }
+  ]
+},
+  "Dynamic Dispatch": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Core Concept:</b></p><ul><li><b>Dynamic Dispatch</b> (or Dynamic Method Dispatch) is the mechanism by which a call to an overridden method is resolved at <b>runtime</b> rather than compile-time.</li><li>The compiler doesn't know which method implementation to call; the JVM decides at the last moment based on the <i>actual object</i> being referred to, not the variable type.</li></ul><br><p><b>Why use it?</b></p><ul><li><b>Enables Polymorphism:</b> It is the technical engine that makes runtime polymorphism possible.</li><li><b>Extensibility:</b> You can add new subclasses (e.g., a new plugin) without recompiling the code that calls the plugin methods. The dispatch mechanism automatically finds the new code.</li><li><b>Cleaner Code:</b> Replaces massive <code>if (obj instanceof TypeA) ... else if (obj instanceof TypeB)</code> blocks.</li></ul><br><p><b>Key Components:</b></p><ul><li><b>Upcasting:</b> A Reference Variable of a Parent class holding an Object of a Child class.</li><li><b>Overriding:</b> The Child class must provide a specific implementation of a method defined in the Parent.</li><li><b>Virtual Method Table (vtable):</b> (Under the hood) The JVM maintains a table of method addresses for each class. When a method is called, it looks up the address in this table for the specific object type to find the correct code.</li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "class GameCharacter {\n    void attack() { System.out.println(\"Basic Punch\"); }\n}\n\nclass Warrior extends GameCharacter {\n    @Override\n    void attack() { System.out.println(\"Sword Slash\"); }\n}\n\nclass Archer extends GameCharacter {\n    @Override\n    void attack() { System.out.println(\"Shoot Arrow\"); }\n}\n\nclass Main {\n    public static void main(String[] args) {\n        // 1. Compile time: 'c' is just a GameCharacter reference.\n        GameCharacter c;\n        \n        // 2. Runtime: The object is actually a Warrior.\n        c = new Warrior();\n        \n        // 3. Dynamic Dispatch: JVM checks heap object (Warrior) -> calls Sword Slash\n        c.attack(); \n        \n        // 4. Runtime: The object changes to Archer.\n        c = new Archer();\n        \n        // 5. Dynamic Dispatch: JVM checks heap object (Archer) -> calls Shoot Arrow\n        c.attack();\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>Does NOT apply to Static Methods:</b> Static methods are bound at compile-time (<i>Static Dispatch</i>) based on the reference type. You cannot override static methods (only hide them).</li><li><b>Does NOT apply to Private/Final Methods:</b> These cannot be overridden, so the compiler knows exactly which method to call at compile-time (Optimization).</li><li><b>Does NOT apply to Instance Variables:</b> Data is not polymorphic. If Parent and Child both have a variable <code>int x</code>, <code>parentRef.x</code> will always access the Parent's variable, even if the object is a Child.</li><li><b>Double Dispatch:</b> In some patterns (like <b>Visitor</b>), you need to dispatch based on two object types (the visitor and the element). Java only supports <b>Single Dispatch</b> (based on the receiver object), so we simulate Double Dispatch using two method calls.</li></ul>"
+    }
+  ]
+},
+  "Immutability": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Core Concept:</b></p><ul><li><b>Immutability:</b> An object is Immutable if its internal state (data) cannot be modified after it is created. Once initialized, it remains constant for its entire lifecycle. If you want to change something, you must create a new object.</li></ul><br><p><b>Why use it?</b></p><ul><li><b>Thread Safety:</b> Since the state cannot change, multiple threads can access the object simultaneously without synchronization (no locking needed).</li><li><b>Hash Keys:</b> They make perfect keys for <code>HashMap</code> or <code>HashSet</code>. If the key object changed (mutable), its hashcode would change, and you would lose the value in the map.</li><li><b>Caching:</b> You can safely cache and share references without worrying that one caller will modify the data and affect others.</li></ul><br><p><b>Key Components (The Recipe):</b></p>To create an immutable class in Java:<br><ul><li><b><code>final</code> Class:</b> Prevent subclasses (which might be mutable).</li><li><b><code>private final</code> Fields:</b> Ensure fields are assigned once and not accessible directly.</li><li><b>No Setters:</b> Remove any methods that modify state.</li><li><b>Deep Copy:</b> If the class holds a Mutable object (like a <code>List</code> or <code>Date</code>), you must perform a defensive copy in the Constructor and the Getter.</li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// 1. Final class\npublic final class ImmutableUser {\n    \n    // 2. Private Final fields\n    private final String name;\n    private final List<String> roles; \n\n    public ImmutableUser(String name, List<String> roles) {\n        this.name = name;\n        // 3. Defensive Copy (In): Don't trust the list passed by the caller\n        this.roles = new ArrayList<>(roles);\n    }\n\n    public String getName() {\n        return name;\n    }\n\n    // 4. No Setters\n    \n    public List<String> getRoles() {\n        // 5. Defensive Copy (Out): Return a copy or unmodifiable view\n        // return new ArrayList<>(roles);\n        return Collections.unmodifiableList(roles);\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>String is Immutable:</b> This is the most famous example. <code>String s = \"A\"; s = \"B\";</code> does not change \"A\"; it creates a new string \"B\" and points <code>s</code> to it.</li><li><b>Shallow vs. Deep Immutability:</b><ul><li><b>Shallow:</b> The fields are final, but they point to mutable objects (e.g., an immutable <code>Student</code> class holding a mutable <code>Address</code> object). This is dangerous.</li><li><b>Deep:</b> The object and everything it points to is immutable.</li></ul></li><li><b>Memory Overhead:</b> Since you create new objects for every change, it can generate garbage (pressure on GC). However, modern GCs are very efficient at collecting short-lived objects.</li><li><b>Builder Pattern:</b> Often used to construct complex immutable objects cleanly since you can't use setters after creation.</li></ul>"
+    }
+  ]
+},
+  "Abstract Class vs Interface": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Core Concept:</b></p><ul><li><b>Abstract Class:</b> A class that cannot be instantiated and is used to define a base for subclasses. It represents an \"Is-A\" relationship (Identity).</li><li><b>Interface:</b> A contract that defines a set of behaviors. It represents a \"Can-Do\" relationship (Capability).</li></ul><br><p><b>Why use them? (The Choice)</b></p><ul><li><b>Use Abstract Class when:</b> You want to share code and state (variables) among closely related classes (e.g., <code>Car</code> and <code>Truck</code> sharing <code>fuelLevel</code> and <code>startEngine()</code>).</li><li><b>Use Interface when:</b> You want to define a common capability for unrelated classes (e.g., <code>Bird</code> and <code>Airplane</code> both implement <code>Flyable</code>). It enables loose coupling.</li></ul><br><p><b>Key Components (Comparison):</b></p><ul><li><b>Relationship:</b> Abstract Class is \"Is-A\" (Inheritance); Interface is \"Can-Do\" (Capability).</li><li><b>State (Fields):</b> Abstract Class can have private, protected, non-static, mutable fields. Interface has only <code>public static final</code> (Constants) and no instance state.</li><li><b>Inheritance:</b> Abstract Class supports <b>Single Inheritance</b> (extends one class). Interface supports <b>Multiple Inheritance</b> (implements many).</li><li><b>Constructors:</b> Abstract Class has constructors to initialize state. Interface cannot have constructors.</li><li><b>Access Modifiers:</b> Abstract methods can be public, protected, private. Interface methods are implicitly <code>public</code> (Java 9 allows private for internal logic).</li><li><b>Speed:</b> Abstract Class is slightly faster (direct binding). Interface is slightly slower (lookup in interface table).</li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// 1. Abstract Class: Defines Identity & Shared State\nabstract class Animal {\n    String name; // State\n    \n    public Animal(String name) { this.name = name; } // Constructor\n    \n    abstract void makeSound(); // Abstract method\n    \n    void sleep() { // Concrete shared method\n        System.out.println(name + \" is sleeping.\");\n    }\n}\n\n// 2. Interface: Defines Capability\ninterface Pet {\n    void play(); // Abstract contract\n}\n\n// 3. Concrete Class: Combines both\nclass Dog extends Animal implements Pet {\n    public Dog(String name) { super(name); }\n    \n    @Override\n    void makeSound() { System.out.println(\"Bark\"); }\n    \n    @Override\n    public void play() { System.out.println(\"Fetching ball\"); }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>Java 8+ Blur:</b> With <code>default</code> and <code>static</code> methods in Interfaces, you can add code to interfaces. However, you still cannot have instance variables (state) in interfaces. State is the main tie-breaker.</li><li><b>Versioning:</b><ul><li>Adding a method to an <b>Interface</b> breaks all implementing classes (unless you make it <code>default</code>).</li><li>Adding a concrete method to an <b>Abstract Class</b> is safe (all children inherit it automatically).</li></ul></li><li><b>Design Rule:</b> \"Favor Interfaces over Abstract Classes\" (Item 20 in <i>Effective Java</i>). Use Abstract Classes only when you explicitly need to share variables or strictly control the hierarchy.</li><li><b>Marker Interface:</b> An interface with no methods (e.g., <code>Serializable</code>) used purely to \"mark\" a class with a specific property.</li></ul>"
+    }
+  ]
+}
 
 }
+
 
 
 
