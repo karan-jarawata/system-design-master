@@ -719,12 +719,308 @@
       "content": "<ul><li><b>Q4: What are the downsides of Immutability?</b><br><b>Answer:</b> <b>Memory Overhead.</b> Creating a new object for every small change generates \"garbage\" (e.g., String concatenation in a loop). <b>Fix:</b> Use <code>StringBuilder</code> (Mutable) for heavy editing, then convert to <code>String</code>.</li></ul>"
     }
   ]
+},
+
+  "Checked vs Unchecked": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Core Distinction:</b></p><ul><li><b>Checked Exceptions (<code>Exception</code>):</b><ul><li><b>Nature:</b> Anticipated, recoverable events external to the program (e.g., File missing, Network down).</li><li><b>Compiler Rule:</b> <b>Mandatory Handling.</b> You must <code>try-catch</code> or <code>throws</code>.</li><li><b>Intent:</b> \"Don't ignore this; have a Plan B.\"</li></ul></li><li><b>Unchecked Exceptions (<code>RuntimeException</code>):</b><ul><li><b>Nature:</b> Logic errors (Bugs) or Unrecoverable system faults (e.g., NullPointer, Database Dead).</li><li><b>Compiler Rule:</b> <b>Optional Handling.</b> Compiler stays silent.</li><li><b>Intent:</b> \"Fix the code\" or \"Fail fast.\"</li></ul></li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Decision Matrix (How to choose):</b></p><table><thead><tr><th>Scenario</th><th>Type to Throw</th><th>Rationale</th></tr></thead><tbody><tr><td><b>Caller can recover</b> (Retry, Alternate Path)</td><td>Checked</td><td>Forces the dev to write recovery logic.</td></tr><tr><td><b>Programming Error</b> (Null arg, Bad cast)</td><td>Unchecked</td><td>No recovery possible; the code is broken.</td></tr><tr><td><b>System Failure</b> (DB dead, Config missing)</td><td>Unchecked</td><td>Caller can't fix a dead DB. Let it crash to the top.</td></tr><tr><td><b>Modern API (Spring)</b></td><td>Unchecked</td><td>Reduces boilerplate; handled by Global Exception Handler.</td></tr></tbody></table>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The \"Wrap and Rethrow\" Pattern (Critical for LLD):</b></p><ul><li><b>Problem:</b> Checked exceptions (e.g., <code>SQLException</code>) leak implementation details to higher layers. The Service layer shouldn't know you are using SQL.</li><li><b>Solution:</b> Catch the Checked exception at the boundary, wrap it in a custom Unchecked exception, and throw.</li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// BAD (Leaky Abstraction - Service knows about SQL)\npublic User get(String id) throws SQLException { ... } \n\n// GOOD (Clean Abstraction - Service only knows Data Access failed)\npublic User get(String id) {\n    try {\n        // ... SQL logic ...\n    } catch (SQLException e) {\n        // Wrap & Rethrow. Preserves stack trace (e).\n        throw new DataAccessException(\"Failed to fetch user\", e);\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>Industry Trend:</b> Modern Java (Spring/Lombok) heavily prefers <b>Unchecked Exceptions</b>. Legacy Java used Checked exceptions too much, resulting in empty catch blocks. Ideally, use a Centralized Error Handler (<code>@ControllerAdvice</code>).</li><li><b>Layer Isolation:</b> Never let a Checked Exception from a low-level library (JDBC, File I/O) propagate to the Service layer. Wrap it.</li><li><b>The Spring Transaction Trap:</b> In Spring, <code>@Transactional</code> <b>only rolls back on Unchecked exceptions</b> by default. It commits if a Checked exception is thrown, unless you specify <code>rollbackFor = Exception.class</code>.</li></ul>"
+    }
+  ]
+},
+
+  "Custom Exceptions": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Purpose:</b></p><ul><li><b>Semantic Clarity:</b> Replaces vague errors (<code>RuntimeException</code>) with specific business language (<code>UserNotFoundException</code>).</li><li><b>Granular Handling:</b> Allows the caller to catch specific scenarios (Catch <code>InvalidPassword</code>) while letting others bubble up.</li><li><b>Context Passing:</b> Custom exceptions can carry metadata (e.g., <code>failedAmount</code>, <code>userId</code>) to help with debugging or user feedback.</li></ul><br><p><b>The Design Pattern: Domain Hierarchy</b></p>Don't just create random exceptions. Structure them like your architecture.<br><ul><li><b>Root Layer:</b> <code>BaseAppException</code> (Extends RuntimeException).</li><li><b>Module Layer:</b> <code>BillingException</code>, <code>AuthException</code> (Extends BaseAppException).</li><li><b>Leaf Layer:</b> <code>InsufficientFundsException</code>, <code>TokenExpiredException</code> (Extends Module Exception).</li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// The \"Smart\" Exception: Holds Logic & Data\n\n// 1. Base Class (Unchecked)\npublic abstract class PaymentException extends RuntimeException {\n    public PaymentException(String message) { super(message); }\n}\n\n// 2. Concrete Class with Context\npublic class InsufficientFundsException extends PaymentException {\n    \n    // DATA fields (Crucial for debugging/UI)\n    private final double currentBalance;\n    private final double attemptedAmount;\n\n    public InsufficientFundsException(double currentBalance, double attemptedAmount) {\n        super(\"Transaction declined: Balance \" + currentBalance + \" < \" + attemptedAmount);\n        this.currentBalance = currentBalance;\n        this.attemptedAmount = attemptedAmount;\n    }\n    \n    // Getters allowed...\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Usage Benefits (Comparison):</b></p><table><thead><tr><th>Feature</th><th>Generic (Exception)</th><th>Custom (UserNotFound)</th></tr></thead><tbody><tr><td><b>Readability</b></td><td>Low (throw new RuntimeException(\"user missing\"))</td><td>High (throw new UserNotFound(id))</td></tr><tr><td><b>Catching</b></td><td>Catches everything (bugs & logic)</td><td>Catches only specific logic</td></tr><tr><td><b>API Response</b></td><td>Hard to map to 404/400</td><td>Easy 1:1 mapping</td></tr></tbody></table><br><p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>Don't Over-Engineer:</b> Rule of Thumb: Create a new class <i>only</i> if you intend to handle it differently (e.g., return a different HTTP status or trigger a specific retry logic).</li><li><b>Mapping to HTTP (API Layer):</b> Custom exceptions are the bridge between Logic and API.<ul><li><code>ResourceNotFoundException</code> $\\rightarrow$ 404 Not Found</li><li><code>BusinessRuleViolationException</code> $\\rightarrow$ 422 Unprocessable Entity</li><li><code>SystemFailureException</code> $\\rightarrow$ 500 Internal Server Error</li></ul></li><li><b>Security:</b> Never put sensitive data (passwords, PII) inside the exception message/fields, as these often get logged in plain text.</li></ul>"
+    }
+  ]
+},
+
+  "Propagation": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Three Strategies:</b></p>When an exception occurs, you have three choices. Your choice defines the resilience and cleanliness of your architecture.<br><ul><li><b>1. Handle (Catch & Recover):</b><ul><li><b>Action:</b> Catch the error and implement a \"Plan B.\"</li><li><b>Use When:</b> You can fix the issue locally without bothering the user. (e.g., Cache fails $\\rightarrow$ Fetch from DB).</li></ul></li><li><b>2. Bubble Up (Propagate):</b><ul><li><b>Action:</b> Do nothing (or declare <code>throws</code>). Let the exception fly up the stack.</li><li><b>Use When:</b> Your method is a utility (e.g., File Reader) and has no context on how to solve business problems.</li></ul></li><li><b>3. Wrap & Rethrow (Translate) [Crucial for LLD]:</b><ul><li><b>Action:</b> Catch a low-level exception, wrap it in a high-level Domain exception, and throw the new one.</li><li><b>Use When:</b> Crossing architectural boundaries (e.g., Data Layer $\\rightarrow$ Service Layer).</li><li><b>Goal:</b> Prevent <b>Leaky Abstractions</b>.</li></ul></li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// Code Example: Wrap & Rethrow\n// This is the standard pattern for maintaining clean layers.\n\n// Layer: Repository (Low Level)\npublic void save(User user) {\n    try {\n        database.execute(sql);\n    } catch (SQLException e) {\n        // STOP! Do not let SQL details leak out.\n        // Wrap 'e' to keep the stack trace (Root Cause).\n        throw new UserStorageException(\"Save failed\", e);\n    }\n}\n\n// Layer: Service (High Level)\n// Service code stays clean. It doesn't know we use SQL.\npublic void register(User user) {\n    try {\n        repo.save(user);\n    } catch (UserStorageException e) { // catching the Domain Error\n        // Handle business logic failure\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Anti-Pattern: \"Log and Throw\":</b></p><ul><li><b>Avoid this:</b> <code>catch (e) { logger.error(e); throw e; }</code></li><li>It creates duplicate logs (once here, once at the global handler). <b>Rule:</b> Either log it and handle it (swallow), OR throw it. Never do both.</li></ul><br><p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>Preserve Abstraction:</b> The Service Layer should never catch <code>SQLException</code> or <code>IOException</code>. It should only catch domain errors (<code>StorageException</code>). If you see low-level errors in high-level code, it's a \"Leaky Abstraction.\"</li><li><b>Swallowing Exceptions:</b> Never write an empty catch block (<code>catch (e) {}</code>). It buries the error. At minimum, log it.</li><li><b>Root Cause Analysis:</b> When Wrapping & Rethrowing, always pass the original exception into the constructor (<code>new MyEx(msg, originalEx)</code>). If you forget this, you lose the stack trace and won't know <i>why</i> the error happened.</li></ul>"
+    }
+  ]
+},
+
+
+  "Optional vs Null": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Problem: The \"Billion Dollar Mistake\"</b></p><ul><li><b>Ambiguity:</b> <code>null</code> is silent. It can mean \"Not Found,\" \"Not Initialized,\" or \"Error.\"</li><li><b>Risk:</b> Developers forget to check <code>if (x != null)</code>, leading to <b>NullPointerException (NPE)</b> which crashes the application at runtime.</li></ul><br><p><b>The Solution: Optional&lt;T&gt;</b></p><ul><li><b>Concept:</b> A container object (a \"box\") that may or may not contain a non-null value.</li><li><b>Intent:</b> It forces the client code to explicitly handle the \"case where the value is missing.\" You cannot access the value without \"opening the box.\"</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Core Patterns (The LLD Toolkit)</b></p>Instead of <code>if-else</code> blocks, use functional pipelines.<br><table><thead><tr><th>Method</th><th>Purpose</th><th>Scenario</th></tr></thead><tbody><tr><td><code>orElseThrow()</code></td><td>Get value or crash.</td><td>Validation: \"User must exist, or else 404.\"</td></tr><tr><td><code>ifPresent()</code></td><td>Do something if exists.</td><td>Side Effects: \"If email exists, send logic.\"</td></tr><tr><td><code>map()</code></td><td>Transform if exists.</td><td>DTOs: \"Convert User entity to DTO only if found.\"</td></tr><tr><td><code>orElse()</code></td><td>Default value.</td><td>Config: \"Use default timeout if config missing.\"</td></tr></tbody></table>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// The Old Way (Null Checks - Error Prone)\nUser user = repo.find(\"karan\");\nif (user != null) {\n    Address addr = user.getAddress();\n    if (addr != null) {\n        return addr.getCity();\n    }\n}\nreturn \"Unknown\"; // Easy to miss a return path\n\n// The LLD Way (Optional Pipeline - Safe)\nreturn repo.find(\"karan\") // returns Optional<User>\n    .map(User::getAddress)\n    .map(Address::getCity)\n    .orElse(\"Unknown\");"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>Return Type Only:</b> Strict rule for LLD—Use <code>Optional</code> <b>only as a return type</b>. It signals to the caller \"This might be empty.\"</li><li><b>Don't use as Parameters:</b> Do not write <code>method(Optional&lt;String&gt; s)</code>. It makes the API clumsy. Overload the method instead.</li><li><b>Don't use as Fields:</b> Do not declare <code>private Optional&lt;String&gt; name</code> in a class.<ul><li><b>Reason 1:</b> It is not Serializable (breaks Redis/Caching).</li><li><b>Reason 2:</b> Memory overhead (creates a wrapper object for every field). Use <code>null</code> for fields, wrap in <code>Optional</code> in the getter.</li></ul></li></ul>"
+    }
+  ]
+},
+
+  "DTO vs Domain": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Separation of Worlds:</b></p><ul><li><b>Domain Model (Internal Representation):</b><ul><li><b>Context:</b> Database & Business Logic.</li><li><b>Nature:</b> \"Heavy.\" Contains annotations (<code>@Entity</code>), relationships (<code>@OneToMany</code>), and business methods.</li><li><b>Goal:</b> Maintain data integrity and business rules.</li></ul></li><li><b>DTO (Data Transfer Object) (External Contract):</b><ul><li><b>Context:</b> API & Client Communication.</li><li><b>Nature:</b> \"Light.\" Plain Java Objects (POJOs) with only fields and getters/setters. No logic.</li><li><b>Goal:</b> Efficient data transport and strict API contracts.</li></ul></li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Why Separate Them? (Decoupling)</b></p><table><thead><tr><th>Factor</th><th>Use Domain Directly (Bad)</th><th>Use DTO (Good)</th></tr></thead><tbody><tr><td><b>Coupling</b></td><td>API breaks if DB Column name changes.</td><td>API is stable; only the Mapper changes.</td></tr><tr><td><b>Security</b></td><td>Accidental leak of password, salt, id.</td><td>Explicitly whitelist fields to expose.</td></tr><tr><td><b>Performance</b></td><td>Serializing Entity triggers <b>Lazy Loading</b> (N+1 queries).</td><td>DTO contains only fetched data.</td></tr><tr><td><b>Versioning</b></td><td>Hard to support v1 and v2 simultaneously.</td><td>Different DTOs for v1 (<code>UserV1DTO</code>) and v2.</td></tr></tbody></table>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// The Entity (Internal - DB Linked)\n@Entity\npublic class User {\n    @Id private Long id;\n    private String email;\n    private String passwordHash; // Sensitive! Leaking this is a disaster.\n    private boolean isDeleted;   // Internal flag!\n}\n\n// The DTO (External - API Safe)\npublic class UserResponseDTO {\n    public String email;\n    public String status; // Calculated (\"Active\" vs \"Deleted\")\n    // Password is physically missing here. Safe.\n}\n\n// The Mapper (The Bridge)\npublic UserResponseDTO toDTO(User user) {\n    UserResponseDTO dto = new UserResponseDTO();\n    dto.email = user.getEmail();\n    dto.status = user.isDeleted() ? \"Inactive\" : \"Active\";\n    return dto;\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>Serialization Hazards:</b> Never return an <code>@Entity</code> directly in a Controller. JSON serializers (like Jackson) will try to access lazy-loaded fields (e.g., <code>user.getOrders()</code>), causing <b>Infinite Recursion</b> or <b>N+1 Database Queries</b>.</li><li><b>Boilerplate Reduction:</b> In interviews, mention using libraries like <b>MapStruct</b> or <b>ModelMapper</b>. It shows you know production standards for automating the mapping code.</li><li><b>Multiple Views:</b> You can have multiple DTOs for the same Entity to optimize payload size:<ul><li><code>UserSummaryDTO</code> (List View: ID + Name)</li><li><code>UserDetailDTO</code> (Profile View: ID + Name + Address + History)</li></ul></li></ul>"
+    }
+  ]
+},
+
+  "Validation Layer": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Two-Phase Validation Strategy:</b></p>To keep code clean and secure, validation is split into two distinct stages.<br><ul><li><b>Phase 1: Syntactic Validation (Format)</b><ul><li><b>Where:</b> DTO / Controller Layer.</li><li><b>What:</b> \"Does the data look right?\" (e.g., Is email format valid?)</li><li><b>Mechanism:</b> Annotations (<code>@NotNull</code>, <code>@Email</code>).</li><li><b>Goal:</b> <b>Fail Fast.</b> Don't bother the database if the format is garbage.</li></ul></li><li><b>Phase 2: Semantic Validation (Logic)</b><ul><li><b>Where:</b> Service / Domain Layer.</li><li><b>What:</b> \"Is the data valid in our system?\" (e.g., Is email unique?)</li><li><b>Mechanism:</b> Database queries / Business Rule checks.</li><li><b>Goal:</b> Ensure data integrity.</li></ul></li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Security: Input Sanitization</b></p>Before validation starts, sanitize input to prevent attacks.<br><ul><li><b>XSS (Cross-Site Scripting):</b> Strip HTML tags from text inputs (<code>&lt;script&gt;</code>).</li><li><b>SQL Injection:</b> Use Prepared Statements (standard in JPA/Hibernate).</li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// Phase 1: Syntactic (DTO Annotations)\npublic class SignupDTO {\n    @NotNull(message = \"Name required\")\n    private String name;\n\n    @Email(message = \"Bad email format\")\n    private String email; // Checks format only (foo@bar.com)\n}\n\n// Phase 2: Semantic (Service Logic)\npublic void register(SignupDTO dto) {\n    // 1. Semantic Check: Uniqueness\n    if (repo.existsByEmail(dto.getEmail())) {\n        throw new UserAlreadyExistsException(\"Email taken\");\n    }\n\n    // 2. Semantic Check: Business Rule\n    if (dto.getAge() < 18 && dto.getCountry().equals(\"US\")) {\n        throw new BusinessRuleException(\"Must be 18+ in US\");\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>Separation of Concerns:</b> Never put DB checks (Semantic) inside the DTO or Controller. It couples your API layer to your Data layer.</li><li><b>Fail Fast Principle:</b> Always perform Syntactic validation before Semantic. Syntactic is cheap (CPU only); Semantic is expensive (I/O, DB calls).</li><li><b>The \"Validator Class\" Pattern:</b> If business rules are complex (e.g., Loan Approval with 20 checks), move the logic out of the Service and into a dedicated <code>LoanValidator</code> class to keep the Service readable.</li></ul>"
+    }
+  ]
+},
+
+  "Anti-Corruption Layer": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Core Concept:</b></p><ul><li><b>The Problem:</b> You are building a modern system (Clean Architecture) but need to integrate with a <b>Legacy System</b> (Spaghetti Code, Mainframe, XML) or a poorly designed 3rd Party API.</li><li><b>The Risk:</b> If you use the Legacy System's classes/models directly in your new code, the \"rot\" spreads. Your clean service layer becomes polluted with confusing names and structures.</li><li><b>The Solution:</b> Build a defensive wall (The <b>ACL</b>). It translates the \"Messy External Model\" into your \"Clean Internal Model.\"</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Components of an ACL:</b></p><ul><li><b>The Adapter (Facade):</b> The interface exposed to your new system. It speaks <i>your</i> language.</li><li><b>The Translator:</b> A private utility that maps <code>Legacy Object</code> $\\leftrightarrow$ <code>Modern Object</code>.</li><li><b>The Client:</b> The low-level network code that actually talks to the legacy system (SOAP, REST, etc.).</li></ul><br><p><b>Code Structure:</b></p>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// 1. The \"Clean\" Interface (What your Service uses)\n// Notice: It uses your clean domain language (sku, boolean)\npublic interface InventoryService {\n    boolean isProductInStock(String sku);\n}\n\n// 2. The ACL Implementation (The Translation Logic)\n// Notice: It encapsulates the mess (XML_ITEM_01, \"Y\"/\"N\" flags)\n@Service\npublic class LegacyInventoryACL implements InventoryService {\n    \n    @Autowired private LegacySoapClient client;\n\n    @Override\n    public boolean isProductInStock(String sku) {\n        // A. Translate Request (Clean -> Messy)\n        String legacyId = \"ID_\" + sku; \n        \n        // B. Call Legacy System\n        LegacyResponse response = client.fetchXML_ITEM_01(legacyId);\n        \n        // C. Translate Response (Messy -> Clean)\n        // Legacy system uses \"Y\"/\"N\", we want boolean\n        return \"Y\".equals(response.getVal_stk_flag());\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>Decoupling is King:</b> The primary goal is that your core domain logic never imports a class from the legacy system. It only talks to the ACL interface.</li><li><b>Strangler Fig Pattern:</b> ACL is the enabler for the \"Strangler Fig\" migration strategy. You wrap the old system in an ACL. Over time, you replace the backend of the ACL with a new microservice, while the interface remains the same.</li><li><b>Cost vs. Benefit:</b> Don't use ACL for everything. If the external system is modern and clean (e.g., Stripe API), just use their SDK. ACL is specifically for isolating mess.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    }
+  ]
+},
+
+
+  "Idempotency": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Definition:</b></p><ul><li><b>Math:</b> $f(f(x)) = f(x)$</li><li><b>Engineering:</b> Performing an operation multiple times produces the same result as performing it exactly once.</li><li><b>Goal:</b> Resilience against network failures (Timeouts) and automatic Retries.</li></ul><br><p><b>The Problem: \"The Double Charge\"</b></p><ul><li><b>Scenario:</b> User clicks \"Pay $100\". Server charges card. The <b>Network Fails</b> before the response returns.</li><li><b>The Retry:</b> Client thinks the request failed and sends it again.</li><li><b>Result:</b> Server charges the card again. User is angry.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>HTTP Methods Behavior:</b></p><table><thead><tr><th>Method</th><th>Idempotent?</th><th>Why?</th></tr></thead><tbody><tr><td><b>GET</b></td><td>Yes</td><td>Read-only. Reading 10 times changes nothing.</td></tr><tr><td><b>PUT</b></td><td>Yes</td><td>\"Set X=5\". Doing it 10 times results in X=5.</td></tr><tr><td><b>DELETE</b></td><td>Yes</td><td>\"Delete ID 5\". Doing it 10 times results in ID 5 gone.</td></tr><tr><td><b>POST</b></td><td><b>NO</b></td><td>\"Create Order\". Doing it 10 times creates 10 orders. Requires Idempotency Keys.</td></tr></tbody></table>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Solution: Idempotency Keys</b></p><ul><li><b>The Mechanism:</b> The server must recognize \"I have seen this request before.\"</li><li><b>Client:</b> Generates a unique ID (UUID) for the intent (e.g., <code>req_123</code>).</li><li><b>Server Logic:</b><ul><li><b>If Key Exists:</b> Return the saved response (Do not process again).</li><li><b>If Key New:</b> Process request $\\rightarrow$ Save Key + Response $\\rightarrow$ Return Result.</li></ul></li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "public Response processPayment(String key, Data data) {\n    // 1. Check Cache/DB\n    if (store.contains(key)) {\n        return store.get(key); // Return cached success\n    }\n\n    // 2. Lock (Critical for Concurrency)\n    // Prevent two threads processing the same key at the exact same ms\n    if (!lock.acquire(key)) {\n        throw new ConflictException(\"Processing\");\n    }\n\n    // 3. Process & Save\n    Result result = paymentService.charge(data);\n    store.save(key, result);\n    \n    return result;\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>The \"Post\" Exception:</b> In REST, POST is the only method that is <b>not</b> idempotent by default. You must manually implement it for critical endpoints (Payments).</li><li><b>Concurrency Race Condition:</b> If a user clicks \"Submit\" twice instantly, two requests might hit the server before the first one is saved. You need a <b>Distributed Lock</b> (e.g., Redis Lock) on the Idempotency Key to prevent parallel processing.</li><li><b>Response Caching:</b> You don't just save \"Processed: True\". You must save the <b>actual JSON response</b>. When the retry comes, you return the exact same JSON body so the client doesn't crash parsing a different format.</li></ul>"
+    }
+  ]
+},
+
+
+  "Config-Driven Design": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Core Philosophy:</b></p><ul><li><b>Definition:</b> Writing code that adapts its behavior based on external configuration, rather than hardcoded logic.</li><li><b>The Goal:</b> Change Business Logic without changing Source Code.</li><li><b>The Benefit:</b> Reduces \"Time to Market.\" A Product Manager can toggle a feature or change a tax rate in seconds, without waiting for a developer to commit, build, test, and deploy.</li></ul><br><p><b>The Evolution of Config:</b></p><table><thead><tr><th>Level</th><th>Strategy</th><th>Pros/Cons</th></tr></thead><tbody><tr><td><b>Level 0</b></td><td>Hardcoded (<code>if (country == \"US\")</code>)</td><td><b>Bad.</b> Requires full code redeploy to change.</td></tr><tr><td><b>Level 1</b></td><td>Property Files (<code>application.yaml</code>)</td><td><b>Better.</b> Requires a service restart to apply changes.</td></tr><tr><td><b>Level 2</b></td><td>Dynamic Config (DB / Consul)</td><td><b>Best.</b> Changes apply in <b>Real-Time (Hot Reload)</b> without restart.</td></tr></tbody></table>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Feature Toggles (Flags):</b></p>Decouple <b>Deployment</b> (moving code to server) from <b>Release</b> (showing code to users).<br><ul><li><b>Boolean Flags:</b> Turn features on/off. <code>if (featureFlags.isOn(\"dark_mode\"))</code>.</li><li><b>Kill Switch:</b> If a new feature causes bugs, turn it off instantly via config. No rollback needed.</li><li><b>Canary / Percentage Rollouts:</b> \"Enable New Checkout for 5% of users.\" Monitor logs. If safe, increase to 100%.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Environment Separation:</b></p>The \"Build Once, Deploy Anywhere\" Rule.<br><ul><li><b>Artifact:</b> The code (JAR/Docker Image) must be <b>identical</b> across Dev, Stage, and Prod.</li><li><b>Variable:</b> Only the Config changes.<br><i>Dev:</i> <code>DB_URL=localhost</code>, <code>LOG_LEVEL=DEBUG</code><br><i>Prod:</i> <code>DB_URL=rds-endpoint</code>, <code>LOG_LEVEL=INFO</code></li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// The Bad Way (Hardcoded)\npublic double calculateTax(String country) {\n    if (\"US\".equals(country)) return 0.10; // Hardcoded!\n    if (\"IN\".equals(country)) return 0.18; // Redeploy needed to change\n    return 0;\n}\n\n// The LLD Way (Config-Driven)\n@Service\npublic class TaxService {\n    // Injected from DB or Config Server (Hot Reloadable)\n    private Map<String, Double> taxRates; \n\n    public double calculateTax(String country) {\n        // 1. Logic is generic\n        // 2. Behavior is defined by data\n        return taxRates.getOrDefault(country, 0.0);\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>Hot Reloading:</b> In High-Level Design (HLD), we use tools like <b>Spring Cloud Config</b> or <b>Consul</b> to push changes to running services. The service listens for the change event and refreshes its beans without downtime.</li><li><b>A/B Testing:</b> Config-Driven Design is the foundation of A/B testing. You feed Config A to User Group 1 and Config B to User Group 2 to measure which one performs better.</li><li><b>Complexity Warning:</b> Don't overdo it. Too many feature flags make the code a nightmare to test (20 flags = $2^{20}$ possible combinations). Clean up old flags once the feature is permanently 100% live.</li></ul>"
+    }
+  ]
+},
+
+
+  "Feature Toggles": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Core Concept:</b></p><ul><li><b>Definition:</b> A mechanism that allows you to modify system behavior without changing code.</li><li><b>The Mantra:</b> \"Deploy $\\neq$ Release.\"<ul><li><b>Deploy:</b> Installing code onto the server (Technical act).</li><li><b>Release:</b> Making the feature visible to users (Business act).</li></ul></li><li><b>Goal:</b> <b>Continuous Deployment.</b> You can push half-finished code to Production, kept hidden behind a \"False\" flag.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Common Types of Toggles:</b></p><table><thead><tr><th>Type</th><th>Purpose</th><th>Duration</th></tr></thead><tbody><tr><td><b>Release Toggle</b></td><td>Hide incomplete work. Allow trunk-based development.</td><td>Short-lived (Days/Weeks)</td></tr><tr><td><b>Ops Toggle (Kill Switch)</b></td><td>Safety valve. If a new endpoint spikes latency, turn it off.</td><td>Medium-lived</td></tr><tr><td><b>Experiment Toggle</b></td><td>A/B Testing. \"Show blue button to 50% users.\"</td><td>Short/Medium</td></tr><tr><td><b>Permission Toggle</b></td><td>Premium features. \"Only Gold users see this.\"</td><td>Long-lived (Years)</td></tr></tbody></table>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// 1. Basic Strategy (If/Else Clutter)\n// Risk: Code becomes hard to read with nested if statements.\nif (featureFlags.isOn(\"new-search-algo\")) {\n    return newSearchService.search(query);\n} else {\n    return legacySearchService.search(query);\n}\n\n// 2. Advanced Strategy (Strategy Pattern - LLD Approved)\n// Solution: Inject the decision logic, keeping the core code clean.\n// The Factory decides which implementation to inject based on the Flag.\nSearchService service = featureManager.isOn(\"new-algo\") \n                      ? new NewSearchService() \n                      : new LegacySearchService();\nservice.search(query);"
+    },
+    {
+      "type": "text",
+      "content": "<br><p><b>Toggle Lifecycle (The \"Debt\" Trap):</b></p>Feature flags are <b>Technical Debt</b>. If you don't remove them after the feature is stable, your code becomes a graveyard of dead paths.<br><ol><li><b>Create:</b> Add flag <code>use_new_checkout</code>.</li><li><b>Deploy:</b> Code goes to Prod (Flag = False).</li><li><b>Enable:</b> Turn Flag = True (Gradual rollout).</li><li><b>Stabilize:</b> Ensure no bugs.</li><li><b>Cleanup:</b> <b>CRITICAL.</b> Delete the if/else block and the flag.</li></ol>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>Performance (Caching):</b> Do not query the Database for a flag on every single request. <b>Solution:</b> Cache flags in memory (short TTL) or use a dedicated system (LaunchDarkly) that pushes updates to SDKs.</li><li><b>Testing Nightmare:</b> Every flag doubles your test cases ($2^n$). <b>Strategy:</b> Test only two states: \"All Flags On\" (Future) and \"All Flags Off\" (Current Prod).</li><li><b>Context-Awareness:</b> Smart toggles take context: <code>isEnabled(\"dark_mode\", userId=123)</code>. This allows specific user targeting (Canary Releases).</li></ul>"
+    }
+  ]
+},
+
+
+  "Env Separation": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Golden Rule: \"Build Once, Deploy Anywhere\"</b></p><ul><li><b>Philosophy:</b> Your application binary (JAR, Docker Image) must be <b>immutable</b>.</li><li><b>The Artifact:</b> You build the artifact <i>once</i> in the CI pipeline. You do not rebuild it for Production.</li><li><b>The Variable:</b> The only thing that changes between environments is the <b>Configuration</b> (injected at runtime).</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Hierarchy of Environments:</b></p><table><thead><tr><th>Env</th><th>Purpose</th><th>Config Characteristics</th></tr></thead><tbody><tr><td><b>Local/Dev</b></td><td>Coding & Unit Testing</td><td>DB=localhost, Logs=DEBUG, Auth=Mock</td></tr><tr><td><b>QA/Stage</b></td><td>Integration Testing (Mirror of Prod)</td><td>DB=TestRDS, Logs=INFO, Auth=Real</td></tr><tr><td><b>Prod</b></td><td>Real User Traffic</td><td>DB=ProdRDS, Logs=WARN, Auth=Real</td></tr></tbody></table><br><p><b>What Separates? (The Config)</b></p>Never hardcode these. They must be injected via Environment Variables or External Config Stores.<br><ul><li><b>Resources:</b> Database URLs, Redis endpoints, Queue topics.</li><li><b>Credentials:</b> API Keys, Passwords (use Secrets Manager, never plain text).</li><li><b>Behavior:</b> Log levels, Thread pool sizes, Feature flags.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>12-Factor App Methodology (Factor III):</b></p><ul><li><b>Rule:</b> Store config in the environment, not in the code.</li><li><b>Violation:</b> Committing <code>config-prod.properties</code> inside the Git repo.</li><li><b>Correct:</b> Application reads <code>System.getenv(\"DB_URL\")</code> at startup.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// Bad (Hardcoded / Profile Hell)\n// If you have to rebuild the JAR to change this, you failed.\nString dbUrl = \"jdbc:mysql://prod-db:3306/users\"; \n\n// Good (Injected)\n// Spring Boot automatically maps env vars (APP_DB_URL) to this field\n@Value(\"${app.db.url}\")\nprivate String dbUrl; "
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>Secrets Management:</b> Never commit passwords to Git. Use tools like <b>HashiCorp Vault</b> or <b>AWS Secrets Manager</b>. The app fetches the secret at runtime using an IAM role.</li><li><b>Parity:</b> Keep Dev and Prod as similar as possible. <b>Anti-Pattern:</b> Using H2 (In-Memory) for Dev and Oracle for Prod (leads to SQL dialect bugs). <b>Fix:</b> Use Docker to run the real DB locally.</li><li><b>Startup Validation:</b> Fail fast. If <code>DB_URL</code> is null, crash the app immediately on startup. Don't wait for the first user request to fail.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    }
+  ]
 }
 
 
 
   
 }
+
 
 
 
