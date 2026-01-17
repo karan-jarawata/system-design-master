@@ -421,6 +421,42 @@
             padding-left: 1.5rem; 
         }
         .modal-text li { margin-bottom: 0.5rem; }
+
+
+        /* --- TABLE STYLING FOR MODALS --- */
+            .modal-text table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 1.5rem 0;
+                font-size: 0.9rem;
+                border-radius: 8px;
+                overflow: hidden; /* Rounds the corners */
+                border: 1px solid var(--border);
+            }
+            
+            .modal-text th, 
+            .modal-text td {
+                padding: 12px 15px;
+                border-bottom: 1px solid var(--border);
+                text-align: left;
+            }
+            
+            .modal-text th {
+                background-color: var(--bg-sidebar); /* Uses your theme variable */
+                font-weight: 600;
+                color: var(--accent); /* Makes the headers match the LLD/HLD theme color */
+                text-transform: uppercase;
+                font-size: 0.8rem;
+                letter-spacing: 0.05em;
+            }
+            
+            .modal-text tr:last-child td {
+                border-bottom: none; /* Remove bottom border for last row */
+            }
+            
+            .modal-text tr:hover td {
+                background-color: var(--nav-hover); /* subtle hover effect */
+            }
         
         /* --- THE GEMINI CODE BLOCK --- */
         .gemini-code-container {
@@ -1350,6 +1386,7 @@ function copyToClipboard(elementId) {
 </script>
 </body>
 </html>
+
 
 
 
