@@ -437,12 +437,42 @@
       "content": "<p><b>Important Things to Remember (LLD Perspective):</b></p><ul><li><b>Never Rename Columns directly:</b> <code>RENAME COLUMN</code> is a destructive action. The code looking for \"old\" will instantly crash. Use Expand & Contract.</li><li><b>Locking & Performance:</b> Adding a column with a <code>DEFAULT</code> value (in older DB versions) can lock the entire table. <b>Fix:</b> Add as <code>NULL</code> first -> Populate -> Add <code>NOT NULL</code> constraint.</li><li><b>Deprecation Phase:</b> If you delete a column, ensure the code has stopped using it for at least one full deployment cycle.</li><li><b>NoSQL is easier (but messier):</b> In MongoDB, you don't need migrations. You can have Document A with <code>name</code> and Document B with <code>firstName</code>. The complexity moves from the Database to the Application Code.</li></ul>"
     }
   ]
+},
+
+  "Threads vs Processes": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Core Concept & Analogy:</b></p><ul><li><b>Process (The House):</b> A Process is the \"container.\" It has the address (Memory Space) and the resources (Kitchen/TV). It provides the environment to live in.</li><li><b>Thread (The Person):</b> A Thread is the \"worker\" inside the house. It actually does the things (cooking, cleaning).</li><li><b>Multi-threading:</b> Multiple people living in the same house. They share the same Fridge (<b>Heap Memory</b>) but have their own To-Do lists (<b>Stacks</b>).</li></ul><br><p><b>How Java \"Thinks\" of a Thread:</b></p>In Java, a Thread is not just a concept; it is an Object that wraps a real Operating System resource.<br><ul><li><b>1:1 Mapping:</b> When you call <code>t.start()</code>, the JVM asks the OS to create a real, native thread. One Java Thread = One OS Thread.</li><li><b>The Wrapper:</b> The Java Thread object (in Heap) is just the \"Remote Control.\" It holds metadata, but the actual execution happens in the OS.</li><li><b>The Job vs The Worker:</b><ul><li><b>Runnable Interface</b> = The Job (The specific logic/code to run).</li><li><b>Thread Class</b> = The Worker (The resource that executes the job).</li></ul></li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<br><p><b>Memory Architecture (Crucial for LLD):</b></p><ul><li><b>The Heap (Shared Space):</b> Where Objects live (<code>new HashMap()</code>). Visible to ALL threads. <i>Risk: Race Conditions.</i></li><li><b>The Stack (Private Space):</b> Where Method Calls and Local Variables live. Visible ONLY to the owner thread. <i>Risk: None (Thread-safe).</i></li></ul><br><p><b>Context Switching (The Cost):</b></p><ul><li><b>Process Switch:</b> Slow. CPU saves entire memory map and loads new app.</li><li><b>Thread Switch:</b> Fast. CPU stays in same memory address, just swaps Registers and Stack Pointer.</li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// Way 1: The \"Job\" Approach (Recommended - implements Runnable)\n// Decouples the logic from the thread object.\n\n// 1. Define the Job\nRunnable myTask = () -> {\n    System.out.println(\"Thread is running: \" + Thread.currentThread().getName());\n};\n\n// 2. Hire the Worker (Thread) and give him the Job\nThread worker = new Thread(myTask);\nworker.start(); // STARTS the thread. Do not call run() directly!\n\n// Way 2: The \"Subclass\" Approach (Not Recommended - extends Thread)\n// Hardcodes the logic into the thread itself."
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Questions & \"Gotchas\":</b></p><ul><li><b>Q1: What is the difference between <code>t.start()</code> and <code>t.run()</code>?</b><br><b>Answer:</b> <code>start()</code> creates a new separate thread (native OS call) and then calls <code>run()</code> inside that new thread. <code>run()</code> is just a normal method call on the <i>current</i> thread (no multi-threading).</li><li><b>Q2: Why did Chrome move to \"Process-per-Tab\"?</b><br><b>Answer:</b> Isolation. If one tab (Thread) crashed, the whole browser (Process) closed. Processes provide memory isolation and stability.</li><li><b>Q3: If a Thread throws a <code>StackOverflowError</code>, what crashes?</b><br><b>Answer:</b> Only that specific thread dies.</li><li><b>Q4: If a Thread throws an <code>OutOfMemoryError</code> (Heap Space), what crashes?</b><br><b>Answer:</b> The entire Application (Process) usually crashes (Shared Heap is full for everyone).</li><li><b>Q5: Why is <code>implements Runnable</code> better than <code>extends Thread</code>?</b><br><b>Answer:</b> Java allows single inheritance. If you extend <code>Thread</code>, you can't extend anything else. <code>Runnable</code> is an interface, allowing better flexibility and design (separation of Task from Runner).</li></ul>"
+    },
+    {
+        "type": "gallery",
+        "urls": [
+          "images/processthread.png"
+        ],
+        "caption": ""
+      }
+  ]
 }
 
 
 
   
 }
+
 
 
 
