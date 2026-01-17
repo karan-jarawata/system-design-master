@@ -461,7 +461,7 @@
     {
         "type": "gallery",
         "urls": [
-          "images/processthread.png"
+          "images/processthread.jpg"
         ],
         "caption": ""
       }
@@ -486,7 +486,14 @@
     {
       "type": "text",
       "content": "<p><b>LLD Interview Questions & \"Gotchas\":</b></p><ul><li><b>Q1: What is the difference between BLOCKED and WAITING? (Very Common)</b><br><b>Answer:</b> <b>BLOCKED</b> happens automatically when waiting for a <i>Lock</i> (resource busy). <b>WAITING</b> happens manually when you call <code>.wait()</code> expecting a <i>Signal/Notification</i> (logic flow).</li><li><b>Q2: Can we restart a dead thread?</b><br><b>Answer:</b> No. Once TERMINATED, it's gone. Calling <code>start()</code> again throws an exception.</li><li><b>Q3: Difference between <code>Thread.sleep()</code> and <code>Object.wait()</code>?</b><br><b>Answer:</b> <code>sleep()</code> <b>keeps</b> the lock (\"I'm napping with the key in my pocket\"). <code>wait()</code> <b>releases</b> the lock (\"I'm pausing, here is the key for someone else\").</li><li><b>Q4: What is <code>Thread.yield()</code>?</b><br><b>Answer:</b> A hint to the scheduler to let other threads run. It goes from Running -> Ready (stays in RUNNABLE). Rarely used.</li></ul>"
-    }
+    },
+    {
+        "type": "gallery",
+        "urls": [
+          "images/threadlifecycle.png"
+        ],
+        "caption": ""
+      }
   ]
 },
 
@@ -668,7 +675,14 @@
     {
       "type": "text",
       "content": "<p><b>LLD Interview Questions & \"Gotchas\":</b></p><ul><li><b>Q1: How do you make a Java class Thread-Safe? (The Hierarchy)</b><br><b>Answer:</b> (Always order by preference) <br>1. <b>Statelessness:</b> Can I remove the fields? (Best)<br>2. <b>Immutability:</b> Can I make fields final?<br>3. <b>Thread-Safe Tools:</b> Can I use <code>AtomicInteger</code> or <code>ConcurrentHashMap</code>?<br>4. <b>Locking:</b> If all else fails, use <code>synchronized</code>.</li><li><b>Q2: Are Spring Boot Controllers/Services Thread-Safe?</b><br><b>Answer:</b> By default, Spring beans are <b>Singletons</b> (shared by all threads). Therefore, they <b>MUST be Stateless</b>. If you put a mutable instance variable (like <code>private int count</code>) inside a Controller, it is a critical bug.</li><li><b>Q3: Is <code>SimpleDateFormat</code> thread-safe?</b><br><b>Answer:</b> <b>No.</b> It stores intermediate parsing results in instance variables. Use <code>java.time.DateTimeFormatter</code> (Immutable) instead.</li><li><b>Q4: What is <code>ThreadLocal</code>?</b><br><b>Answer:</b> It gives every thread its own private \"pocket\" for data (e.g., storing a User ID for the duration of a request), ensuring isolation without passing parameters everywhere.</li></ul>"
-    }
+    },
+    {
+        "type": "gallery",
+        "urls": [
+          "images/threadsafety.png"
+        ],
+        "caption": ""
+      }
   ]
 },
 
@@ -711,6 +725,7 @@
 
   
 }
+
 
 
 
