@@ -466,12 +466,252 @@
         "caption": ""
       }
   ]
+},
+
+  "Thread Lifecycle": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Core Concept & Analogy (The Gym Member):</b></p>A thread's life isn't just \"Running\" or \"Stopped.\" It moves through distinct phases managed by the OS Scheduler.<br><ul><li><b>New:</b> You just bought the gym membership. You haven't stepped inside yet.</li><li><b>Runnable (Ready + Running):</b> You are inside the gym. You might be lifting weights (<b>Running</b>) or waiting for your turn on the bench (<b>Ready</b>).</li><li><b>Blocked:</b> You want to use the Squat Rack, but someone else is using it. You wait passively for the resource (Lock).</li><li><b>Waiting:</b> You are resting on a bench and tell your trainer, \"Tap me when you are ready.\" You wait for a specific signal (Notification).</li><li><b>Timed Waiting:</b> You nap for exactly 10 minutes. You wake up automatically (Sleep).</li><li><b>Terminated:</b> You finished the workout and left. You cannot re-enter.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<br><p><b>The 6 States (Technical Definitions - <code>Thread.State</code>):</b></p><ul><li><b>NEW:</b> Thread object created (<code>new Thread()</code>) but <code>start()</code> not called. No OS resources allocated.</li><li><b>RUNNABLE:</b> Includes both \"Ready to Run\" and \"Actually Running.\" The OS swaps them so fast Java groups them together.</li><li><b>BLOCKED:</b> <b>Passive Wait.</b> The thread tries to enter a <code>synchronized</code> block but the Lock is held by another thread. It uses 0% CPU.</li><li><b>WAITING:</b> <b>Active Voluntary Wait.</b> The thread explicitly paused itself (<code>Object.wait()</code>, <code>Thread.join()</code>) and waits for a signal (<code>notify()</code>).</li><li><b>TIMED_WAITING:</b> Same as WAITING, but with a timeout (<code>Thread.sleep(1000)</code>). Exits on timeout or interrupt.</li><li><b>TERMINATED:</b> Execution completed or crashed. The thread is dead.</li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "public class LifecycleDemo {\n    public static void main(String[] args) throws InterruptedException {\n        \n        // 1. NEW State\n        Thread t1 = new Thread(() -> {\n            try {\n                // 3. TIMED_WAITING State (during sleep)\n                Thread.sleep(1000); \n            } catch (InterruptedException e) {\n                e.printStackTrace();\n            }\n        });\n        \n        System.out.println(\"State 1: \" + t1.getState()); // Output: NEW\n\n        t1.start();\n        // 2. RUNNABLE State\n        System.out.println(\"State 2: \" + t1.getState()); // Output: RUNNABLE\n\n        Thread.sleep(100); // Main thread pauses to ensure t1 starts sleeping\n        \n        System.out.println(\"State 3: \" + t1.getState()); // Output: TIMED_WAITING\n\n        t1.join(); // Main thread waits for t1 to finish\n        \n        // 4. TERMINATED State\n        System.out.println(\"State 4: \" + t1.getState()); // Output: TERMINATED\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Questions & \"Gotchas\":</b></p><ul><li><b>Q1: What is the difference between BLOCKED and WAITING? (Very Common)</b><br><b>Answer:</b> <b>BLOCKED</b> happens automatically when waiting for a <i>Lock</i> (resource busy). <b>WAITING</b> happens manually when you call <code>.wait()</code> expecting a <i>Signal/Notification</i> (logic flow).</li><li><b>Q2: Can we restart a dead thread?</b><br><b>Answer:</b> No. Once TERMINATED, it's gone. Calling <code>start()</code> again throws an exception.</li><li><b>Q3: Difference between <code>Thread.sleep()</code> and <code>Object.wait()</code>?</b><br><b>Answer:</b> <code>sleep()</code> <b>keeps</b> the lock (\"I'm napping with the key in my pocket\"). <code>wait()</code> <b>releases</b> the lock (\"I'm pausing, here is the key for someone else\").</li><li><b>Q4: What is <code>Thread.yield()</code>?</b><br><b>Answer:</b> A hint to the scheduler to let other threads run. It goes from Running -> Ready (stays in RUNNABLE). Rarely used.</li></ul>"
+    }
+  ]
+},
+
+  "Locks": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Core Concept:</b></p><ul><li><b>Locks</b> are mechanisms used to enforce limits on access to a resource in an environment where there are many threads of execution.</li></ul><br><p><b>The Analogy: \"The Fitting Room\"</b></p><ul><li><b>The Shared Resource:</b> A clothing store has one <b>Fitting Room</b>.</li><li><b>The Threads:</b> Many <b>Customers</b> want to try on clothes.</li><li><b>The Lock:</b> The <b>Latch</b> on the fitting room door.</li><li><b>The Process:</b><ul><li><b>Acquire Lock:</b> Customer A enters and locks the door.</li><li><b>Critical Section:</b> Customer A changes clothes. Customer B must wait outside (Blocked).</li><li><b>Release Lock:</b> Customer A unlocks and leaves.</li><li><b>Next Turn:</b> Customer B sees the door is free and enters.</li></ul></li><li><b>Without a Lock (Race Condition):</b> Customer A is half-naked, and Customer B barges in. Chaos (Data Corruption) ensues.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<br><p><b>Technical Definitions:</b></p><ul><li><b>Race Condition:</b> A bug where the output depends on the timing of uncontrollable events (threads). Happens when multiple threads Read-Modify-Write shared data simultaneously.</li><li><b>Critical Section:</b> The specific lines of code that access the shared resource. This section needs protection.</li><li><b>Monitor (Intrinsic Lock):</b> Every Object in Java has an internal lock built-in. When you use <code>synchronized</code>, the thread grabs this specific object's monitor. <b>Rule:</b> Only one thread can hold an object's monitor at a time.</li></ul><br><p><b>Types of Synchronization:</b></p><ul><li><b>Synchronized Method (Coarse-Grained):</b> Locks the entire method using <code>this</code>. <i>Downside:</i> Slow; freezes the whole object.</li><li><b>Synchronized Block (Fine-Grained) - BEST PRACTICE:</b> Locks only a specific part of the code. Allows other threads to access other parts of the object.</li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "class FittingRoom {\n    public void tryOnClothes(String customerName) {\n        System.out.println(customerName + \" entered the store.\");\n\n        // Only one person can be inside this block at a time\n        synchronized(this) { \n            System.out.println(customerName + \" locked the Fitting Room.\");\n            try {\n                Thread.sleep(1000); // Simulate changing clothes\n            } catch (InterruptedException e) {}\n            System.out.println(customerName + \" unlocked the Fitting Room.\");\n        }\n        \n        System.out.println(customerName + \" left the store.\");\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Questions (Locks):</b></p><ul><li><b>Q1: Can Thread A enter <code>synchronized methodA()</code> and Thread B enter <code>synchronized methodB()</code> on the SAME object at the same time?</b><br><b>Answer:</b> No. Both methods use the same lock (<code>this</code>). Thread B is blocked.</li><li><b>Q2: Can Thread A enter a synchronized method and Thread B enter a non-synchronized method on the same object?</b><br><b>Answer:</b> Yes. Normal methods are \"Open Doors\"—anyone can walk in.</li><li><b>Q3: What is the difference between Object Lock and Class Lock?</b><br><b>Answer:</b><ul><li><b>Object Lock:</b> Locks a specific instance (<code>new FittingRoom()</code>).</li><li><b>Class Lock:</b> Locks the Class definition itself (<code>FittingRoom.class</code>). It is a Global Lock for all instances.</li></ul></li><li><b>Q4: Why prefer Synchronized Blocks over Methods?</b><br><b>Answer:</b> Performance. Blocks allow you to keep the \"Critical Section\" as small as possible.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<hr><p><b>The Deadlock (The Nightmare Scenario)</b></p><p><b>1. The Core Analogy: Pen and Paper</b></p><ul><li><b>The Scenario:</b> You and your friend need to write a letter. You need both a Pen and Paper.</li><li><b>The Trap:</b><ul><li>You grab the Pen (Holding Lock A).</li><li>Friend grabs the Paper (Holding Lock B).</li><li>You wait for the Paper.</li><li>Friend waits for the Pen.</li></ul></li><li><b>Result:</b> Neither of you will give up what you have. You stare at each other forever.</li></ul><br><br><p><b>2. Technical Definition & Conditions</b></p><ul><li><b>Deadlock:</b> A situation where two or more threads are blocked forever, waiting for each other.</li><li><b>The 4 Conditions (Coffman Conditions) - All must be true:</b><ol><li><b>Mutual Exclusion:</b> Only one thread can use the resource at a time.</li><li><b>Hold and Wait:</b> Holding a resource while waiting for another.</li><li><b>No Preemption:</b> Resources cannot be forcibly taken away.</li><li><b>Circular Wait:</b> A closed chain of threads waiting for each other.</li></ol></li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// How to create a Deadlock\n\n// Thread 1\nsynchronized(LockA) {\n    System.out.println(\"Holding Lock A...\");\n    Thread.sleep(100); // Wait for Thread 2 to grab Lock B\n    \n    synchronized(LockB) { // WAITING FOREVER\n        System.out.println(\"Got Lock B\");\n    }\n}\n\n// Thread 2\nsynchronized(LockB) {\n    System.out.println(\"Holding Lock B...\");\n    Thread.sleep(100); // Wait for Thread 1 to grab Lock A\n    \n    synchronized(LockA) { // WAITING FOREVER\n        System.out.println(\"Got Lock A\");\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Deadlock Interview Questions:</b></p><ul><li><b>Q1: How do you prevent Deadlocks in code?</b><br><b>Answer:</b> The most practical way is <b>Lock Ordering</b>. Always acquire locks in the same order everywhere in your code. (e.g., Always Lock A then Lock B).</li><li><b>Q2: How do you detect a Deadlock in a running server?</b><br><b>Answer:</b> Take a <b>Thread Dump</b> (using tools like <code>jstack</code> or VisualVM). The tool will literally print a message saying: \"Found one Java-level deadlock\" and list the threads involved.</li><li><b>Q3: Can <code>synchronized</code> detect deadlocks and recover automatically?</b><br><b>Answer:</b> No. <code>synchronized</code> will wait forever. This is why we sometimes use <code>ReentrantLock</code> with <code>.tryLock()</code>, which allows us to say \"If I can't get the lock in 2 seconds, I'll give up,\" effectively breaking the deadlock.</li></ul>"
+    }
+  ]
+},
+
+  "ReentrantLock": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Core Concept:</b></p><ul><li><b>ReentrantLock</b> is a class in <code>java.util.concurrent.locks</code> that provides advanced locking capabilities beyond <code>synchronized</code>.</li></ul><br><p><b>The Analogy: \"The Security Badge\"</b></p><ul><li><b>The Scenario:</b> You work in a high-security building.</li><li><b>Reentrancy (Re-entering):</b><ul><li><b>Main Entrance:</b> You swipe your badge to enter. System: \"Welcome.\" (You hold the lock).</li><li><b>Server Room (Inside):</b> You need to enter a room <i>inside</i> the building. You swipe the same badge again.</li><li><b>Smart System (Reentrant):</b> It sees it's YOU (who already holds the lock) and lets you in immediately.</li><li><b>Dumb System (Non-Reentrant):</b> It says \"User is already in. Wait for User to leave.\" You are trapped waiting for yourself (Deadlock).</li></ul></li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<br><p><b>Technical Definitions:</b></p><ul><li><b>Hold Count:</b> The lock keeps a counter.<ul><li><code>lock()</code> -> Count increments (0 -> 1).</li><li><code>lock()</code> again (same thread) -> Count increments (1 -> 2).</li><li><code>unlock()</code> -> Count decrements (2 -> 1).</li><li>The lock is only released when Count reaches <b>0</b>.</li></ul></li><li><b>Fairness:</b><ul><li><b>Unfair (Default):</b> Faster. A new thread can \"cut in line\" if the lock is free.</li><li><b>Fair (<code>new ReentrantLock(true)</code>):</b> Slower. Strictly follows <b>FIFO</b>. The longest-waiting thread always gets the lock next.</li></ul></li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "import java.util.concurrent.locks.ReentrantLock;\n\npublic class SecuritySystem {\n    // 1. Create the Lock\n    // Pass 'true' to constructor for Fairness (FIFO)\n    private final ReentrantLock lock = new ReentrantLock(true); \n\n    public void accessResource() {\n        // 2. Lock Manually\n        lock.lock(); \n        \n        try {\n            // --- CRITICAL SECTION ---\n            System.out.println(\"Processing secure data...\");\n            \n            // Reentrancy Example:\n            // Calling another method that requires the SAME lock.\n            // This works fine because the lock is Reentrant.\n            internalAudit(); \n            \n        } catch (Exception e) {\n            e.printStackTrace();\n        } finally {\n            // 3. Unlock ALWAYS in finally\n            // Even if the code above crashes, this runs.\n            lock.unlock(); \n        }\n    }\n\n    public void internalAudit() {\n        lock.lock(); // Count goes 1 -> 2\n        try {\n            System.out.println(\"Auditing...\");\n        } finally {\n            lock.unlock(); // Count goes 2 -> 1\n        }\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Questions & \"Gotchas\":</b></p><ul><li><b>Q1: What is the main difference between <code>synchronized</code> and <code>ReentrantLock</code>?</b><br><b>Answer:</b> Flexibility. <code>synchronized</code> is implicit and rigid (must wait forever). <code>ReentrantLock</code> is explicit (manual) and supports <b>Timeouts</b> (<code>tryLock</code>), <b>Fairness policies</b>, and multiple Condition variables.</li><li><b>Q2: What is <code>tryLock()</code> and why is it useful?</b><br><b>Answer:</b> <code>tryLock()</code> attempts to grab the lock but returns <code>false</code> immediately (or after a timeout) if it fails. Use it to prevent Deadlocks (\"If I can't get the lock in 2 seconds, I'll give up\").</li><li><b>Q3: Why shouldn't we use Fairness (true) all the time?</b><br><b>Answer:</b> <b>Performance.</b> Managing a strict queue takes CPU effort. Unfair locks have much higher throughput because they reduce context switching. Only use Fair locks if \"Starvation\" is a real problem.</li><li><b>Q4: What happens if you throw an Exception inside a <code>lock()</code> block without <code>finally</code>?</b><br><b>Answer:</b> The method exits, but <code>lock.unlock()</code> is never called. The lock remains held forever, hanging the system.</li></ul>"
+    }
+  ]
+},
+
+  "Volatile": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Core Concept:</b></p><ul><li><b>The Notice Board vs. Personal Notepad Analogy:</b></li><li><b>The Setup:</b> Imagine an office with a Boss (Main Thread) and an Employee (Worker Thread).<ul><li><b>Main Memory (RAM):</b> A big Notice Board in the hallway.</li><li><b>CPU Cache:</b> The Employee's personal Notepad at their desk.</li></ul></li><li><b>The Problem (Without Volatile):</b> The Boss writes \"STOP WORKING\" on the Notice Board. The Employee looks at their Notepad, which still says \"KEEP WORKING.\" Result: The Employee works forever (Visibility Problem).</li><li><b>The Solution (With Volatile):</b> Declaring a variable <code>volatile</code> is a new rule: \"You are forbidden from writing this in your Notepad. You must walk to the Notice Board every single time you read or write this.\"</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Technical Definitions:</b></p><ul><li><b>Visibility:</b> <code>volatile</code> guarantees that changes made by one thread are immediately visible to other threads. It bypasses the CPU Cache (L1/L2) and goes straight to Main Memory (RAM).</li><li><b>Instruction Reordering (Memory Barrier):</b> Compilers like to rearrange code to make it faster. <code>volatile</code> acts as a wall. It prevents the compiler from reordering instructions across the variable.</li><li><b>Limitation:</b> It guarantees <b>Visibility</b>, but NOT <b>Atomicity</b>.</li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "class Worker {\n    // WITHOUT 'volatile': \n    // The thread might cache 'running = true' and loop forever, \n    // even after you call stop().\n    private volatile boolean running = true; \n\n    public void run() {\n        System.out.println(\"Worker started.\");\n        \n        while (running) {\n            // \"Poll\" the variable. \n            // Because it is volatile, it checks Main Memory every single loop.\n        }\n        \n        System.out.println(\"Worker stopped.\");\n    }\n\n    public void stop() {\n        running = false; // Writes immediately to Main Memory\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The \"Count++\" Trap (What Volatile cannot do):</b></p><ul><li><b>Scenario:</b> You have <code>volatile int count = 0</code>. Two threads do <code>count++</code>.</li><li><b>The Bug:</b> <code>count++</code> is three steps: Read (0) -> Add (1) -> Write (1).</li><li><code>volatile</code> ensures they READ the latest value (0), but it doesn't stop them from running Step 2 at the exact same time. They both write 1.</li><li><b>Rule:</b> Never use <code>volatile</code> for counters or read-modify-write operations. Use <code>AtomicInteger</code> instead.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Questions & \"Gotchas\":</b></p><ul><li><b>Q1: What is the difference between <code>volatile</code> and <code>synchronized</code>?</b><br><b>Answer:</b><ul><li><b>volatile:</b> Light. Guarantees <b>Visibility only</b>. No locking (non-blocking).</li><li><b>synchronized:</b> Heavy. Guarantees <b>Visibility AND Atomicity</b>. Forces threads to wait (blocking).</li></ul></li><li><b>Q2: Can we use volatile for a Singleton (Double-Checked Locking)?</b><br><b>Answer:</b> Yes. The instance variable must be <code>volatile</code> to prevent a half-initialized object from being visible to other threads due to instruction reordering.</li><li><b>Q3: When should you use volatile?</b><br><b>Answer:</b> Only in two cases: <br>1. <b>Flags</b> (boolean status like <code>stopRequested</code>).<br>2. <b>Single Writer, Many Readers</b> (One thread updates, many just read).</li></ul>"
+    }
+  ]
+},
+
+
+  "Atomic Ops": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Core Concept:</b></p><ul><li><b>Atomic Operations</b> are operations that appear to the rest of the system to occur instantaneously. They are indivisible.</li></ul><br><p><b>The Core Analogy: \"The Like Button\"</b></p><ul><li><b>The Scenario:</b> A post has 99 likes. Two friends click \"Like\" at the exact same millisecond.</li><li><b>Non-Atomic Way (The Glitch):</b><ul><li>Phone A reads: 99. Phone B reads: 99.</li><li>Phone A writes: 100. Phone B writes: 100.</li><li><b>Result:</b> 100 Likes. (One like was lost).</li></ul></li><li><b>Atomic Way (The Fix):</b> The hardware forces the operations into a strict line.</li><li><b>Result:</b> 99 -> 100 -> 101.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<br><p><b>Technical Definitions:</b></p><ul><li><b>CAS (Compare-And-Swap):</b> The secret sauce behind Atomic variables. It is a hardware instruction that is faster than locking.<br><i>Logic:</i> \"I think the current value is A. If it is A, change it to B. If it is NOT A (because someone changed it), tell me, and I will try again.\"</li><li><b>Optimistic Locking:</b> Atomics assume conflicts are rare. They don't lock the door; they just try to update and retry if they fail. This is <b>Non-Blocking</b>.</li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "import java.util.concurrent.atomic.AtomicInteger;\n\npublic class AtomicDemo {\n\n    // The \"Dangerous\" Way (int)\n    // int count = 0; // Not thread-safe. (Read-Modify-Write is 3 steps)\n\n    // The \"Safe\" Way (AtomicInteger)\n    // 1. Create the Atomic Variable\n    private AtomicInteger count = new AtomicInteger(0);\n\n    public void increment() {\n        // 2. Atomic Increment\n        // Efficiently performs \"Read-Modify-Write\" in one shot using CAS.\n        // Returns the new value.\n        int newValue = count.incrementAndGet(); \n    }\n    \n    public int getCount() {\n        return count.get();\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Questions & \"Gotchas\":</b></p><ul><li><b>Q1: How are Atomics different from synchronized?</b><br><b>Answer:</b><ul><li><b>Atomics (CAS):</b> Optimistic. Non-blocking. Uses CPU instructions directly. Very fast for simple counters.</li><li><b>Synchronized:</b> Pessimistic. Blocking. Context switches threads. Better for complex logic.</li></ul></li><li><b>Q2: What is the \"ABA Problem\" in CAS?</b><br><b>Answer:</b> A famous bug. Thread 1 reads A. Thread 2 changes A -> B -> A. Thread 1 wakes up, sees A, and thinks \"Nothing changed!\", so it proceeds erroneously. <b>Fix:</b> Use <code>AtomicStampedReference</code> (Versions: A v1 -> B v2 -> A v3).</li><li><b>Q3: Can AtomicInteger replace synchronized blocks?</b><br><b>Answer:</b> Only for single variable updates. If you need to update balance AND transactionHistory together atomically, you still need <code>synchronized</code>.</li></ul>"
+    }
+  ]
+},
+
+  "ExecutorService": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Core Concept:</b></p><ul><li><b>ExecutorService</b> is the High-Level Interface in Java that manages a pool of threads, a work queue, and the lifecycle of task execution. It replaces the manual creation of threads.</li></ul><br><p><b>The Core Analogy: \"The Restaurant Manager\"</b></p><ul><li><b>The Old Way (<code>new Thread()</code>):</b> Customer enters. You hire a new chef. Chef cooks. You fire the chef. <i>Result:</i> Chaos and high cost.</li><li><b>The New Way (Thread Pool):</b> You hire a <b>Manager (ExecutorService)</b> and a <b>Fixed Crew</b> of 5 chefs.<ul><li>Customer enters. Manager gives the order to Chef 1.</li><li>If all chefs are busy, the Manager puts the order on the <b>Waiting Spike (Queue)</b>.</li><li>When Chef 1 is done, they pick the next ticket from the queue.</li></ul></li><li><b>Result:</b> Stability. You handle 1,000 customers with just 5 reused chefs.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<br><p><b>Technical Definitions:</b></p><ul><li><b>Why <code>new Thread()</code> is forbidden:</b><ul><li><b>Expensive:</b> Creating a thread takes OS resources (Stack Memory ~1MB).</li><li><b>Uncontrolled:</b> If you spawn 100k threads, you get <code>OutOfMemoryError</code>.</li></ul></li><li><b>Thread Pool:</b> A collection of pre-started threads that are reused for multiple tasks.</li></ul><br><p><b>Types of Pools (The \"Kitchen\" Types):</b></p><ul><li><b>FixedThreadPool(n):</b> Creates n threads. If busy, tasks queue up. <i>Best for:</i> Predictable, stable loads.</li><li><b>CachedThreadPool():</b> Creates new threads as needed. Kills them if idle for 60s. <i>Best for:</i> Short, bursty tasks. <i>Risk:</i> Can crash if load is infinite.</li><li><b>SingleThreadExecutor():</b> Only 1 thread. Tasks run sequentially. <i>Best for:</i> Ordering (logging).</li><li><b>ScheduledThreadPool():</b> Runs tasks after delay or periodically.</li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "import java.util.concurrent.*;\n\npublic class ManagerDemo {\n    public static void main(String[] args) throws ExecutionException, InterruptedException {\n        // 1. Hire the Manager (Fixed crew of 2 threads)\n        ExecutorService manager = Executors.newFixedThreadPool(2);\n\n        // 2. Submit a Task (Callable = Returns a Result)\n        // \"Future\" is the Claim Ticket/Receipt.\n        Future<String> receipt = manager.submit(() -> {\n            Thread.sleep(1000); // Simulate work\n            return \"Burger Ready!\";\n        });\n\n        System.out.println(\"Doing other work while burger cooks...\");\n\n        // 3. Get the Result (Blocking)\n        // This waits until the chef is done.\n        String result = receipt.get(); \n        System.out.println(result);\n\n        // 4. Close the Kitchen\n        manager.shutdown();\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Questions & \"Gotchas\":</b></p><ul><li><b>Q1: Difference between <code>execute()</code> and <code>submit()</code>?</b><br><b>Answer:</b> <code>execute()</code> is \"Fire and Forget\" (returns void). <code>submit()</code> returns a <b>Future</b>, allowing you to check status or get return values.</li><li><b>Q2: If a thread crashes (unchecked exception), what happens?</b><br><b>Answer:</b> The pool detects the thread died, discards it, and creates a <b>new one</b> to replace it. Pool size remains constant.</li><li><b>Q3: Risks of <code>CachedThreadPool</code> in production?</b><br><b>Answer:</b> <b>System Crash.</b> Since it creates a thread for <i>every</i> task if others are busy, a spike of 1M requests = 1M threads = <code>OutOfMemoryError</code>.</li><li><b>Q4: What is a Future?</b><br><b>Answer:</b> It's a placeholder object for a result that hasn't arrived yet (like a claim ticket). It allows the main thread to keep working and check for the result later using <code>future.get()</code>.</li></ul>"
+    }
+  ]
+},
+
+
+  "Concurrent Collections": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Core Concept:</b></p><ul><li><b>Concurrent Collections</b> are specialized data structures designed to be accessed and modified by multiple threads simultaneously without explicit external synchronization and without compromising data integrity.</li></ul><br><p><b>The Core Analogy: \"The Attendance Sheet\"</b></p><ul><li><b>The Scenario:</b> A classroom with 30 students and one attendance sheet.</li><li><b>The Old Way (Hashtable / Synchronized Map):</b><ul><li><b>The Rule:</b> The teacher holds the single sheet.</li><li><b>The Bottleneck:</b> If Student A is signing, Student Z must wait in line, even if they are signing at the bottom of the page.</li><li><b>Result:</b> Safe, but Slow (Coarse-grained locking).</li></ul></li><li><b>The New Way (ConcurrentHashMap):</b><ul><li><b>The Rule:</b> The teacher tears the sheet into 16 pieces (Buckets) and pastes them on different walls.</li><li><b>The Parallelism:</b> Student A goes to Wall 1. Student Z goes to Wall 16. They sign simultaneously.</li><li><b>Result:</b> Safe and Fast (Fine-grained locking).</li></ul></li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<br><p><b>Technical Definitions:</b></p><ul><li><b>Why HashMap fails:</b> It is not thread-safe. If two threads modify it at once, it can corrupt the internal linked list (infinite loops) or lose data.</li><li><b>Why Hashtable is obsolete:</b> It uses a <b>Global Lock</b> (synchronized on the whole method). Only one thread can read/write at a time.</li><li><b>ConcurrentHashMap (The King):</b><ul><li><b>Lock Striping (Bucket Locking):</b> Instead of locking the whole map, it only locks the specific Bucket (index) you are writing to.</li><li><b>Read Operations (<code>get</code>):</b> Completely <b>Lock-Free</b>. They are non-blocking and very fast.</li><li><b>Iterators:</b> <b>Fail-Safe</b>. You can iterate over the map while other threads are adding/removing items without crashing.</li></ul></li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "import java.util.concurrent.ConcurrentHashMap;\n\npublic class ConcurrentMapDemo {\n    public static void main(String[] args) {\n        \n        // Thread-safe map designed for high concurrency\n        ConcurrentHashMap<String, Integer> map = new ConcurrentHashMap<>();\n\n        map.put(\"Apple\", 1);\n        map.put(\"Banana\", 2);\n\n        // Thread 1: Writing to 'Orange' bucket\n        new Thread(() -> {\n            map.put(\"Orange\", 3); \n            System.out.println(\"Added Orange\");\n        }).start();\n\n        // Thread 2: Reading 'Apple' bucket (Non-blocking)\n        // Works instantly even if Thread 1 is writing\n        new Thread(() -> {\n            System.out.println(\"Read Apple: \" + map.get(\"Apple\"));\n        }).start();\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Questions & \"Gotchas\":</b></p><ul><li><b>Q1: How does ConcurrentHashMap work internally in Java 8+?</b><br><b>Answer:</b> It no longer uses \"Segments.\" It uses a hybrid of <b>CAS</b> and <b>synchronized</b>.<ul><li><b>Empty Bucket:</b> Uses <b>CAS</b> to insert the new node (Lock-Free).</li><li><b>Collision:</b> If the slot has data, it locks <b>ONLY that specific Node</b> (using <code>synchronized</code>) to append to the list/tree.</li></ul></li><li><b>Q2: Why does ConcurrentHashMap NOT allow null keys or values?</b><br><b>Answer:</b> <b>Ambiguity.</b> In a normal map, <code>null</code> could mean \"Value is null\" OR \"Key doesn't exist.\" In multi-threading, you can't double-check with <code>containsKey()</code> because the map might change between the two calls. To prevent this race condition confusion, nulls are banned.</li><li><b>Q3: What is <code>ConcurrentModificationException</code>?</b><br><b>Answer:</b> A crash in normal collections (ArrayList) if you modify the list while iterating. <b>Fix:</b> Use <code>CopyOnWriteArrayList</code> or <code>ConcurrentHashMap</code> (Fail-Safe iterators).</li><li><b>Q4: Is <code>size()</code> accurate in ConcurrentHashMap?</b><br><b>Answer:</b> No, it is an <b>estimate</b>. Because threads are constantly adding/removing, the size might change before the method returns.</li></ul>"
+    }
+  ]
+},
+
+  "Thread-Safety": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Core Concept:</b></p><ul><li><b>Thread-Safety</b> means that code functions correctly (no data corruption, no crashes) when accessed by multiple threads simultaneously.</li></ul><br><p><b>The Core Analogy: \"The Kitchen Safety Hierarchy\"</b></p><ul><li><b>The Goal:</b> Multiple chefs (Threads) need to cook in the same building without ruining each other's food.</li><li><b>Strategy 1: Private Kitchens (Statelessness) - 🥇 GOLD STANDARD:</b> Every chef gets their own private room and ingredients. <br><i>Result:</i> 100% Safe. No collisions possible.</li><li><b>Strategy 2: The Museum Display (Immutability) - 🥈 SILVER BULLET:</b> The recipe book is behind bulletproof glass. Chefs can read it, but no one can scribble on it. <br><i>Result:</i> 100% Safe. Read-only shared data never causes race conditions.</li><li><b>Strategy 3: The Locked Pot (Synchronization) - 🥉 BRONZE:</b> There is one shared soup pot with a lock on the lid. <br><i>Result:</i> Safe, but Slow. Chefs must wait in line.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<br><p><b>Technical Definitions & Code:</b></p><ul><li><b>Stateless Object:</b> An object with no instance variables (fields). It relies only on method arguments (Stack memory), which are inherently private to the thread.</li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// A. Stateless Service (The Best Way)\n// Safe because it has NO state (fields)\npublic class MathService {\n    \n    public int add(int a, int b) {\n        // 'a' and 'b' are local variables (Stack). \n        // Thread A's 'a' is totally different from Thread B's 'a'.\n        return a + b; \n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<ul><li><b>Immutable Object:</b> An object whose state cannot be changed after creation. All fields are <code>final</code> and there are no setters.</li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// B. Immutable Object (The Read-Only Way)\n// Safe because state CANNOT change\npublic final class UserConfig {\n    private final String url;\n    private final int timeout;\n\n    public UserConfig(String url, int timeout) {\n        this.url = url;\n        this.timeout = timeout;\n    }\n\n    public String getUrl() { return url; }\n    // NO SETTERS.\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Questions & \"Gotchas\":</b></p><ul><li><b>Q1: How do you make a Java class Thread-Safe? (The Hierarchy)</b><br><b>Answer:</b> (Always order by preference) <br>1. <b>Statelessness:</b> Can I remove the fields? (Best)<br>2. <b>Immutability:</b> Can I make fields final?<br>3. <b>Thread-Safe Tools:</b> Can I use <code>AtomicInteger</code> or <code>ConcurrentHashMap</code>?<br>4. <b>Locking:</b> If all else fails, use <code>synchronized</code>.</li><li><b>Q2: Are Spring Boot Controllers/Services Thread-Safe?</b><br><b>Answer:</b> By default, Spring beans are <b>Singletons</b> (shared by all threads). Therefore, they <b>MUST be Stateless</b>. If you put a mutable instance variable (like <code>private int count</code>) inside a Controller, it is a critical bug.</li><li><b>Q3: Is <code>SimpleDateFormat</code> thread-safe?</b><br><b>Answer:</b> <b>No.</b> It stores intermediate parsing results in instance variables. Use <code>java.time.DateTimeFormatter</code> (Immutable) instead.</li><li><b>Q4: What is <code>ThreadLocal</code>?</b><br><b>Answer:</b> It gives every thread its own private \"pocket\" for data (e.g., storing a User ID for the duration of a request), ensuring isolation without passing parameters everywhere.</li></ul>"
+    }
+  ]
+},
+
+
+  "Immutability": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Core Concept:</b></p><ul><li><b>The Museum Display Analogy:</b></li><li><b>Mutable Object:</b> You leave a precious manuscript on a table. Anyone can scribble on it. To protect it, you need a guard (Lock/Synchronization).</li><li><b>Immutable Object:</b> You put the manuscript inside a <b>bulletproof glass case</b>. 1,000 people can look at it (Read) simultaneously, but no one can touch it.</li><li><b>Result:</b> You don't need a guard. It is inherently safe because it is <b>Read-Only</b>.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Technical Definitions:</b></p><ul><li><b>Immutable Object:</b> An object whose state (data) cannot be modified after it is created.</li><li><b>The Golden Rule:</b> \"If you can't change it, you can't break it.\"</li><li><b>Key Characteristics:</b><ul><li>No \"Setters\" (e.g., <code>setName()</code>).</li><li>All fields are <code>private</code> and <code>final</code>.</li><li>The class is <code>final</code> (preventing subclasses from altering behavior).</li></ul></li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Strategy (Create vs. Modify):</b></p><ul><li>If you need to \"change\" data in an immutable object, you <b>do NOT modify</b> the existing object. Instead, you <b>create a New Copy</b> with the updated value.</li><li><i>Example:</i> <code>String</code> in Java. <code>s.toUpperCase()</code> does not change <code>s</code>; it returns a completely new String object.</li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "import java.util.ArrayList;\nimport java.util.List;\n\n// 1. Make class final (No subclasses allowed)\npublic final class ImmutableUser {\n    \n    // 2. Make fields private and final (Must be set in constructor)\n    private final String name;\n    private final int age;\n    private final List<String> roles;\n\n    public ImmutableUser(String name, int age, List<String> roles) {\n        this.name = name;\n        this.age = age;\n        \n        // 3. DEEP COPY (Crucial Step!)\n        // If we just said \"this.roles = roles\", the caller could modify the \n        // original list later and break our immutability.\n        this.roles = new ArrayList<>(roles);\n    }\n\n    // 4. Getters Only (No Setters)\n    public String getName() { return name; }\n    public int getAge() { return age; }\n\n    public List<String> getRoles() {\n        // Return a copy or unmodifiable view so they can't touch our internal list\n        return new ArrayList<>(roles);\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Questions & \"Gotchas\":</b></p><ul><li><b>Q1: Why is String immutable in Java?</b><br><b>Answer:</b><ul><li><b>Security:</b> Strings are used for Database URLs and passwords. If mutable, a hacker could change a filename after the security check but before file access.</li><li><b>Thread-Safety:</b> Safe to share across threads without locks.</li><li><b>String Pool:</b> Caching identical strings to save memory is only possible if they never change.</li></ul></li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<ul><li><b>Q2: What is the difference between <code>final</code> and Immutable?</b><br><b>Answer:</b><ul><li><b>final:</b> Refers to the <b>Reference</b> (\"I cannot point this variable to a new object\").</li><li><b>Immutable:</b> Refers to the <b>Object Content</b> (\"The data inside this object cannot change\").</li><li><i>Trap:</i> <code>final List&lt;String&gt; list = new ArrayList&lt;&gt;();</code> -> You cannot say <code>list = new List()</code>, BUT you CAN say <code>list.add(\"Hack\")</code>. The list is final but Mutable.</li></ul></li><li><b>Q3: How do you handle a Date or List field inside an Immutable class?</b><br><b>Answer:</b> You must use <b>Defensive Copies</b> (Deep Copy). Copy the incoming list in the Constructor, and return a copy in the Getter.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<ul><li><b>Q4: What are the downsides of Immutability?</b><br><b>Answer:</b> <b>Memory Overhead.</b> Creating a new object for every small change generates \"garbage\" (e.g., String concatenation in a loop). <b>Fix:</b> Use <code>StringBuilder</code> (Mutable) for heavy editing, then convert to <code>String</code>.</li></ul>"
+    }
+  ]
 }
 
 
 
   
 }
+
 
 
 
