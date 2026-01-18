@@ -1,18 +1,25 @@
 [
   {
-    "id": 1,
-    "title": "1. OOP Physics",
-    "subtitle": "The Foundation",
+    "id": 0,
+    "title": "0. Runtime Anatomy",
+    "subtitle": "",
     "groups": [
       {
-        "name": "Runtime Anatomy",
+        "name": "",
         "topics": [
           {"title": "The Anatomy of a Line", "priority": "high", "note": "Complete execution flow: Program Counter ticks -> Stack Frame carves 'Left' -> Heap allocates 'Right' -> Reference connects them." },
           {"title": "Identity vs Equality", "priority": "high", "note": "== vs .equals(). Comparing memory addresses vs. comparing actual data state." },
           {"title": "Object Duplication", "priority": "high", "note": "Shallow vs Deep Copy. Understanding pointer replication vs recursive memory allocation." },
           {"title": "The HashCode Contract", "priority": "medium", "note": "Why equality logic must match bucket logic for collections." }
         ]
-      },
+      }
+    ]
+  },
+  {
+    "id": 1,
+    "title": "1. OOP Physics",
+    "subtitle": "The Foundation",
+    "groups": [
       {
         "name": "Core Concepts",
         "topics": [
@@ -318,6 +325,7 @@
     ]
   }
 ]
+
 
 
 
