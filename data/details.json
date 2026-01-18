@@ -1337,17 +1337,165 @@
         "caption": ""
       }
   ]
+},
+
+  "SRP": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Definition: Single Responsibility Principle</b></p><ul><li><b>The Principle:</b> A class should have <b>one, and only one, reason to change</b>.</li><li><b>The Misconception:</b> People think \"It should do only one thing.\" No, that applies to functions. A class can have many methods, but they must all serve the same purpose or stakeholder.</li><li><b>The Litmus Test:</b> Ask yourself, \"Who is responsible for requesting changes to this class?\" <br>If the answer is \"The DBA\" AND \"The UI Designer,\" you have violated SRP.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Violation (The \"God Class\"):</b></p>Here, the <code>Employee</code> class has three divergent reasons to change:<ol><li><b>Business Logic:</b> HR changes salary rules.</li><li><b>Database Logic:</b> DBA changes SQL schema.</li><li><b>Presentation Logic:</b> Frontend changes report format.</li></ol>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// Bad Code: \"God Class\"\npublic class Employee {\n    public double calculatePay() { ... } // Logic\n    public void saveToDatabase() { ... } // Persistence\n    public String generateReport() { ... } // Presentation\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Solution (Decoupling):</b></p>Split the responsibilities into specialized classes."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// 1. Business Data & Rules (Domain)\npublic class Employee {\n    public double calculatePay() { ... } \n}\n\n// 2. Persistence (Repository Pattern)\npublic class EmployeeRepository {\n    public void save(Employee e) { ... }\n}\n\n// 3. Presentation (View/DTO)\npublic class EmployeeReporter {\n    public String generate(Employee e) { ... }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>\"Reason to Change\":</b> This is the keyword. Don't just say \"it keeps code clean.\" Say: \"It isolates the impact of change. If the Database schema changes, I shouldn't risk breaking the Payroll calculation logic.\"</li><li><b>High Cohesion:</b> SRP leads to High Cohesion. This means all methods in a class are closely related and work towards a shared goal.</li><li><b>Balance:</b> Don't overdo it. If you split a class into 10 tiny classes that are never used apart, you've created \"Fragmented Logic\" (Unnecessary Complexity). Only split if there is a divergent reason to change.</li></ul>"
+    }
+  ]
+},
+
+  "Liskov Substitution": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Definition:</b></p><ul><li><b>The Principle:</b> Objects of a superclass should be replaceable with objects of its subclasses without breaking the application.</li><li><b>The Simple Rule:</b> It's not enough for a child class to \"Is-A\" parent; it must <b>\"Act-Like-A\"</b> parent.</li><li><b>The Warning:</b> If a subclass overrides a method to do nothing or throws an exception, you have likely violated LSP.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Violation (The \"Penguin\" Problem):</b></p>In biology, a Penguin is a Bird. In OOP, if <code>Bird</code> has a <code>fly()</code> method, a Penguin cannot be a Bird.<br><br><b>Bad Code:</b>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "class Bird {\n    public void fly() { ... }\n}\n\nclass Penguin extends Bird {\n    @Override\n    public void fly() {\n        // LSP Violation! \n        // The calling code expects to fly, but gets a crash.\n        throw new UnsupportedOperationException(\"I can't fly!\");\n    }\n}\n\n// Why it breaks:\npublic void makeBirdFly(Bird bird) {\n    bird.fly(); // If I pass a Penguin here, the program crashes.\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Solution (Segregation):</b></p>Don't force functionality on classes that can't support it. Break the hierarchy based on <b>Capability</b>, not just biology."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "class Bird { ... }\n\ninterface Flyable {\n    void fly();\n}\n\nclass Sparrow extends Bird implements Flyable {\n    public void fly() { ... }\n}\n\nclass Penguin extends Bird {\n    // No fly method here. Safe.\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>The \"Square is a Rectangle\" Paradox:</b> This is the most famous interview question.<ul><li><b>Math:</b> A Square is a Rectangle.</li><li><b>OOP:</b> A Square is <b>NOT</b> a Rectangle if the objects are mutable.</li><li><b>Why:</b> If you have <code>setHeight(10)</code> on a Rectangle, you expect width to stay the same. On a Square, <code>setHeight(10)</code> implicitly changes the width to 10 too. This \"side effect\" breaks the expectations of the client code.</li></ul></li><li><b>Design by Contract:</b> LSP forces you to honor the contract of the parent class.<ul><li><b>Preconditions</b> (Input requirements) cannot be strengthened in subclass.</li><li><b>Postconditions</b> (Output guarantees) cannot be weakened in subclass.</li></ul></li><li><b>Refactoring Tip:</b> If you see methods like <code>throw new NotImplementedException()</code>, strictly flag it as an LSP violation.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    }
+  ]
+},
+
+  "Interface Segregation": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Definition:</b></p><ul><li><b>The Principle:</b> Clients should not be forced to depend on interfaces they do not use.</li><li><b>The Motto:</b> \"Many specific interfaces are better than one general-purpose interface.\"</li><li><b>The Goal:</b> Reduce the side effects of changes. If you change a method in a \"Fat Interface,\" you shouldn't force classes that don't use that method to recompile or break.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Violation (The \"Fat Interface\"):</b></p>This occurs when you create a \"God Interface\" that covers too many capabilities.<br><br><b>Scenario:</b> We have a <code>Worker</code> interface. Robots work, but they don't eat."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// Bad Code: Forcing behavior\ninterface Worker {\n    void work();\n    void eat(); // Robots can't implement this meaningfully\n}\n\nclass Robot implements Worker {\n    public void work() { ... }\n    \n    public void eat() {\n        // ISP Violation! \n        // The Robot class is forced to implement a dummy method.\n        // This usually triggers an LSP violation too.\n        throw new RuntimeException(\"I don't eat!\");\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Solution (Role Interfaces):</b></p>Split the interface based on the client's needs, not the object's capabilities."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// Good Code: Segregated Interfaces\ninterface Workable {\n    void work();\n}\n\ninterface Feedable {\n    void eat();\n}\n\n// Humans implement both roles\nclass Human implements Workable, Feedable {\n    public void work() { ... }\n    public void eat() { ... }\n}\n\n// Robots implement only what they need\nclass Robot implements Workable {\n    public void work() { ... }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>Pollution:</b> If your interface implementation has methods that return <code>null</code> or throw <code>NotImplementedException</code>, you are likely violating ISP.</li><li><b>Refactoring Pattern:</b> If you have a massive interface (e.g., <code>OrderService</code> with 50 methods), use ISP to break it down into <code>OrderReader</code>, <code>OrderWriter</code>, and <code>OrderManager</code>. This makes <b>mocking in unit tests</b> much easier (you only mock the small interface you need).</li><li><b>Connection to SRP:</b> ISP is essentially SRP applied to Interfaces. An interface should have a single responsibility or role.</li></ul>"
+    }
+  ]
+},
+
+  "Dependency Inversion": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Definition:</b></p><ul><li><b>The Principle:</b> High-level modules (Business Logic) should not depend on Low-level modules (Database, I/O, Network). Both should depend on <b>Abstractions</b> (Interfaces).</li><li><b>The Goal:</b> <b>Decoupling.</b> You want to be able to swap out the \"details\" (e.g., switch from MySQL to MongoDB, or Stripe to PayPal) without touching a single line of your core business logic.</li><li><b>Inversion:</b> Traditionally, logic depends on the database. Here, we invert the dependency arrow so the database implementation \"conforms\" to the logic's interface needs.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Violation (Tight Coupling):</b></p>Here, the <code>OrderService</code> (High Level) imports and creates a <code>MySQLDatabase</code> (Low Level). If you want to switch to PostgreSQL, you have to rewrite the Service.<br><br><b>Bad Code:</b>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "class MySQLDatabase {\n    public void save(String order) { ... }\n}\n\nclass OrderService {\n    // VIOLATION: Hard dependency on a specific implementation (MySQL)\n    // The Service is now \"married\" to MySQL.\n    private MySQLDatabase database = new MySQLDatabase();\n\n    public void processOrder(String order) {\n        database.save(order);\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Solution (Depend on Interface):</b></p>The Service defines \"What I need\" (the Interface). The Database implements it. The Service creates nothing; it receives the implementation (Dependency Injection)."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// 1. The Abstraction (Owned by High-Level Logic)\ninterface OrderRepository {\n    void save(String order);\n}\n\n// 2. The Low-Level Detail (Depends on Abstraction)\nclass MySQLDatabase implements OrderRepository {\n    public void save(String order) { ... } // SQL logic\n}\n\nclass MongoDatabase implements OrderRepository {\n    public void save(String order) { ... } // Mongo logic\n}\n\n// 3. The High-Level Module (Depends on Abstraction)\nclass OrderService {\n    private OrderRepository repository;\n\n    // Injection via Constructor\n    public OrderService(OrderRepository repository) {\n        this.repository = repository;\n    }\n\n    public void processOrder(String order) {\n        repository.save(order); // Doesn't know if it's MySQL or Mongo\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>DIP vs. DI vs. Framework:</b><ul><li><b>DIP:</b> The Principle (The Concept).</li><li><b>DI:</b> The Mechanism (The pattern, e.g., Constructor Injection).</li><li><b>Spring/Guice:</b> The Framework (The tool that automates DI).</li></ul></li><li><b>Wire Everything in Main:</b> In a DIP-compliant app, the only place that knows about specific classes (like <code>new MySQLDatabase()</code>) is the entry point (Application Startup / Configuration). The rest of the app just speaks \"Interface.\"</li><li><b>Testing Power:</b> DIP is the primary reason <b>Unit Testing</b> is possible. Because <code>OrderService</code> depends on an interface, you can inject a <code>MockRepository</code> during tests to simulate DB failures without needing a real database.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    }
+  ]
 }
 
   
 
   
+
   
-
-
 
   
 }
+
 
 
 
