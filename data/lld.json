@@ -123,7 +123,7 @@
           { "title": "Command", "priority": "medium", "note": "Encapsulate requests (Undo/Redo logic)." },
           { "title": "State", "priority": "medium", "note": "Managing object states (Order processing)." },
           { "title": "Template Method", "priority": "medium", "note": "Skeleton algorithms. Hooks for subclasses." },
-          { "title": "Chain of Resp", "priority": "medium", "note": "Middleware pipelines, Logging filters." },
+          { "title": "Chain of Responsibility", "priority": "medium", "note": "Middleware pipelines, Logging filters." },
           { "title": "Iterator", "priority": "low", "note": "Traversing collections without exposing internals." }
         ]
       }
@@ -309,4 +309,5 @@
     ]
   }
 ]
+
 
