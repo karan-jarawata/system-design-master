@@ -1738,6 +1738,520 @@
       "content": ""
     }
   ]
+},
+
+  "Singleton (DD)": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>\"Bhai, ye pure system mein ek hi piece rahega, sab log ussi ko share karenge. No duplicates allowed!\"</b></p><p><b>1. Simple Explanation</b></p><ul><li><b>Definition:</b> The Singleton pattern ensures that a class has <b>only one instance</b> and provides a global point of access to it. No matter how many times you ask for it, you get the exact same object back.</li><li><b>Why?</b> Creating multiple objects might break logic (e.g., conflicting writes) or waste resources (e.g., opening 10 DB connections instead of sharing one).</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>2. Real-World Analogy: The Clipboard</b></p><ul><li>If you copy text from Chrome, it goes to the <b>Clipboard</b>.</li><li>If you paste it into Notepad, it comes from the <b>same Clipboard</b>.</li><li>It wouldn't make sense to have 5 different Clipboards running at once; you wouldn't know which one holds your data! The system enforces a single shared instance.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>3. Technical Implementation (Double-Checked Locking)</b></p>This is the \"Gold Standard\" for interviews. It is <b>lazy</b> (creates object only when needed) and <b>thread-safe</b>."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "public class DatabaseConnection {\n\n    // 1. Static variable to hold the single instance.\n    // 'volatile' ensures changes are visible to all threads immediately.\n    private static volatile DatabaseConnection instance;\n\n    // 2. Private Constructor: No one outside can say \"new DatabaseConnection()\"\n    private DatabaseConnection() {\n        System.out.println(\"Connection Created!\");\n    }\n\n    // 3. Public method to get the instance\n    public static DatabaseConnection getInstance() {\n        // Check 1: If it exists, return it. Avoids expensive lock.\n        if (instance == null) {\n            \n            // Synchronized Block: Only one thread can enter here at a time.\n            synchronized (DatabaseConnection.class) {\n                \n                // Check 2: Double check! Maybe another thread created it\n                // while we were waiting for the lock.\n                if (instance == null) {\n                    instance = new DatabaseConnection();\n                }\n            }\n        }\n        return instance;\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>4. LLD Interview Key Takeaways</b></p><ul><li><b>The \"Private Constructor\" is Key:</b> If you forget to make the constructor private, the interviewer will fail you immediately. That is the lock on the door preventing <code>new Class()</code>.</li><li><b>Why \"Double-Checked\"?</b><ul><li><b>First Check:</b> Performance (Don't freeze threads if the object already exists).</li><li><b>Second Check:</b> Correctness (Prevent race conditions where two threads enter the block simultaneously).</li></ul></li><li><b>Use Cases:</b><ul><li><b>Logging:</b> Write to one file sequentially.</li><li><b>Configuration:</b> Load <code>application.properties</code> once.</li><li><b>Hardware Interface:</b> Printer Spooler (Don't print two docs on top of each other).</li></ul></li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    }
+  ]
+},
+
+  "Factory Method (DD)": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>\"Object banane ki headache, factory ki, tum bas use karo. Logic client se dur rakho!\"</b></p><p><b>1. Simple Explanation</b></p><ul><li><b>The Concept:</b> The Factory Method pattern allows you to create objects without specifying the exact class of object that will be created.</li><li><b>Problem:</b> If you use <code>new Truck()</code> everywhere in your code, and later you want to switch to <code>new Ship()</code>, you have to find and change that code in 100 places.</li><li><b>Solution:</b> You move the creation logic (the <code>new</code> keyword) into a special method. The client just calls <code>createTransport(\"Sea\")</code> and gets an object. It doesn't care if it's a Ship, Boat, or Submarine; it just knows it works.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>2. Real-World Analogy: Logistics Company</b></p><ul><li><b>Scenario:</b> You (the Client) want to send a parcel.</li><li><b>The Abstraction:</b> You don't care if the company uses a <b>Truck</b> (for road), a <b>Ship</b> (for sea), or a <b>Drone</b>.</li><li><b>The Factory:</b> You just tell the Logistics Manager: \"I need a delivery to London.\"</li><li><b>The Logic:</b> The Manager decides: \"London is overseas, so I will instantiate a <b>Ship</b> object.\" You just call the method <code>deliver()</code>; you don't worry about the vehicle creation mechanics.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>3. Technical Implementation</b></p>We define an interface for the object (<code>Transport</code>) and a Factory class that creates them based on input."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// 1. The Interface (The \"Product\")\ninterface Transport {\n    void deliver();\n}\n\n// 2. Concrete Products\nclass Truck implements Transport {\n    public void deliver() { System.out.println(\"Delivering by road in a Box.\"); }\n}\n\nclass Ship implements Transport {\n    public void deliver() { System.out.println(\"Delivering by sea in a Container.\"); }\n}\n\n// 3. The Factory (The \"Creator\")\nclass LogisticsFactory {\n    // The \"Factory Method\"\n    // Notice: It returns the Interface, not the specific class!\n    public Transport createTransport(String type) {\n        if (type.equals(\"Road\")) {\n            return new Truck();\n        } else if (type.equals(\"Sea\")) {\n            return new Ship();\n        } else {\n            throw new IllegalArgumentException(\"Unknown transport type\");\n        }\n    }\n}\n\n// Usage\nclass Client {\n    public static void main(String[] args) {\n        LogisticsFactory factory = new LogisticsFactory();\n        \n        // Client doesn't know \"Truck\" class exists. Just knows \"Road\".\n        Transport t1 = factory.createTransport(\"Road\");\n        t1.deliver(); \n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>4. LLD Interview Key Takeaways</b></p><ul><li><b>Open/Closed Principle:</b> This is the biggest selling point. If you want to add <b>Air</b> transport later, you simply create a <code>Plane</code> class and update the Factory. You do <b>not</b> touch the Client code (the main app logic). The client remains safe and bug-free.</li><li><b>Decoupling:</b> The client code is decoupled from the concrete classes (<code>Truck</code>, <code>Ship</code>). It only depends on the interface (<code>Transport</code>).</li><li><b>Library Design:</b> Mention this example: \"This is used heavily in libraries (like <b>JDBC</b>). When we do <code>DriverManager.getConnection()</code>, we don't know if we are getting a MySQL connection or Oracle connection object; the factory handles it internally.\"</li></ul>"
+    }
+  ]
+},
+
+  "Builder (DD)": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>\"Jab constructor mein 10 parameters pass karne pade aur aadhe 'null' ho, toh samajh lo Builder pattern ki zarurat hai!\"</b></p><p><b>1. Simple Explanation</b></p><ul><li><b>The Concept:</b> The Builder pattern is used to construct a complex object step-by-step.</li><li><b>The Problem (Telescoping Constructor):</b> Imagine a class with 10 fields (Name, Address, Phone, etc.). If you use a constructor, you have to pass all 10, even if you only need 2. You end up with ugly code like <code>new User(\"John\", null, null, 25, null...)</code>.</li><li><b>The Solution:</b> Instead of one giant constructor, you use a \"Builder\" object. You tell it only what you need (<code>builder.setName(\"John\").setAge(25)</code>), and finally, call <code>.build()</code> to get the object.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>2. Real-World Analogy: Custom Pizza</b></p><ul><li>Think of <b>Subway</b> or <b>Domino's</b>.</li><li>You don't walk in and say \"Give me Pizza Variant #432\".</li><li>You build it step-by-step:<ul><li>\"Start with Thin Crust.\"</li><li>\"Add Cheese.\"</li><li>\"Skip the onions.\"</li><li><b>\"Build it!\"</b></li></ul></li><li>The final product is complex, but the process of creating it was clean and customizable.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>3. Technical Implementation</b></p>We usually use a <b>Static Inner Class</b> for the Builder to ensure the outer class remains immutable."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "public class User {\n    // All fields are final (Immutable) - Good practice!\n    private final String firstName; // Required\n    private final String lastName;  // Required\n    private final int age;          // Optional\n    private final String phone;     // Optional\n\n    // Private Constructor: Only the Builder can create a User\n    private User(UserBuilder builder) {\n        this.firstName = builder.firstName;\n        this.lastName = builder.lastName;\n        this.age = builder.age;\n        this.phone = builder.phone;\n    }\n\n    // Static Inner Builder Class\n    public static class UserBuilder {\n        private final String firstName;\n        private final String lastName;\n        private int age;\n        private String phone;\n\n        // Constructor for Required Parameters\n        public UserBuilder(String firstName, String lastName) {\n            this.firstName = firstName;\n            this.lastName = lastName;\n        }\n\n        // Methods return 'this' to allow Chaining (Fluent Interface)\n        public UserBuilder age(int age) {\n            this.age = age;\n            return this;\n        }\n\n        public UserBuilder phone(String phone) {\n            this.phone = phone;\n            return this;\n        }\n\n        // The final step\n        public User build() {\n            return new User(this);\n        }\n    }\n}\n\n// Usage\npublic class Client {\n    public static void main(String[] args) {\n        // Clean, readable, and no confusing 'nulls'\n        User user = new User.UserBuilder(\"Karan\", \"Jarawata\")\n                        .age(24)\n                        .phone(\"1234567890\")\n                        .build();\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>4. LLD Interview Key Takeaways</b></p><ul><li><b>Method Chaining (Fluent Interface):</b> Interviewers love the syntax <code>obj.setA().setB().setC()</code>. Explain that returning <code>this</code> in the setter methods makes this possible.</li><li><b>Immutability:</b> This is the strongest technical advantage. Since the <code>User</code> has no setters and the constructor is private, once <code>.build()</code> returns the object, it cannot be changed. This makes it <b>thread-safe</b>.</li><li><b>Telescoping Constructor:</b> Use this keyword. \"Builder solves the Telescoping Constructor anti-pattern where you have multiple constructors with 1, 2, 3... n arguments.\"</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    }
+  ]
+},
+
+ "Adapter (DD)": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>\"Jab do alag interfaces baat na kar paayein, toh beech mein Adapter laga do. Just like your travel charger!\"</b></p><p><b>1. Simple Explanation</b></p><ul><li><b>The Concept:</b> The Adapter pattern acts as a bridge between two incompatible interfaces.</li><li><b>The Problem:</b> You have an existing system that expects data in <b>Format A</b>. You buy a new library that gives data in <b>Format B</b>. You cannot change the code of the library, and you don't want to rewrite your system.</li><li><b>The Solution:</b> You create a wrapper class (the Adapter) that translates the calls from the existing system into the format the new library understands.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>2. Real-World Analogy: The Travel Plug</b></p><ul><li><b>Scenario:</b> You are from India (Round Pin Plug).</li><li><b>Problem:</b> You travel to the USA (Flat Pin Socket). Your charger won't fit directly.</li><li><b>Constraint:</b> You won't rebuild the hotel wall (System), and you won't buy a new laptop (Library).</li><li><b>Solution:</b> You use an <b>Adapter</b>. It takes your Round Pins and outputs Flat Pins.</li></ul>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// 1. The Target Interface (What the client uses)\ninterface Bird {\n    void fly();\n    void makeSound();\n}\n\n// 2. The Adaptee (The existing incompatible class)\nclass PlasticToyDuck {\n    public void squeak() {\n        System.out.println(\"Squeak\");\n    }\n}\n\n// 3. The Adapter (The Wrapper)\n// It implements the interface Client expects, but holds the incompatible object.\nclass BirdAdapter implements Bird {\n    private PlasticToyDuck toyDuck;\n\n    public BirdAdapter(PlasticToyDuck toyDuck) {\n        this.toyDuck = toyDuck;\n    }\n\n    @Override\n    public void fly() {\n        System.out.println(\"I can't fly, I am plastic!\");\n    }\n\n    @Override\n    public void makeSound() {\n        // Translation happens here!\n        // Client calls makeSound(), Adapter translates it to squeak()\n        toyDuck.squeak();\n    }\n}\n\n// Usage\nclass Client {\n    public static void main(String[] args) {\n        PlasticToyDuck toy = new PlasticToyDuck();\n        \n        // Wrap the toy in the adapter so it looks like a Bird\n        Bird birdAdapter = new BirdAdapter(toy);\n        \n        // Client thinks it's treating a real bird\n        birdAdapter.makeSound(); // Prints: \"Squeak\"\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>4. LLD Interview Key Takeaways</b></p><ul><li><b>Wrapper Pattern:</b> Adapter is also known as a Wrapper. If the interviewer asks \"How do you integrate a 3rd party Legacy API that doesn't match our interface?\", the answer is Adapter.</li><li><b>Composition over Inheritance:</b> Notice that <code>BirdAdapter</code> <b>contains</b> (has-a) the <code>PlasticToyDuck</code>, it doesn't extend it. This is preferred because the Adapter can hold any subclass of the Adaptee.</li><li><b>Two Types:</b> Mention there are <b>Class Adapters</b> (using Inheritance) and <b>Object Adapters</b> (using Composition). Object Adapters (shown above) are generally safer and more flexible.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    }
+  ]
+},
+
+  "Facade (DD)": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>\"Bohot saare complex wires ke peeche ek simple button. Client ko bas button dabana hai, wires nahi suljhane.\"</b></p><p><b>1. Simple Explanation</b></p><ul><li><b>The Concept:</b> The Facade pattern provides a simplified interface to a library, a framework, or any other complex set of classes.</li><li><b>The Problem:</b> Your system has many moving parts. To perform a task, the client needs to call Method A from Class 1, Method B from Class 2, and Method C from Class 3, in a specific order. This makes the client code messy and tightly coupled.</li><li><b>The Solution:</b> You build a \"Facade\" (a front-facing class). The client calls <b>one method</b> on the Facade, and the Facade handles the confusing calls to the internal subsystems.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>2. Real-World Analogy: The Hotel Concierge</b></p><ul><li><b>Without Facade:</b> You want a taxi, dinner, and show tickets. You have to call the taxi company, then the restaurant, then the theater yourself.</li><li><b>With Facade:</b> You call the <b>Concierge (Facade)</b> and say \"Arrange my evening.\" The Concierge makes all the calls for you. You have a single point of contact.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>3. Technical Implementation (Home Theater)</b></p>To watch a movie, you have to turn on the Lights, Screen, Projector, Amp, and DVD. The Facade wraps this complexity."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// Complex Subsystem Parts\nclass Light { public void dim() { System.out.println(\"Lights dimmed\"); } }\nclass Screen { public void down() { System.out.println(\"Screen down\"); } }\nclass Projector { public void on() { System.out.println(\"Projector on\"); } }\nclass Amplifier { public void setVolume(int level) { System.out.println(\"Volume \" + level); } }\nclass DVDPlayer { public void play(String movie) { System.out.println(\"Playing \" + movie); } }\n\n// The Facade\nclass HomeTheaterFacade {\n    private Light light;\n    private Screen screen;\n    private Projector projector;\n    private Amplifier amp;\n    private DVDPlayer player;\n\n    public HomeTheaterFacade(Light l, Screen s, Projector p, Amplifier a, DVDPlayer d) {\n        this.light = l; this.screen = s; this.projector = p; this.amp = a; this.player = d;\n    }\n\n    // The One-Button Interface\n    public void watchMovie(String movie) {\n        System.out.println(\"Get ready to watch a movie...\");\n        light.dim();\n        screen.down();\n        projector.on();\n        amp.setVolume(5);\n        player.play(movie);\n    }\n}\n\n// Usage\nclass Client {\n    public static void main(String[] args) {\n        // Setup done once...\n        HomeTheaterFacade homeTheater = new HomeTheaterFacade(new Light(), new Screen(), ...);\n        \n        // Client just does this:\n        homeTheater.watchMovie(\"Inception\");\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>4. LLD Interview Key Takeaways</b></p><ul><li><b>Not \"Adding\" Functionality:</b> Clarify that a Facade rarely adds new logic. It mainly <b>organizes</b> existing logic. It is a coordinator, not a worker.</li><li><b>Loose Coupling:</b> If the internal logic of the Projector changes (e.g., method name changes), only the <code>HomeTheaterFacade</code> needs to be updated. The Client code remains untouched.</li><li><b>Microservices Gateway:</b> In system design interviews, the <b>API Gateway</b> is essentially a Facade. It takes a simple request from the Frontend and coordinates calls to the User Service, Product Service, and Cart Service.</li></ul>"
+    }
+  ]
+},
+
+  "Decorator (DD)": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>\"Base item wahi rahega, bas upar se layers chadhaate jao. Like adding toppings on a pizza without changing the crust!\"</b></p><p><b>1. Simple Explanation</b></p><ul><li><b>The Concept:</b> The Decorator pattern allows you to <b>dynamically</b> add behavior or features to an object without modifying its source code.</li><li><b>The Problem:</b> Inheritance is static. If you have a class <code>Coffee</code>, and you want <code>CoffeeWithMilk</code>, <code>CoffeeWithSugar</code>, <code>CoffeeWithMilkAndSugar</code>... you will end up with a <b>\"Class Explosion\"</b> (too many subclasses).</li><li><b>The Solution:</b> You use <b>Composition</b>. You wrap the original object inside a \"Decorator\" class that adds the new feature. You can wrap it again and again (like Russian Matryoshka dolls).</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>2. Real-World Analogy: Starbucks Coffee</b></p><ul><li>You start with a basic <b>Espresso</b>.</li><li>You wrap it with <b>Milk</b> (Latte).</li><li>You wrap that with <b>Caramel</b>.</li><li>It's still a \"Beverage\", but it now has layers of flavor. You didn't create a specific class called <code>EspressoWithMilkAndCaramel</code>; you just composed it on the spot.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>3. Technical Implementation</b></p>We use an interface <code>Coffee</code> and wrap it with decorators. The Decorator <b>is a</b> Coffee, but it also <b>has a</b> Coffee."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// 1. The Component Interface\ninterface Coffee {\n    String getDescription();\n    double getCost();\n}\n\n// 2. Concrete Component (The Base Object)\nclass SimpleCoffee implements Coffee {\n    public String getDescription() { return \"Simple Coffee\"; }\n    public double getCost() { return 5.0; }\n}\n\n// 3. The Decorator (The Wrapper)\n// It implements Coffee (so it looks like a coffee) AND contains a Coffee.\nabstract class CoffeeDecorator implements Coffee {\n    protected Coffee tempCoffee; // The object we are wrapping\n\n    public CoffeeDecorator(Coffee newCoffee) {\n        this.tempCoffee = newCoffee;\n    }\n    \n    public String getDescription() {\n        return tempCoffee.getDescription();\n    }\n    \n    public double getCost() {\n        return tempCoffee.getCost();\n    }\n}\n\n// 4. Concrete Decorators (The Toppings)\nclass Milk extends CoffeeDecorator {\n    public Milk(Coffee newCoffee) { super(newCoffee); }\n\n    public String getDescription() { return tempCoffee.getDescription() + \", Milk\"; }\n    public double getCost() { return tempCoffee.getCost() + 1.5; }\n}\n\nclass Sugar extends CoffeeDecorator {\n    public Sugar(Coffee newCoffee) { super(newCoffee); }\n\n    public String getDescription() { return tempCoffee.getDescription() + \", Sugar\"; }\n    public double getCost() { return tempCoffee.getCost() + 0.5; }\n}\n\n// Usage\nclass Client {\n    public static void main(String[] args) {\n        // Start with plain coffee\n        Coffee myCoffee = new SimpleCoffee(); \n        \n        // Add Milk\n        myCoffee = new Milk(myCoffee);\n        \n        // Add Sugar\n        myCoffee = new Sugar(myCoffee);\n        \n        // Result: Simple Coffee, Milk, Sugar | Cost: 7.0\n        System.out.println(myCoffee.getDescription() + \" $\" + myCoffee.getCost());\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>4. LLD Interview Key Takeaways</b></p><ul><li><b>Open/Closed Principle:</b> Decorator is the perfect example of OCP. You extended the behavior of <code>SimpleCoffee</code> (added Milk/Sugar) without opening or modifying the <code>SimpleCoffee</code> class file.</li><li><b>Inheritance vs. Composition:</b> This is the killer point. \"Inheritance is static (compile-time); Decorator is dynamic (run-time).\" You can decide to add Sugar while the program is running based on user input.</li><li><b>Java I/O Library:</b> The most famous real-world use case. <br><code>new BufferedReader(new FileReader(new File(\"data.txt\")))</code><br><code>BufferedReader</code> decorates <code>FileReader</code>, which decorates <code>File</code>. They all implement the <code>Reader</code> interface.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    }
+  ]
+},
+
+  "Composite (DD)": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>\"Ek single file ho ya pura folder, command same rahega. Treat the group just like a single item!\"</b></p><p><b>1. Simple Explanation</b></p><ul><li><b>The Concept:</b> The Composite pattern is used when you have to represent a <b>Part-Whole hierarchy</b> (a tree structure).</li><li><b>The Problem:</b> You have objects (Leaves) and groups of objects (Composites). You want to treat them exactly the same way. You don't want to write: <code>if (obj is Group) { loop children } else { obj.do() }</code>.</li><li><b>The Solution:</b> Both the single object and the group implement the <b>same interface</b>. When you call a method on the group, it automatically loops through its children and calls the method on them recursively.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>2. Real-World Analogy: File System</b></p><ul><li><b>Scenario:</b> Windows Explorer / Finder.</li><li><b>Leaf:</b> Individual Files (e.g., <code>resume.pdf</code>).</li><li><b>Composite:</b> Folders. A Folder can contain Files and <i>other</i> Folders.</li><li><b>The Interaction:</b> When you right-click and select <b>\"Get Size\"</b>:<ul><li>If it's a File, it returns its size (e.g., 2MB).</li><li>If it's a Folder, it calculates the sum of all files and sub-folders inside it.</li></ul></li><li>You (the User) don't care if you clicked a file or a folder; the interaction is identical.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>3. Technical Implementation</b></p>We use a common interface <code>FileSystemComponent</code> for both Files and Folders."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "import java.util.ArrayList;\nimport java.util.List;\n\n// 1. The Component Interface (Common for both)\ninterface FileSystemComponent {\n    void showDetails();\n}\n\n// 2. The Leaf (Individual Object)\nclass File implements FileSystemComponent {\n    private String name;\n\n    public File(String name) { this.name = name; }\n\n    public void showDetails() {\n        System.out.println(\"File: \" + name);\n    }\n}\n\n// 3. The Composite (Group of Objects)\nclass Folder implements FileSystemComponent {\n    private String name;\n    // Holds a list of children (Files OR other Folders)\n    private List<FileSystemComponent> children = new ArrayList<>();\n\n    public Folder(String name) { this.name = name; }\n\n    public void addComponent(FileSystemComponent component) {\n        children.add(component);\n    }\n\n    // The Magic: Recursion\n    public void showDetails() {\n        System.out.println(\"Folder: \" + name);\n        for (FileSystemComponent child : children) {\n            child.showDetails(); // Delegates to child (File or Folder)\n        }\n    }\n}\n\n// Usage\nclass Client {\n    public static void main(String[] args) {\n        File file1 = new File(\"Resume.pdf\");\n        File file2 = new File(\"Photo.jpg\");\n        \n        Folder subFolder = new Folder(\"My Documents\");\n        subFolder.addComponent(file1);\n        \n        Folder rootFolder = new Folder(\"C: Drive\");\n        rootFolder.addComponent(subFolder); // Adding a Folder to a Folder\n        rootFolder.addComponent(file2);     // Adding a File to a Folder\n        \n        // Client treats the Root Folder just like a File\n        rootFolder.showDetails();\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>4. LLD Interview Key Takeaways</b></p><ul><li><b>Recursion is King:</b> The Composite pattern relies heavily on recursion. When you call a method on the root, it ripples down to the leaves automatically.</li><li><b>UI Systems (DOM):</b> This is the classic use case. In HTML/React, a <code>&lt;div&gt;</code> (Composite) can contain <code>&lt;p&gt;</code> (Leaf) or other <code>&lt;div&gt;</code>s. The browser renders the top div, and everything inside draws itself.</li><li><b>Uniformity vs. Safety:</b> Be ready for this question. \"Should the <code>add()</code> method be in the Interface or the Composite class?\"<ul><li><b>Interface:</b> Gives <b>Uniformity</b> (you can treat everything the same), but is <b>Unsafe</b> (you might try to <code>add()</code> to a File, which crashes).</li><li><b>Composite Class:</b> <b>Safer</b>, but you lose some polymorphism (you need to know it's a Folder to add things). Usually, we prefer Safety.</li></ul></li></ul>"
+    }
+  ]
+},
+
+  "Proxy (DD)": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>\"Asli Boss tak pahunchne se pehle, PA (Personal Assistant) se milna padega. Direct entry not allowed!\"</b></p><p><b>1. Simple Explanation</b></p><ul><li><b>The Concept:</b> The Proxy pattern provides a substitute or placeholder for another object. A Proxy controls access to the original object, allowing you to perform actions either <b>before</b> or <b>after</b> the request gets to the real object.</li><li><b>Why?</b> Maybe the real object is heavy to load (Lazy Loading), requires security clearance (Protection), or you want to log every request (Logging). The client talks to the Proxy, thinking it's the Real object.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>2. Real-World Analogy: Company Firewall</b></p><ul><li><b>Scenario:</b> You (Client) request <code>Google.com</code> or <code>BannedSite.com</code>.</li><li><b>The Proxy:</b> The request goes to the Company Proxy Server first, not the real internet.</li><li><b>The Logic:</b><ul><li>The Proxy checks: \"Is this website on the block list?\"</li><li><b>If Yes:</b> It blocks you (Access Denied).</li><li><b>If No:</b> It forwards the request to the real server and fetches the page for you.</li></ul></li><li>You feel like you are browsing directly, but the Proxy is filtering everything in the middle.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>3. Technical Implementation</b></p>We use a <code>ProxyInternet</code> class to wrap the <code>RealInternet</code> class and add security checks."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// 1. The Interface\ninterface Internet {\n    void connectTo(String serverhost) throws Exception;\n}\n\n// 2. The Real Object (The \"Heavy\" or \"Sensitive\" Logic)\nclass RealInternet implements Internet {\n    public void connectTo(String serverhost) {\n        System.out.println(\"Connecting to \" + serverhost);\n    }\n}\n\n// 3. The Proxy (The Gatekeeper)\nclass ProxyInternet implements Internet {\n    private Internet realInternet = new RealInternet();\n    private static List<String> bannedSites;\n\n    static {\n        bannedSites = new ArrayList<>();\n        bannedSites.add(\"banned.com\");\n        bannedSites.add(\"work-distraction.com\");\n    }\n\n    @Override\n    public void connectTo(String serverhost) throws Exception {\n        // Pre-processing (Security Check)\n        if (bannedSites.contains(serverhost.toLowerCase())) {\n            throw new Exception(\"Access Denied to \" + serverhost);\n        }\n        \n        // Forwarding to Real Object\n        realInternet.connectTo(serverhost);\n    }\n}\n\n// Usage\nclass Client {\n    public static void main(String[] args) {\n        Internet internet = new ProxyInternet();\n        \n        try {\n            internet.connectTo(\"google.com\"); // Works\n            internet.connectTo(\"banned.com\"); // Throws Exception\n        } catch (Exception e) {\n            System.out.println(e.getMessage());\n        }\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>4. LLD Interview Key Takeaways</b></p><ul><li><b>Lazy Loading (Hibernate/JPA):</b> This is the #1 interview answer. \"How does Hibernate fetch a <code>User</code> but not their 10,000 <code>orders</code> immediately?\" <br><b>Answer:</b> It returns a <b>Proxy</b> object. The real orders are only fetched from the DB (the expensive query) when you actually call <code>.getOrders()</code>.</li><li><b>Spring AOP (Aspect Oriented Programming):</b> Spring uses Proxies for things like <code>@Transactional</code>. When you call a method, the Proxy intercepts it, starts the transaction, runs your method, and then commits the transaction.</li><li><b>Protection Proxy:</b> Mention that Proxies are often used for security (RBAC - Role Based Access Control) to check if a user has Admin permissions before executing a sensitive command.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    }
+  ]
+},
+
+  "Strategy (DD)": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>\"Manzil wahi hai, bas rasta badalna hai. Car se jao ya paidal, Google Maps logic change kar deta hai bina system crash kiye!\"</b></p><p><b>1. Simple Explanation</b></p><ul><li><b>The Concept:</b> The Strategy pattern defines a family of algorithms, puts each of them in its own class, and makes their objects <b>interchangeable</b>.</li><li><b>The Problem:</b> You have a class that does something (e.g., calculates shipping cost), but the logic changes based on the situation (Air, Train, Road). You end up with a massive <code>if-else</code> or <code>switch</code> block that is hard to maintain.</li><li><b>The Solution:</b> You remove the <code>if-else</code>. You create an interface <code>ShippingStrategy</code>. You create classes <code>AirShipping</code>, <code>RoadShipping</code>. The main class just holds the interface and calls <code>calculate()</code>. You can swap the strategy at runtime!</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>2. Real-World Analogy: Google Maps</b></p><ul><li><b>Goal:</b> Reach Destination X.</li><li><b>Strategies:</b><ul><li><b>Car Mode:</b> Prioritizes highways and speed.</li><li><b>Walking Mode:</b> Uses sidewalks and shortcuts.</li><li><b>Public Transport:</b> Follows bus/train schedules.</li></ul></li><li>The \"Goal\" (Navigation) remains the same, but the \"Strategy\" (Algorithm) to get there is completely different. The app swaps the algorithm instantly when you click the icon.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>3. Technical Implementation (Payment System)</b></p>We want to implement a system where the user can pay via Credit Card or UPI. The context (Cart) doesn't care <i>how</i> the payment happens, only <i>that</i> it happens."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// 1. The Strategy Interface\ninterface PaymentStrategy {\n    void pay(int amount);\n}\n\n// 2. Concrete Strategies (The Algorithms)\nclass CreditCardStrategy implements PaymentStrategy {\n    private String name;\n    public CreditCardStrategy(String name) { this.name = name; }\n    \n    public void pay(int amount) {\n        System.out.println(amount + \" paid with Credit Card by \" + name);\n    }\n}\n\nclass UpiStrategy implements PaymentStrategy {\n    private String upiId;\n    public UpiStrategy(String upiId) { this.upiId = upiId; }\n    \n    public void pay(int amount) {\n        System.out.println(amount + \" paid using UPI ID: \" + upiId);\n    }\n}\n\n// 3. The Context (The Shopping Cart)\nclass ShoppingCart {\n    // The Context doesn't know details, just talks to the Interface\n    public void checkout(int amount, PaymentStrategy strategy) {\n        strategy.pay(amount);\n    }\n}\n\n// Usage\nclass Client {\n    public static void main(String[] args) {\n        ShoppingCart cart = new ShoppingCart();\n        \n        // Runtime Decision 1: User pays by Card\n        cart.checkout(100, new CreditCardStrategy(\"Karan\"));\n        \n        // Runtime Decision 2: User changes mind, pays by UPI\n        cart.checkout(200, new UpiStrategy(\"karan@okhdfcbank\"));\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>4. LLD Interview Key Takeaways</b></p><ul><li><b>Death to If-Else:</b> If an interviewer shows you code with 10 <code>if (type == 'X')</code> statements, your immediate answer should be: \"Refactor this using the Strategy Pattern.\"</li><li><b>Runtime Switching:</b> Emphasize that unlike Inheritance (which is fixed at compile time), Strategy allows you to swap behavior <b>while the app is running</b>. (e.g., A game character switching from \"Bow\" to \"Sword\" changes the attack strategy instantly).</li><li><b>Comparators in Java:</b> The most common Java example. <code>Collections.sort(list, new NameComparator())</code> vs <code>Collections.sort(list, new AgeComparator())</code>. You are passing different strategies for sorting to the same sort function.</li></ul>"
+    }
+  ]
+},
+
+  "Observer (DD)": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>\"YouTube pe 'Bell Icon' dabaya hai? Bas wahi hai logic. Video aayegi toh notification apne aap aayega, baar-baar check nahi karna padega!\"</b></p><p><b>1. Simple Explanation</b></p><ul><li><b>The Concept:</b> The Observer pattern defines a <b>one-to-many dependency</b> between objects.</li><li><b>The Mechanism:</b> One object (the <b>Subject</b>) holds the state. When the Subject changes, it automatically \"notifies\" all attached <b>Observers</b> so they can update themselves.</li><li><b>The Goal:</b> Decoupling. The Subject doesn't care who the observers are or what they do with the data. It just says, \"Hey, I changed!\"</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>2. Real-World Analogy: YouTube Subscription</b></p><ul><li><b>The Channel (Subject):</b> Uploads a new video.</li><li><b>The Subscribers (Observers):</b> Thousands of people have clicked \"Subscribe\".</li><li><b>The Action:</b> The Channel does not call each person individually. It pushes a <b>\"Notification\"</b> to the list of subscribers.</li><li>If you Unsubscribe, you stop getting notifications. The Channel keeps working fine without you.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>3. Technical Implementation</b></p>We have a <code>WeatherStation</code> (Subject) that updates a <code>PhoneDisplay</code> (Observer) whenever the temperature changes."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "import java.util.ArrayList;\nimport java.util.List;\n\n// 1. The Observer Interface (The Subscriber)\ninterface Observer {\n    void update(float temperature);\n}\n\n// 2. The Subject Interface (The Publisher)\ninterface Subject {\n    void registerObserver(Observer o);\n    void removeObserver(Observer o);\n    void notifyObservers();\n}\n\n// 3. Concrete Subject\nclass WeatherStation implements Subject {\n    private List<Observer> observers = new ArrayList<>();\n    private float temperature;\n\n    public void setTemperature(float temperature) {\n        this.temperature = temperature;\n        notifyObservers(); // State changed? Notify everyone!\n    }\n\n    public void registerObserver(Observer o) {\n        observers.add(o);\n    }\n\n    public void removeObserver(Observer o) {\n        observers.remove(o);\n    }\n\n    public void notifyObservers() {\n        for (Observer o : observers) {\n            o.update(temperature);\n        }\n    }\n}\n\n// 4. Concrete Observer\nclass PhoneDisplay implements Observer {\n    private String username;\n\n    public PhoneDisplay(String username) { this.username = username; }\n\n    public void update(float temperature) {\n        System.out.println(\"Notification for \" + username + \": Temp is now \" + temperature + \"°C\");\n    }\n}\n\n// Usage\nclass Client {\n    public static void main(String[] args) {\n        WeatherStation station = new WeatherStation();\n        \n        Observer user1 = new PhoneDisplay(\"Karan\");\n        Observer user2 = new PhoneDisplay(\"Alice\");\n        \n        station.registerObserver(user1);\n        station.registerObserver(user2);\n        \n        // Simulating a weather update\n        station.setTemperature(30.5f); \n        // Output: Both Karan and Alice get the update instantly.\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>4. LLD Interview Key Takeaways</b></p><ul><li><b>Push vs. Pull Model:</b><ul><li><b>Push:</b> The Subject sends the data <i>in</i> the notification (like <code>update(temperature)</code> above).</li><li><b>Pull:</b> The Subject just says <code>update()</code>, and the Observer has to call <code>subject.getData()</code> to fetch what it needs.</li></ul></li><li><b>Memory Leaks (The Lapsed Listener Problem):</b> This is a pro tip. If an Observer registers but never unregisters (User closes the window but code forgets to <code>removeObserver</code>), the Subject keeps a reference to it, preventing <b>Garbage Collection</b>. This causes memory leaks.</li><li><b>Event Listeners:</b> Mention that all UI frameworks (Java Swing <code>ActionListener</code>, JavaScript <code>addEventListener</code>) are built on the Observer pattern.</li></ul>"
+    }
+  ]
+},
+
+  "Command (DD)": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>\"Order waiter ko de diya, ab wo chef tak kaise pahunchega ye tumhari tension nahi. Request ko packet bana ke pass kar do!\"</b></p><p><b>1. Simple Explanation</b></p><ul><li><b>The Concept:</b> The Command pattern turns a request (method call) into a standalone <b>object</b>.</li><li><b>The Mechanism:</b> Instead of calling a method directly (<code>light.turnOn()</code>), you wrap that call inside an object (<code>new TurnOnCommand(light)</code>).</li><li><b>The Benefit:</b> Since the request is now an object, you can pass it around, store it in a list (Queue), delay its execution, or even reverse it (Undo).</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>2. Real-World Analogy: The Restaurant</b></p><ul><li><b>You (Client):</b> You want food. You don't run into the kitchen and tell the Chef what to do.</li><li><b>The Waiter (Invoker):</b> You give your order to the waiter.</li><li><b>The Order Slip (Command):</b> The waiter writes your request on a piece of paper. This paper is the \"Command Object\". It contains all the info needed.</li><li><b>The Chef (Receiver):</b> The waiter hangs the slip in the kitchen. The Chef picks it up and cooks.</li><li>The waiter doesn't know how to cook Lasagna; they just know how to pass the command object to the kitchen.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>3. Technical Implementation (Remote Control)</b></p>We build a Remote Control where buttons can be programmed to do anything (Light On, Fan Off, etc.)."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// 1. The Command Interface\ninterface Command {\n    void execute();\n}\n\n// 2. The Receiver (Does the actual work)\nclass Light {\n    public void turnOn() { System.out.println(\"Light is ON\"); }\n    public void turnOff() { System.out.println(\"Light is OFF\"); }\n}\n\n// 3. Concrete Command (Wraps the request)\nclass LightOnCommand implements Command {\n    private Light light;\n\n    public LightOnCommand(Light light) {\n        this.light = light;\n    }\n\n    public void execute() {\n        light.turnOn(); // Delegates to the Receiver\n    }\n}\n\n// 4. The Invoker (The Remote Button)\nclass RemoteControl {\n    private Command command;\n\n    public void setCommand(Command command) {\n        this.command = command;\n    }\n\n    public void pressButton() {\n        command.execute(); // Remote doesn't know it's turning on a light.\n    }\n}\n\n// Usage\nclass Client {\n    public static void main(String[] args) {\n        Light livingRoomLight = new Light();\n        \n        // Wrap the request into an object\n        Command lightsOn = new LightOnCommand(livingRoomLight);\n        \n        RemoteControl remote = new RemoteControl();\n        remote.setCommand(lightsOn);\n        \n        // User presses button -> Command executes -> Light turns on\n        remote.pressButton();\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>4. LLD Interview Key Takeaways</b></p><ul><li><b>Undo/Redo:</b> This is the #1 feature of the Command Pattern. Because every action is an object, you can keep a <code>List&lt;Command&gt;</code> history. To \"Undo\", you just pop the last command and call a generic <code>undo()</code> method (which you would add to the interface).</li><li><b>Job Queues:</b> If you need to process tasks asynchronously (like a Thread Pool or Task Scheduler), you use the Command pattern. You create \"Job objects\" and add them to a queue. The worker threads pick up the Command objects and call <code>.execute()</code>.</li><li><b>Macro Commands:</b> You can create a <code>PartyModeCommand</code> that holds a list of other commands (LightOn, MusicOn, ACOn) and executes them all at once.</li></ul>"
+    }
+  ]
+},
+
+  "State (DD)": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>\"Phone lock hai toh swipe karne par passcode mangega, unlock hai toh menu khulega. Action same (Swipe), par result state par depend karta hai!\"</b></p><p><b>1. Simple Explanation</b></p><ul><li><b>The Concept:</b> The State pattern allows an object to change its behavior when its internal state changes. It appears as if the object changed its class.</li><li><b>The Problem:</b> You have an object with many states (e.g., \"Draft\", \"Published\", \"Archived\"). Your code is full of <code>if (state == DRAFT) { ... } else if (state == PUBLISHED) { ... }</code>. This is hard to maintain.</li><li><b>The Solution:</b> You create a separate class for each state. The main object delegates the work to the \"Current State\" object. When the state changes, you just swap the object.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>2. Real-World Analogy: Vending Machine</b></p><ul><li><b>State 1: No Coin.</b> If you press \"Dispense\", it says: \"Insert money first!\"</li><li><b>State 2: Has Coin.</b> If you press \"Dispense\", it says: \"Here is your Soda.\"</li><li><b>State 3: Sold Out.</b> If you press \"Dispense\", it says: \"Sorry, out of stock.\"</li><li>The <b>\"Dispense Button\"</b> is the exact same hardware, but its logic flips completely based on the machine's current state.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>3. Technical Implementation</b></p>We implement the Vending Machine logic without a single <code>if-else</code> statement by delegating behavior to State classes."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// 1. The State Interface\ninterface State {\n    void insertCoin();\n    void pressButton();\n}\n\n// 2. Concrete States\nclass NoCoinState implements State {\n    VendingMachine machine;\n    public NoCoinState(VendingMachine m) { this.machine = m; }\n\n    public void insertCoin() {\n        System.out.println(\"Coin inserted.\");\n        machine.setState(machine.getHasCoinState()); // State Transition\n    }\n    public void pressButton() {\n        System.out.println(\"No coin. Can't dispense.\");\n    }\n}\n\nclass HasCoinState implements State {\n    VendingMachine machine;\n    public HasCoinState(VendingMachine m) { this.machine = m; }\n\n    public void insertCoin() {\n        System.out.println(\"Coin already inside.\");\n    }\n    public void pressButton() {\n        System.out.println(\"Dispensing Soda...\");\n        machine.setState(machine.getNoCoinState()); // Transition back\n    }\n}\n\n// 3. The Context (The Machine)\nclass VendingMachine {\n    private State noCoinState;\n    private State hasCoinState;\n    \n    private State currentState; // Holds the current \"Brain\"\n\n    public VendingMachine() {\n        noCoinState = new NoCoinState(this);\n        hasCoinState = new HasCoinState(this);\n        currentState = noCoinState; // Initial State\n    }\n\n    public void setState(State state) { this.currentState = state; }\n    public State getHasCoinState() { return hasCoinState; }\n    public State getNoCoinState() { return noCoinState; }\n\n    // Delegation: The Machine just asks the State to handle it\n    public void insertCoin() { currentState.insertCoin(); }\n    public void pressButton() { currentState.pressButton(); }\n}\n\n// Usage\nclass Client {\n    public static void main(String[] args) {\n        VendingMachine vm = new VendingMachine();\n        \n        vm.pressButton(); // Output: \"No coin. Can't dispense.\"\n        \n        vm.insertCoin();  // Output: \"Coin inserted.\" (State changes internally)\n        \n        vm.pressButton(); // Output: \"Dispensing Soda...\"\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>4. LLD Interview Key Takeaways</b></p><ul><li><b>Finite State Machine (FSM):</b> This is the magic word. If asked to design a Game Character (Idle $\\rightarrow$ Running) or an Order System (Placed $\\rightarrow$ Shipped), say: \"I will use the State Pattern to implement this Finite State Machine.\"</li><li><b>State vs. Strategy:</b> A common confusion.<ul><li><b>Strategy:</b> The <b>Client</b> chooses the strategy (e.g., \"Use Credit Card\").</li><li><b>State:</b> The <b>System</b> transitions itself (e.g., Machine goes from 'NoCoin' to 'HasCoin'). The client doesn't explicitly set the state.</li></ul></li><li><b>Removing Cyclomatic Complexity:</b> Highlight that you eliminated massive <code>switch-case</code> blocks. This makes the code <b>OCP (Open/Closed Principle)</b> compliant. Adding a \"WinnerState\" is easy: just add a class, don't touch the existing logic.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    }
+  ]
+},
+
+  "Template Method (FA)": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>\"Maggi banane ka process fixed hai: Pani ubaalo, noodles daalo. Lekin 'Extra Cheese' dalna hai ya 'Butter', ye tum decide karo. Steps wahi rahenge, bas flavor badlega!\"</b></p><p><b>1. Simple Explanation</b></p><ul><li><b>The Concept:</b> The Template Method pattern defines the <b>skeleton</b> of an algorithm in a base class but lets subclasses override specific steps without changing the algorithm's structure.</li><li><b>The Invariant:</b> Some steps are the same for everyone (implemented in Base).</li><li><b>The Variant:</b> Some steps are unique (abstract methods implemented by Child).</li><li><b>The Goal:</b> <b>Code Reuse.</b> You don't copy-paste the whole algorithm just to change one small step in the middle.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>2. Real-World Analogy: Building a House</b></p><ul><li>The architect gives a master plan (The Template):<ol><li><b>Build Foundation</b> (Fixed: Concrete for everyone).</li><li><b>Build Walls</b> (Fixed: Bricks).</li><li><b>Install Windows</b> (Variable: Sliding Glass or Wood?).</li><li><b>Paint House</b> (Variable: Blue or White?).</li></ol></li><li>The sequence (Foundation $\\rightarrow$ Walls $\\rightarrow$ Windows $\\rightarrow$ Paint) <b>never changes</b>. But the details of Windows and Paint are decided by the owner (Subclass).</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>3. Technical Implementation (OTP System)</b></p>Let's build an OTP System. Whether you send OTP via SMS or Email, the core logic (Generate $\\rightarrow$ Send $\\rightarrow$ Log) remains the same."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// 1. The Abstract Base Class\nabstract class OtpService {\n    \n    // This is the \"Template Method\".\n    // It is 'final' so subclasses CANNOT change the sequence.\n    public final void processOtp(String message) {\n        String otp = generateOtp(); // Common Step\n        sendNotification(message, otp); // Variable Step (Abstract)\n        logSuccess(); // Common Step\n    }\n\n    // Common Step: Same for SMS and Email\n    private String generateOtp() {\n        return \"123456\"; // Dummy logic\n    }\n\n    // Variable Step: Subclasses MUST implement this\n    abstract void sendNotification(String message, String otp);\n\n    // Common Step\n    private void logSuccess() {\n        System.out.println(\"OTP processed successfully.\");\n    }\n}\n\n// 2. Concrete Implementation for SMS\nclass SmsOtp extends OtpService {\n    @Override\n    void sendNotification(String message, String otp) {\n        System.out.println(\"Sending SMS to User: \" + message + \" Code: \" + otp);\n    }\n}\n\n// 3. Concrete Implementation for Email\nclass EmailOtp extends OtpService {\n    @Override\n    void sendNotification(String message, String otp) {\n        System.out.println(\"Sending Email to User: \" + message + \" Code: \" + otp);\n    }\n}\n\n// Usage\nclass Client {\n    public static void main(String[] args) {\n        OtpService smsService = new SmsOtp();\n        // The client just calls the Template Method\n        smsService.processOtp(\"Login Request\");\n        \n        System.out.println(\"---\");\n        \n        OtpService emailService = new EmailOtp();\n        emailService.processOtp(\"Password Reset\");\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>4. LLD Interview Key Takeaways</b></p><ul><li><b>The <code>final</code> Keyword:</b> In Java, this is critical. If you don't make the template method <code>final</code>, a subclass could override it and break the algorithm sequence (e.g., trying to send before generating). The interviewer looks for this keyword.</li><li><b>Hooks:</b> Sometimes you want a step to be optional. You define an empty method in the parent (<code>void addCondiments() {}</code>). The child can override it if they want, or ignore it. This is called a \"Hook\".</li><li><b>Hollywood Principle:</b> \"Don't call us, we'll call you.\" The Parent class (High Level) controls the flow and calls the Child class (Low Level) only when needed. The Child never controls the flow.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    }
+  ]
+},
+
+  "Chain of Responsibility (FA)": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>\"Agar Customer Care ka banda problem solve na kar paye, toh wo Manager ko transfer kar deta hai. Ticket ghumta rahega jab tak koi solve na kar de!\"</b></p><p><b>1. Simple Explanation</b></p><ul><li><b>The Concept:</b> The Chain of Responsibility pattern allows you to pass a request along a chain of handlers. Instead of the client specifying exactly who handles the request, the client sends it to the first object in the chain.</li><li><b>The Flow:</b> Handler 1 checks: \"Can I handle this?\"<ul><li><b>Yes:</b> It handles it (and optionally stops the chain).</li><li><b>No:</b> It passes the request to Handler 2.</li></ul></li><li><b>The Goal:</b> <b>Decoupling.</b> The sender doesn't know who will eventually process the request.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>2. Real-World Analogy: Tech Support Levels</b></p><ul><li><b>Level 1 Support:</b> Basic issues (Password reset). If they can't fix it $\\rightarrow$ Pass to L2.</li><li><b>Level 2 Support:</b> Server issues. If they can't fix it $\\rightarrow$ Pass to Engineering.</li><li><b>Engineering:</b> Code bugs. They fix it.</li><li>The user just sends an email to \"support@company.com\". They don't know (or care) if an L1 Intern or the CTO fixes it.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>3. Technical Implementation (Logger System)</b></p>We build a Logger System where messages cascade. An <code>ERROR</code> might need to be printed to the Console <b>AND</b> saved to a File."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// 1. Abstract Handler\nabstract class Logger {\n    public static int INFO = 1;\n    public static int ERROR = 2;\n\n    protected int level;\n    \n    // The \"Next\" link in the chain\n    protected Logger nextLogger;\n\n    public void setNextLogger(Logger nextLogger) {\n        this.nextLogger = nextLogger;\n    }\n\n    // The Logic: Handle or Pass\n    public void logMessage(int level, String message) {\n        if (this.level <= level) {\n            write(message); // I can handle this!\n        }\n        \n        // Pass it up the chain regardless (Logging usually bubbles up)\n        if (nextLogger != null) {\n            nextLogger.logMessage(level, message);\n        }\n    }\n\n    abstract protected void write(String message);\n}\n\n// 2. Concrete Handlers\nclass ConsoleLogger extends Logger {\n    public ConsoleLogger(int level) { this.level = level; }\n    \n    @Override\n    protected void write(String message) {\n        System.out.println(\"Standard Console::Logger: \" + message);\n    }\n}\n\nclass ErrorLogger extends Logger {\n    public ErrorLogger(int level) { this.level = level; }\n    \n    @Override\n    protected void write(String message) {\n        System.out.println(\"ERROR Console::Logger: \" + message);\n    }\n}\n\n// Usage\nclass Client {\n    public static void main(String[] args) {\n        Logger errorLogger = new ErrorLogger(Logger.ERROR);\n        Logger consoleLogger = new ConsoleLogger(Logger.INFO);\n\n        // Building the Chain: Console -> Error\n        consoleLogger.setNextLogger(errorLogger);\n\n        // Client just talks to the first link\n        System.out.println(\"--- Sending INFO ---\");\n        consoleLogger.logMessage(Logger.INFO, \"This is an information.\");\n\n        System.out.println(\"\\n--- Sending ERROR ---\");\n        consoleLogger.logMessage(Logger.ERROR, \"This is an error!\");\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>4. LLD Interview Key Takeaways</b></p><ul><li><b>Servlet Filters / Spring Security:</b> This is the ultimate \"real-world\" example. When a request hits a Java server, it goes through a chain of filters (AuthFilter $\\rightarrow$ LoggingFilter $\\rightarrow$ CompressionFilter) before reaching your Controller. This is Chain of Responsibility.</li><li><b>Dynamic Chains:</b> Mention that the chain structure is flexible. You can add a new \"SecurityCheckLogger\" in the middle of the chain at runtime without breaking the code.</li><li><b>No Guarantee:</b> Be careful. It's possible the request falls off the end of the chain without anyone handling it (if you don't have a catch-all handler at the end).</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    }
+  ]
+},
+
+  "Iterator (DD)": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>\"Playlist loop pe ho ya shuffle pe, tumhe bas 'Next Song' dabane se matlab hai. Backend mein list hai ya tree, usse tumhe kya?\"</b></p><p><b>1. Simple Explanation</b></p><ul><li><b>The Concept:</b> The Iterator pattern provides a way to access elements of a collection (like a List, Array, or Tree) sequentially without exposing the underlying structure.</li><li><b>The Problem:</b> Different collections store data differently (Arrays use indices <code>[0]</code>, Linked Lists use nodes <code>node.next</code>). If the client code has to learn how every collection works just to loop through it, the code becomes messy and coupled.</li><li><b>The Solution:</b> You create a standard interface called <code>Iterator</code> with methods like <code>hasNext()</code> and <code>next()</code>. The client just calls \"Next\", and the Iterator handles the complex traversal logic internally.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>2. Real-World Analogy: TV Remote Control</b></p><ul><li><b>Action:</b> You press the \"Channel Up\" button.</li><li><b>Result:</b> The TV moves to the next channel.</li><li><b>Abstraction:</b> You don't know (or care) if the TV stores channels as a simple list <code>[1, 2, 3]</code> or a complex satellite frequency map. The \"Channel Up\" button is your Iterator. It gives you the next item regardless of how the system works inside.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>3. Technical Implementation</b></p>We will create a custom collection of names and iterate over it without using a standard for-loop index."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// 1. The Iterator Interface\ninterface Iterator {\n    boolean hasNext();\n    Object next();\n}\n\n// 2. The Container Interface\ninterface Container {\n    Iterator getIterator();\n}\n\n// 3. Concrete Collection\nclass NameRepository implements Container {\n    public String names[] = {\"Robert\", \"John\", \"Julie\", \"Lora\"};\n\n    @Override\n    public Iterator getIterator() {\n        return new NameIterator();\n    }\n\n    // 4. The Inner Class Iterator (Knows the secrets of Repository)\n    // Defined INSIDE the collection so it can access private arrays/lists\n    private class NameIterator implements Iterator {\n        int index;\n\n        @Override\n        public boolean hasNext() {\n            if (index < names.length) {\n                return true;\n            }\n            return false;\n        }\n\n        @Override\n        public Object next() {\n            if (this.hasNext()) {\n                return names[index++];\n            }\n            return null;\n        }\n    }\n}\n\n// Usage\nclass Client {\n    public static void main(String[] args) {\n        NameRepository namesRepository = new NameRepository();\n        \n        // Client doesn't touch the array directly. \n        // It asks for an Iterator.\n        for (Iterator iter = namesRepository.getIterator(); iter.hasNext(); ) {\n            String name = (String) iter.next();\n            System.out.println(\"Name: \" + name);\n        }\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>4. LLD Interview Key Takeaways</b></p><ul><li><b>Java's For-Each Loop:</b> The magic behind <code>for (String s : list)</code> is the Iterator pattern. Java compiles this down to <code>while(iter.hasNext())</code>. If your custom class implements <code>Iterable</code>, you can use it in a for-each loop too.</li><li><b>Fail-Fast vs. Fail-Safe:</b> This is a huge interview topic. \"What happens if I delete an item from the list while iterating over it?\"<ul><li><b>Fail-Fast:</b> Standard Iterators (ArrayList) throw <code>ConcurrentModificationException</code> immediately to prevent bugs.</li><li><b>Fail-Safe:</b> Concurrent collections (ConcurrentHashMap) work on a clone or are weakly consistent, so they don't crash.</li></ul></li><li><b>Uniform Interface:</b> The biggest benefit is that you can write a single function <code>printAll(Iterator i)</code> that works for an ArrayList, a LinkedList, a HashSet, and a Tree. You've decoupled the algorithm from the data structure.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    }
+  ]
 }
 
   
@@ -1751,6 +2265,7 @@
 
   
 }
+
 
 
 
