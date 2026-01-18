@@ -264,11 +264,18 @@
         }
 
         .topic-card {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: 12px; padding: 1rem; cursor: pointer;
-            transition: all 0.2s ease; display: flex; align-items: center;
-            justify-content: space-between; /* Space between content and buttons */
-            gap: 8px; position: relative; overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            gap: 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            
+            /* CHANGED: Changed from hidden to visible so the star can pop out */
+            overflow: visible; 
         }
 
         .topic-card:hover { transform: translateY(-2px); border-color: var(--accent); box-shadow: var(--shadow); }
@@ -537,17 +544,22 @@
         
         /* --- THE STARS (Tilted Top Right) --- */
         .star-badge {
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            padding: 4px 8px;
-            transform: rotate(15deg); /* The Tilt */
-            font-size: 0.85rem;
-            pointer-events: none; /* Let clicks pass through */
-            z-index: 2;
-            background: var(--bg-card); /* Mask the border behind it */
-            border-bottom-left-radius: 8px;
-        }
+                position: absolute;
+                /* CHANGED: More negative values to move it up and out */
+                top: -10px;    
+                right: -8px;   
+                padding: 4px 8px;
+                transform: rotate(15deg);
+                font-size: 0.85rem;
+                pointer-events: none; 
+                z-index: 2;
+                background: var(--bg-card);
+                border-bottom-left-radius: 8px;
+                /* OPTIONAL: Add a tiny border to separate it from background if needed */
+                border: 1px solid var(--border); 
+                border-top: none;
+                border-right: none;
+            }
         
         /* 2 Stars (High - Gold) */
         .star-badge.high {
@@ -1386,6 +1398,7 @@ function copyToClipboard(elementId) {
 </script>
 </body>
 </html>
+
 
 
 
