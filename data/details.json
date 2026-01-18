@@ -1740,7 +1740,7 @@
   ]
 },
 
-  "Singleton (DD)": {
+  "Singleton": {
   "blocks": [
     {
       "type": "text",
@@ -1774,7 +1774,7 @@
   ]
 },
 
-  "Factory Method (DD)": {
+  "Factory Method": {
   "blocks": [
     {
       "type": "text",
@@ -1804,7 +1804,7 @@
   ]
 },
 
-  "Builder (DD)": {
+  "Builder": {
   "blocks": [
     {
       "type": "text",
@@ -1838,7 +1838,7 @@
   ]
 },
 
- "Adapter (DD)": {
+ "Adapter": {
   "blocks": [
     {
       "type": "text",
@@ -1868,7 +1868,7 @@
   ]
 },
 
-  "Facade (DD)": {
+  "Facade": {
   "blocks": [
     {
       "type": "text",
@@ -1902,7 +1902,7 @@
   ]
 },
 
-  "Decorator (DD)": {
+  "Decorator": {
   "blocks": [
     {
       "type": "text",
@@ -1940,7 +1940,7 @@
   ]
 },
 
-  "Composite (DD)": {
+  "Composite": {
   "blocks": [
     {
       "type": "text",
@@ -1974,7 +1974,7 @@
   ]
 },
 
-  "Proxy (DD)": {
+  "Proxy": {
   "blocks": [
     {
       "type": "text",
@@ -2008,7 +2008,7 @@
   ]
 },
 
-  "Strategy (DD)": {
+  "Strategy": {
   "blocks": [
     {
       "type": "text",
@@ -2042,7 +2042,7 @@
   ]
 },
 
-  "Observer (DD)": {
+  "Observer": {
   "blocks": [
     {
       "type": "text",
@@ -2076,7 +2076,7 @@
   ]
 },
 
-  "Command (DD)": {
+  "Command": {
   "blocks": [
     {
       "type": "text",
@@ -2110,7 +2110,7 @@
   ]
 },
 
-  "State (DD)": {
+  "State": {
   "blocks": [
     {
       "type": "text",
@@ -2148,7 +2148,7 @@
   ]
 },
 
-  "Template Method (FA)": {
+  "Template Method": {
   "blocks": [
     {
       "type": "text",
@@ -2182,7 +2182,7 @@
   ]
 },
 
-  "Chain of Responsibility (FA)": {
+  "Chain of Responsibility": {
   "blocks": [
     {
       "type": "text",
@@ -2220,7 +2220,7 @@
   ]
 },
 
-  "Iterator (DD)": {
+  "Iterator": {
   "blocks": [
     {
       "type": "text",
@@ -2265,6 +2265,7 @@
 
   
 }
+
 
 
 
