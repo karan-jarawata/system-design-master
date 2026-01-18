@@ -2851,6 +2851,126 @@
       "content": "<p><b>4. Interview Key Takeaways</b></p><ul><li><b>Premature Optimization:</b> Always cite Donald Knuth: \"Premature optimization is the root of all evil.\" Don't make code ugly to save a millisecond that the user won't even notice.</li><li><b>Profiling First:</b> If asked to optimize, your first step is: <i>\"I would use a profiler (like JProfiler or VisualVM) to find the bottleneck.\"</i> Never optimize based on a guess.</li><li><b>Readability is for Maintenance:</b> Code is read 10x more than it is written. \"Clever\" code is a liability because it's harder for a team to fix or update.</li><li><b>Big O vs. Micro-optimizations:</b> In LLD, focus on <b>Algorithmic Efficiency</b> (e.g., changing $O(n^2)$ to $O(n \\log n)$). This gives huge gains without sacrificing readability. Micro-optimizations (like bit-shifting) are rarely worth it.</li></ul>"
     }
   ]
+},
+
+  "The Anatomy of a Line": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Friendly Explanation</b></p><ul><li><b>The Analogy:</b> Imagine you’re a builder (the <b>Thread</b>). You have a personal notebook in your pocket (<b>Stack</b>) and access to a massive shared warehouse (<b>Heap</b>). When you read a line like <code>User u = new User();</code>, you don't just \"make a variable.\"</li><li><b>The Process:</b> First, you scribble a label \"u\" in your notebook and leave a blank space for an address. Then, you walk into the warehouse, build the actual <b>User furniture</b>, and get its location (e.g., Aisle 5, Shelf 10). Finally, you go back to your notebook and write \"Aisle 5, Shelf 10\" next to \"u\". Now, whenever you need to talk to that user, you check your notebook to see where they are in the warehouse.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Actual Explanation & Details</b></p>When a thread executes a line of object assignment, it involves four distinct physical operations across the JVM/Runtime memory:<ul><li><b>Instruction Fetch (Program Counter):</b> Every thread has a private <b>Program Counter (PC)</b>. It acts as a pointer to the memory address of the current instruction. As the thread reads the line, the PC \"ticks\" to ensure the CPU knows exactly where we are in the logic.</li><li><b>The \"Left\" Side (Stack Allocation):</b> The thread creates a <b>Stack Frame</b> for the current method. On the left of the equals sign, it carves out a small, private slot for the reference variable <code>u</code>. This slot is strictly for holding a 64-bit memory address, not the object itself.</li><li><b>The \"Right\" Side (Heap Allocation):</b> The <code>new</code> keyword triggers the <b>Heap</b> to find a contiguous block of memory. The system writes the actual object data (its fields and methods) into this shared communal space.</li><li><b>The Assignment (The Connection):</b> The address of that specific Heap block is returned to the thread, which writes it into the variable slot on its Stack.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Important LLD Takeaway</b></p><ul><li><b>The Thread Boundary:</b> The Stack is private (safe), but the Heap is shared (dangerous). In LLD, bugs usually happen because multiple threads have different Stack references pointing to the <b>same Heap address</b>.</li><li><b>The Critical Question:</b> Whenever you design a class, ask yourself: <i>\"If two threads walk into the warehouse to change this object at the same time, will the furniture break?\"</i> This is the core foundation of <b>Thread-Safety</b> and <b>Immutability</b>.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    }
+  ]
+},
+
+  "Identity vs Equality": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Friendly Explanation</b></p><ul><li><b>The Analogy:</b> Imagine you have two identical-looking smartphones—same model, same color, same specs.</li><li><b>Identity (<code>==</code>):</b> This is like asking, \"Are these the <b>exact same physical device</b>?\" (Do they have the same serial number?). Even if they look identical, if they are two separate pieces of hardware, the answer is <b>False</b>.</li><li><b>Equality (<code>.equals()</code>):</b> This is like asking, \"Do these two phones have the <b>same data</b> inside?\" If both have the exact same apps, photos, and settings, the answer is <b>True</b>, even if they are physically two different devices.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Actual Explanation & Details</b></p>In the world of memory, this is a distinction between checking the <b>Stack</b> vs. checking the <b>Heap</b>.<ul><li><b>Identity (<code>==</code>):</b><ul><li><b>The Physics:</b> This operator compares the bit patterns stored on the <b>Stack</b>. Since object variables store memory addresses, <code>==</code> checks if two variables hold the exact same \"GPS coordinate.\"</li><li><b>Target:</b> The Memory Address.</li><li><b>Result:</b> True only if both references point to the same physical memory block in the Heap.</li></ul></li><li><b>Equality (<code>.equals()</code>):</b><ul><li><b>The Physics:</b> This is a method call that instructs the Thread to \"walk\" from the Stack into the <b>Heap</b>. Once there, it executes logic to compare the internal state (data fields).</li><li><b>Target:</b> The Object State (Data).</li><li><b>The Contract:</b> In LLD, you must <b>override</b> this. By default, <code>Object.equals()</code> simply uses <code>==</code>. You must write logic like: \"Equal if <code>this.id == other.id</code>.\"</li></ul></li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Important Things to Remember for LLD</b></p><ul><li><b>The HashCode Rule:</b> If you override <code>.equals()</code>, you <b>must</b> override <code>hashCode()</code>. If you don't, your objects will \"disappear\" or be duplicated in collections like <code>HashMap</code> or <code>HashSet</code>. The collection uses the hash to find a \"bucket\" and <code>.equals()</code> to find the specific item.</li><li><b>Consistency:</b> Identity is immutable (the address doesn't change), but Equality can change if the object is <b>mutable</b>.</li><li><b>Safety Tip (Machine Coding):</b> Always use <code>.equals()</code> for business logic (comparing <code>User</code> objects by <code>userId</code>). Use <code>==</code> only for <b>null checks</b> or comparing <b>primitives</b> (like <code>int</code>, <code>boolean</code>).</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    }
+  ]
+},
+
+  "Object Duplication": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Friendly Explanation</b></p><ul><li><b>The Analogy:</b> Think of a <b>Shallow Copy</b> like sharing a link to a Google Doc. You have a new bookmark (Reference), but if your friend deletes a paragraph, you see that change too because you are both looking at the same file in the cloud (Heap).</li><li><b>Deep Copy:</b> This is like downloading that Google Doc and saving it as a new file on your hard drive. Your friend can delete whatever they want in their copy, but your file stays exactly as it was. You are now <b>physically independent</b>.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Actual Explanation & Details</b></p>In LLD, \"Cloning\" is the process of creating a new object with the same state. The \"Physics\" of the memory determine if they are isolated or linked.<ul><li><b>Shallow Copy:</b><ul><li><b>The Physics:</b> The thread creates a new Stack slot and copies the address. In the Heap, a new object is made, but it only copies primitives (numbers/booleans). For <b>reference types</b> (like a List or Profile), it just copies the address of the <i>existing</i> child.</li><li><b>The Result:</b> The Parents are different, but they share the same Children in memory.</li></ul></li><li><b>Deep Copy:</b><ul><li><b>The Physics:</b> The thread is instructed to build a brand-new object in the Heap AND recursively build new versions of every child object it references.</li><li><b>The Result:</b> A completely new tree of objects. The two Stack variables point to two entirely separate \"universes\" in the warehouse.</li></ul></li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Important Things to Remember for LLD</b></p><ul><li><b>The Prototype Pattern:</b> When creating a new object from a \"template\" (like a Game Level or User Profile), you must decide if a Shallow Copy is enough or if you need the safety of a Deep Copy.</li><li><b>Defensive Copying:</b> A top-tier LLD practice. If your class has a private <code>List</code>, never return the actual list in a getter. Return a <b>Deep Copy</b>. This prevents external code from modifying your private state without permission.</li><li><b>Performance vs. Safety:</b><ul><li><b>Shallow Copy:</b> Extremely fast/memory-efficient but causes \"Side-Effect\" bugs.</li><li><b>Deep Copy:</b> Slower and higher memory usage (OOM risk) but provides total <b>Thread-Safety</b> and isolation.</li></ul></li><li><b>Machine Coding Tip:</b> In projects like Splitwise, if generating a \"Monthly Report\" from transactions, use a Deep Copy. If the user adds a new expense while the report is being generated, your report won't get corrupted.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    }
+  ]
+},
+
+  "The HashCode Contract": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Friendly Explanation</b></p><ul><li><b>The Analogy:</b> Imagine a library where books are stored in color-coded bins. The <b>HashCode</b> is the \"Bin Color\" and <b>Equals</b> is the \"Book Title.\"</li><li><b>The Rules:</b> The contract says: If two books are identical, they <b>MUST</b> be put in the same color bin.</li><li><b>The Risk:</b> If you have two identical books but give them different \"bin colors,\" the librarian will look in the \"Red Bin\" for the book, but because you assigned a \"Blue\" hash to the duplicate, the librarian will never find it. The book is effectively lost in the library.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Actual Explanation & Details</b></p>The HashCode contract is a logical agreement between <code>.equals()</code> and <code>hashCode()</code>. It ensures objects behave predictably in hash-based collections.<ul><li><b>The Physics of the Hash:</b> When you put an object in a <code>HashMap</code>, the thread calculates <code>hashCode()</code> to determine a <b>\"bucket\" index</b> (a physical memory location).</li><li><b>The Physics of the Search:</b> When you retrieve it, the thread calculates the hash again to go to the same bucket. Once inside, it uses <code>.equals()</code> to find the exact match among objects in that bucket.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<b>The Three Rules of the Contract:</b><ol><li><b>Consistency:</b> If the object state hasn't changed, <code>hashCode()</code> must return the same value every time.</li><li><b>Equality implies Hashing:</b> If <code>a.equals(b)</code> is true, then <code>a.hashCode() == b.hashCode()</code> <b>must</b> be true.</li><li><b>Inequality != Unique Hash:</b> If <code>a.equals(b)</code> is false, their hashes <i>could</i> still be the same (this is a <b>Hash Collision</b>). However, unique hashes improve performance.</li></ol>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Important Things to Remember for LLD</b></p><ul><li><b>The Golden Rule:</b> Never override <code>.equals()</code> without <code>hashCode()</code>. Failure to do this is a critical mistake that leads to \"disappearing\" objects in production.</li><li><b>Immutability:</b> Use <code>final</code> fields (like <code>userId</code>) for hash calculation. If an object's state changes after being put in a Map and the hash changes, it becomes \"lost\" in the wrong bucket.</li><li><b>Performance:</b> A poor hash function that returns a constant (e.g., <code>return 1;</code>) causes all objects to land in one bucket. This turns your $O(1)$ HashMap into an $O(n)$ LinkedList.</li><li><b>Machine Coding Tip:</b> In projects like Spotify or CricInfo, always base your HashCode on a unique <b>Primary Key</b> (like <code>songId</code> or <code>playerId</code>) to ensure stability.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    }
+  ]
 }
   
   
@@ -2863,6 +2983,7 @@
 
   
 }
+
 
 
 
