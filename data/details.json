@@ -1520,9 +1520,228 @@
       "content": ""
     }
   ]
+},
+
+  "DRY": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Definition: DRY (Don't Repeat Yourself)</b></p><ul><li><b>The Principle:</b> \"Every piece of knowledge must have a <b>single, unambiguous, authoritative representation</b> within a system.\"</li><li><b>The Core Idea:</b> Logic duplication is the enemy of maintainability. If a business rule exists in two places and changes, you might forget to update one, causing bugs.</li><li><b>The Antonym:</b> <b>WET</b> (Write Everything Twice / We Enjoy Typing).</li></ul><br><p><b>The Analogy: \"The Restaurant Menu\"</b></p><ul><li><b>WET (Bad):</b> You write the price of the \"Cheeseburger\" on 50 different paper menus by hand. If the price changes, you have to find and erase 50 prices. You will likely miss one.</li><li><b>DRY (Good):</b> You have a central digital board. The menus just say \"See Board for Prices.\" You update the board once, and it reflects everywhere.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Violation (Copy-Paste Programming):</b></p>Here, the email validation logic is duplicated. If the business decides to ban specific domains, you have to find and fix every instance."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// Bad Code: Duplicated Logic\npublic class RegistrationService {\n    public void register(String email) {\n        // Validation Logic Copy 1\n        if (!email.contains(\"@\") || email.length() < 5) {\n            throw new Error(\"Invalid\");\n        }\n        saveUser(email);\n    }\n}\n\npublic class UpdateProfileService {\n    public void updateEmail(String email) {\n        // Validation Logic Copy 2 (The duplication)\n        if (!email.contains(\"@\") || email.length() < 5) {\n            throw new Error(\"Invalid\");\n        }\n        updateUser(email);\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Solution (Abstraction):</b></p>Centralize the logic. Now, if the validation rule changes, you update it in <b>one place</b>, and the whole system is updated."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// Good Code: Single Source of Truth\npublic class Validator {\n    public static void validateEmail(String email) {\n        if (!email.contains(\"@\") || email.length() < 5) {\n            throw new Error(\"Invalid\");\n        }\n    }\n}\n\n// Usage\nValidator.validateEmail(userEmail); "
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>Logic vs. Code Duplication (The Trap):</b> Be careful. Not all code that looks the same is duplication.<ul><li><b>True Duplication:</b> Two classes calculating \"Sales Tax\" the same way. Refactor this.</li><li><b>Incidental Duplication:</b> <code>ProductDTO</code> has <code>id, name</code> and <code>UserDTO</code> has <code>id, name</code>. They look similar, but represent different concepts. Do not merge them into a generic <code>BaseDTO</code>, or you will violate SRP later.</li></ul></li><li><b>The Rule of Three:</b> Don't abstract too early.<ul><li>1st time: Write it.</li><li>2nd time: Copy it (it's okay).</li><li>3rd time: <b>Refactor</b> it into a shared function.</li><li><i>Reason:</i> Premature abstraction creates complex, generic code that is hard to read.</li></ul></li><li><b>Database Normalization:</b> DRY applies to Databases too. Storing <code>CustomerName</code> in the <code>Orders</code> table is a data violation of DRY (Redundancy).</li></ul>"
+    }
+  ]
+},
+
+  "KISS": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Definition: KISS (Keep It Simple, Stupid)</b></p><ul><li><b>The Principle:</b> Most systems work best if they are kept simple rather than made complex.</li><li><b>The Philosophy:</b> Complexity is a cost. Every extra class, layer of abstraction, or \"clever\" algorithm adds maintenance overhead and potential bugs.</li><li><b>The Goal:</b> Write code that a junior developer can understand in 5 minutes without asking you questions.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Violation (Over-Engineering / \"Clever\" Code):</b></p>Developers often try to show off by writing compact, \"clever\" one-liners or applying massive architecture to small problems.<br><br><b>Bad Code (The \"Clever\" One-Liner):</b><br>Hard to read, impossible to debug."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// What does this do? Only God and the author know.\nreturn list.stream().filter(x -> x > 5).map(x -> x * 2).reduce(0, (a, b) -> a + b) > 100 ? \"High\" : \"Low\";"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Solution (Explicit & Readable):</b></p>Break it down. <b>Clarity beats brevity.</b> Compilers optimize verbose code just fine; humans cannot optimize confused brains."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "int sum = 0;\nfor (int num : list) {\n    if (num > 5) {\n        sum += num * 2;\n    }\n}\n\nif (sum > 100) {\n    return \"High\";\n} else {\n    return \"Low\";\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>Complexity vs. Necessity:</b> In an interview, if you use a complex Design Pattern (like Visitor or Interpreter), justify it. If a simple <code>if-else</code> works and is readable, use it. Applying patterns where they aren't needed is a <b>\"Resume Driven Development\"</b> red flag.</li><li><b>Debugging:</b> Simple code is easy to debug. \"Clever\" code hides bugs.</li><li><b>YAGNI Connection:</b> KISS often goes hand-in-hand with <b>YAGNI</b> (You Aren't Gonna Need It). Don't build a generic \"Rule Engine\" today if you only have one simple rule. Just write the <code>if</code> statement.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    }
+  ]
+},
+
+  
+"YAGNI": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Definition: YAGNI (You Aren't Gonna Need It)</b></p><ul><li><b>The Principle:</b> \"Always implement things when you <b>actually need them</b>, never when you just foresee that you need them.\"</li><li><b>The Origin:</b> A core practice of Extreme Programming (XP).</li><li><b>The Logic:</b> Predicting the future is hard. If you build a feature for a \"future use case,\" you are likely wrong about how it should work. You waste time building, testing, and maintaining it, only to rewrite it when the real requirement arrives.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Violation (Speculative Generality):</b></p>This happens when developers try to be \"future-proof\" by creating generic solutions for specific problems.<br><br><b>Scenario:</b> We need to save a User to a SQL Database. <br><b>Dev's Thought:</b> \"What if we switch to XML or Cloud later? I'll build a generic adapter system now.\""
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// Over-engineered Interface for a future that hasn't happened\ninterface DataStore {\n    void saveSQL();\n    void saveXML(); // Not needed yet\n    void saveCloud(); // Not needed yet\n}\n\n// We implement empty methods just to satisfy the interface\nclass UserRepository implements DataStore {\n    public void saveSQL() { ... }\n    public void saveXML() { /* Empty */ } \n    public void saveCloud() { /* Empty */ }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Solution (Iterative Design):</b></p>Build exactly what is asked for today. If the requirement changes next month, refactor then."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// Simple. Fits the current requirement perfectly.\nclass UserRepository {\n    public void save(User user) {\n        // SQL logic\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>Cost of Carry:</b> Unused code is not free. It is <b>Technical Debt</b>. You have to read it, compile it, and test around it. If it has a bug, it breaks your build even though nobody uses it.</li><li><b>YAGNI vs. Scalability:</b> Do not confuse YAGNI with bad planning.<ul><li><b>Good Architecture:</b> Designing a system that <i>can</i> be easily extended (e.g., using Interfaces).</li><li><b>YAGNI Violation:</b> Actually <i>writing</i> the extension code before it's requested.</li></ul></li><li><b>TDD Connection:</b> Test-Driven Development (TDD) enforces YAGNI naturally. You only write code to pass the current failing test. You never write code for a test that doesn't exist yet.</li></ul>"
+    }
+  ]
+},
+
+  "Law of Demeter": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Definition: Law of Demeter (LoD)</b></p><ul><li><b>The Principle:</b> \"Talk only to your immediate friends.\" (Also known as the Principle of Least Knowledge).</li><li><b>The Rule:</b> A method <i>M</i> of an object <i>O</i> should only invoke methods of:<ul><li>The object <i>O</i> itself.</li><li>Objects passed as arguments to <i>M</i>.</li><li>Objects created within <i>M</i>.</li><li>Direct component objects (fields) of <i>O</i>.</li></ul></li><li><b>The Goal:</b> <b>Reduce coupling</b>. If Object A knows about Object C through Object B, then changing C breaks A. We want to avoid that.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Violation (The \"Train Wreck\"):</b></p>When you see multiple dots in a single line (<code>a.getB().getC().doSomething()</code>), it's often a violation. You are reaching deep into the internal structure of another object.<br><br><b>Bad Code:</b><br>Scenario: A Paperboy wants payment. He reaches directly into the customer's wallet to take cash."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "public class Paperboy {\n    public void collectMoney(Customer customer) {\n        // VIOLATION: Paperboy knows Customer has a Wallet, \n        // AND knows Wallet has Cash.\n        double payment = customer.getWallet().getCash(); \n        \n        if (payment > 2.00) {\n            customer.getWallet().subtract(2.00);\n        }\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Solution (Delegation):</b></p>Ask the intermediate object to do the work for you. \"Hey Customer, pay me.\" You don't care <i>how</i> they pay (Wallet, Pocket, Credit Card)."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "public class Customer {\n    private Wallet wallet;\n\n    public void pay(double amount) {\n        // Customer manages their own internals (Encapsulation)\n        wallet.subtract(amount);\n    }\n}\n\npublic class Paperboy {\n    public void collectMoney(Customer customer) {\n        // Clean. Only talking to the immediate friend (Customer).\n        customer.pay(2.00);\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Exceptions:</b></p><ul><li><b>Data Structures / DTOs:</b> If an object is just a data holder with no behavior, chaining <code>config.getDatabase().getUrl()</code> is usually acceptable because the structure <i>is</i> the contract.</li><li><b>Fluent Interfaces / Builders:</b> <code>Stream.of().filter().map()</code> is not a violation because every method returns the same type of object or a fresh object designed for chaining.</li></ul><br><p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>\"Tell, Don't Ask\":</b> LoD is closely related to this principle. Instead of asking an object for data to process it, tell the object to do the processing itself.</li><li><b>Refactoring Consequence:</b> Strictly following LoD can lead to \"Wrapper Methods\" in the middle class. Use judgment; if you write 50 wrappers just to expose internals, you might have a cohesion problem.</li><li><b>Testing Benefit:</b> It simplifies Unit Testing. In the \"Bad Code,\" to test Paperboy, you have to mock Customer <b>AND</b> Wallet. In the \"Good Code,\" you only mock Customer.</li></ul>"
+    }
+  ]
+},
+
+  "Fail-Fast": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Definition:</b></p><ul><li><b>The Principle:</b> A system should stop normal operation <b>immediately</b> when it encounters an unexpected error or invalid state.</li><li><b>The Philosophy:</b> \"It is better to crash now and be noticed than to continue running with corrupted data.\"</li><li><b>The Goal:</b> Make bugs visible instantly. If you hide an error, it propagates deeper into the system, causing strange behavior that is nearly impossible to debug later.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Violation (Hiding the Bug):</b></p>This is often mistaken for \"Defensive Programming.\" The code tries to be \"nice\" by handling null silently, leading to silent failures.<br><br><b>Bad Code:</b><br>Scenario: A calculator that hides errors."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "public int divide(Integer a, Integer b) {\n    if (b == null || b == 0) {\n        // VIOLATION: Failing silently. \n        // The caller thinks the result is 0, but it was actually an error.\n        System.out.println(\"Error occurred\");\n        return 0; \n    }\n    return a / b;\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Solution (Guard Clauses):</b></p>Validate state at the boundary. If the input is bad, explode immediately."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "public int divide(Integer a, Integer b) {\n    // Fail Fast: Validation is the very first step.\n    if (b == null) throw new IllegalArgumentException(\"B cannot be null\");\n    if (b == 0) throw new ArithmeticException(\"Cannot divide by zero\");\n\n    // If we reach here, we are 100% sure data is valid.\n    return a / b;\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Real-World Example: Java Iterators</b></p>In Java, <code>ArrayList</code> iterators are Fail-Fast. If one thread is reading a list and another thread adds an item to it, the iterator throws <code>ConcurrentModificationException</code> instantly. It does not try to guess; it crashes to prevent unpredictable behavior."
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>Debugging Speed:</b> Emphasize that Fail-Fast reduces debugging time. The stack trace points exactly to where the null entered, not 10 layers deeper.</li><li><b>Data Integrity:</b> In systems handling money or records (Database), Fail-Fast is critical. You never want to save a \"partially correct\" user profile. If one field is invalid, reject the whole save.</li><li><b>Circuit Breaker Pattern:</b> In Microservices, Fail-Fast is applied via Circuit Breakers. If a service is failing, stop calling it immediately (Open Circuit) rather than waiting for timeouts on every request.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    }
+  ]
+},
+
+  "Method Contracts": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Definition:</b></p><ul><li><b>The Principle:</b> Every method has a \"Contract\" that defines what it requires to work and what it guarantees in return.</li><li><b>The Metaphor:</b> It is a legal agreement between the <b>Caller (Client)</b> and the <b>Callee (Service)</b>.<ul><li><b>If</b> the Caller gives valid inputs (Preconditions).</li><li><b>Then</b> the Callee guarantees a valid result (Postconditions).</li></ul></li><li><b>Origin:</b> Bertrand Meyer's \"Design by Contract\" (DbC).</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Three Pillars:</b></p><table><thead><tr><th>Component</th><th>Definition</th><th>Responsibility</th><th>Example</th></tr></thead><tbody><tr><td><b>Preconditions</b></td><td>What must be true <i>before</i> the method runs.</td><td>The <b>Caller</b></td><td>\"Input price > 0\", \"User logged in\".</td></tr><tr><td><b>Postconditions</b></td><td>What will be true <i>after</i> the method runs.</td><td>The <b>Callee</b></td><td>\"Return value is not null\", \"DB updated\".</td></tr><tr><td><b>Invariants</b></td><td>Conditions that remain true for the object's <i>entire lifecycle</i>.</td><td><b>Both</b></td><td>\"Balance $\\ge$ 0\".</td></tr></tbody></table>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// Bad Code (Undefined Contract)\n// Caller doesn't know if negative money is allowed.\npublic void withdraw(double amount) {\n    this.balance -= amount;\n}\n\n// Good Code (Explicit Contract)\n/**\n * Withdraws money.\n * @pre amount > 0 AND amount <= balance\n * @post balance == old_balance - amount\n */\npublic void withdraw(double amount) {\n    // Enforcing Preconditions (Fail-Fast)\n    if (amount <= 0) throw new IllegalArgumentException(\"Amount must be positive\");\n    if (amount > balance) throw new IllegalStateException(\"Insufficient funds\");\n\n    this.balance -= amount;\n    \n    // Invariant check (Internal consistency)\n    assert this.balance >= 0; \n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>LSP Connection:</b> Method contracts are the strict rule behind Liskov Substitution.<ul><li>A Subclass <b>cannot</b> require more (Stronger Preconditions). \"I used to accept any number, now I only accept even numbers.\" $\\rightarrow$ Breaks Client.</li><li>A Subclass <b>cannot</b> promise less (Weaker Postconditions). \"I used to save to DB, now I might just ignore it.\" $\\rightarrow$ Breaks Client.</li></ul></li><li><b>Validation Layer:</b> Explicit contracts explain where validation logic sits. Use annotations like <code>@NonNull</code> or <code>@Nullable</code> to make contracts visible in code.</li><li><b>Exception Documentation:</b> Your contract must include \"Side Effects\" (Exceptions). If your method throws <code>IOException</code>, that is part of the contract.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    }
+  ]
 }
 
   
+  
 
   
 
@@ -1532,6 +1751,7 @@
 
   
 }
+
 
 
 
