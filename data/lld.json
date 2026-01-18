@@ -7,7 +7,7 @@
       {
         "name": "Runtime Anatomy",
         "topics": [
-          {"title": "The Anatomy of a Line", "priority": "high", "note": "The 'Left-Right' rule. Left = Stack (Reference); Right = Heap (Object Payload)." },
+          {"title": "The Anatomy of a Line", "priority": "high", "note": "Complete execution flow: Program Counter ticks -> Stack Frame carves 'Left' -> Heap allocates 'Right' -> Reference connects them." },
           {"title": "Identity vs Equality", "priority": "high", "note": "== vs .equals(). Comparing memory addresses vs. comparing actual data state." },
           {"title": "Object Duplication", "priority": "high", "note": "Shallow vs Deep Copy. Understanding pointer replication vs recursive memory allocation." },
           {"title": "The HashCode Contract", "priority": "medium", "note": "Why equality logic must match bucket logic for collections." }
@@ -318,6 +318,7 @@
     ]
   }
 ]
+
 
 
 
