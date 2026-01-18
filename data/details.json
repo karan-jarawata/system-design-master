@@ -1014,12 +1014,341 @@
       "content": ""
     }
   ]
+},
+
+  "Class Diagram": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Purpose:</b></p><ul><li><b>Definition:</b> The blueprint of your system. It represents the <b>Static Structure</b>—classes, data types, and the relationships between them.</li><li><b>Usage:</b> It maps directly to code (OOP). If you can draw it, you can code it.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Anatomy of a Class Box:</b></p>A standard class is represented by a rectangle divided into three parts:<ol><li><b>Top:</b> Class Name.</li><li><b>Middle:</b> Attributes / Fields (<code>name: type</code>).</li><li><b>Bottom:</b> Methods / Functions (<code>methodName(param): returnType</code>).</li></ol>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Types of Classifiers:</b></p><ul><li><b>Concrete Class:</b> Standard rectangle. Objects you can instantiate (<code>new User()</code>).</li><li><b>Abstract Class:</b> Name in <i>Italics</i> OR labeled <code>&lt;&lt;abstract&gt;&gt;</code>. Cannot be instantiated.</li><li><b>Interface:</b> Labeled <code>&lt;&lt;interface&gt;&gt;</code>. A contract defining \"what\" behaviors are required.</li><li><b>Enum (Enumeration):</b> Labeled <code>&lt;&lt;enumeration&gt;&gt;</code>. Lists constant values (Status, Role).</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Member Notation (Visibility & Modifiers):</b></p><ul><li><b>Visibility:</b><ul><li><code>+</code> Public</li><li><code>-</code> Private</li><li><code>#</code> Protected</li><li><code>~</code> Package/Default</li></ul></li><li><b>Advanced Modifiers:</b><ul><li><b>Static Members:</b> <u>Underlined</u>. Shared by all instances.</li><li><b>Abstract Methods:</b> <i>Italicized</i>. Must be implemented by child.</li><li><b>Derived Attributes:</b> <code>/</code> prefix. Calculated on the fly (e.g., <code>/age</code> derived from <code>birthDate</code>).</li></ul></li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Relationships (The Core of LLD):</b></p><table><thead><tr><th>Relationship</th><th>Symbol</th><th>Meaning</th></tr></thead><tbody><tr><td><b>Inheritance</b></td><td>Solid line + Hollow Triangle</td><td>\"Is-A\". Parent-Child. (<code>extends</code>)</td></tr><tr><td><b>Realization</b></td><td>Dashed line + Hollow Triangle</td><td>\"Can-Do\". Implements Interface. (<code>implements</code>)</td></tr><tr><td><b>Association</b></td><td>Solid Line</td><td>\"Uses\". Basic connection.</td></tr><tr><td><b>Aggregation</b></td><td>Solid Line + <b>Empty</b> Diamond</td><td>\"Has-A\" (Weak). Child survives Parent's death. (Team-Players).</td></tr><tr><td><b>Composition</b></td><td>Solid Line + <b>Filled</b> Diamond</td><td>\"Part-Of\" (Strong). Child dies with Parent. (House-Room).</td></tr><tr><td><b>Dependency</b></td><td>Dashed Line + Open Arrow</td><td>\"Temporarily Uses\". Changes in target affect source.</td></tr></tbody></table>"
+    },
+    {
+        "type": "gallery",
+        "urls": [
+          "images/umlsign.png"
+        ],
+        "caption": ""
+      },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>Composition vs. Aggregation:</b> Ask \"If I delete the Parent, does the Child survive?\" <br>Yes $\\rightarrow$ Aggregation (Empty Diamond). <br>No $\\rightarrow$ Composition (Filled Diamond).</li><li><b>Enums as First-Class Citizens:</b> Always draw a specific <code>&lt;&lt;enumeration&gt;&gt;</code> box for statuses (e.g., <code>OrderStatus</code>) and link it, rather than just writing <code>status: String</code>. This shows Type Safety.</li><li><b>Interface Segregation:</b> Clearly distinguish between extends (solid) and implements (dashed).</li></ul>"
+    },
+    {
+        "type": "gallery",
+        "urls": [
+          "images/classdiagram.jpg"
+        ],
+        "caption": ""
+      }
+  ]
+},
+
+  "UML Modifiers": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>1. Visibility Modifiers (Access Control):</b></p>These symbols determine who can see and use the attribute or method. They map directly to OOP access keywords.<br><table><thead><tr><th>Symbol</th><th>Access Level</th><th>Java Equivalent</th><th>Meaning</th></tr></thead><tbody><tr><td><code>+</code></td><td><b>Public</b></td><td><code>public</code></td><td>Accessible by any other class.</td></tr><tr><td><code>-</code></td><td><b>Private</b></td><td><code>private</code></td><td>Accessible only inside the class itself.</td></tr><tr><td><code>#</code></td><td><b>Protected</b></td><td><code>protected</code></td><td>Accessible by the class and its children (subclasses).</td></tr><tr><td><code>~</code></td><td><b>Package</b></td><td>default</td><td>Accessible by classes in the same package.</td></tr></tbody></table>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>2. Scope & Inheritance Modifiers:</b></p>These define how the member behaves regarding instances and inheritance.<br><ul><li><b>Static (Class Level):</b><ul><li><b>Notation:</b> <u>Underlined Text</u></li><li><b>Meaning:</b> Belongs to the Class, not an instance. Shared by all.</li><li><i>Example:</i> <u><code>+ userCount: int</code></u></li></ul></li><li><b>Abstract (Must Implement):</b><ul><li><b>Notation:</b> <i>Italicized Text</i> (or <code>{abstract}</code> tag)</li><li><b>Meaning:</b> No body. Subclasses must provide implementation.</li><li><i>Example:</i> <i><code>+ calculateTax(): double</code></i></li></ul></li><li><b>Final (Leaf):</b><ul><li><b>Notation:</b> <code>{leaf}</code> or <code>{frozen}</code> tag</li><li><b>Meaning:</b> Cannot be overridden (method) or extended (class).</li></ul></li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>3. Attribute-Specific Modifiers:</b></p><ul><li><b>Derived (Calculated):</b><ul><li><b>Notation:</b> <code>/</code> prefix before the name.</li><li><b>Meaning:</b> Computed on the fly; not stored in memory.</li><li><i>Example:</i> <code>/age</code> (derived from birthDate).</li></ul></li><li><b>Read-Only (Constant):</b><ul><li><b>Notation:</b> <code>{readOnly}</code> tag after the type.</li><li><b>Meaning:</b> Set once (usually in constructor) and immutable.</li></ul></li><li><b>Multiplicity (Collections):</b><ul><li><b>Notation:</b> <code>[min..max]</code> after the name.</li><li><b>Meaning:</b> Defines list size limits.</li><li><i>Example:</i> <code>- emailAddresses: String [1..*]</code> (At least one email required).</li></ul></li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>Defaults Matter:</b> Explicitly writing <code>-</code> (private) demonstrates you understand <b>Encapsulation</b>. Leaving it blank implies lazy design.</li><li><b>Derived Attributes:</b> Use the <code>/</code> notation for business logic fields like \"Total Price\" to clarify they are not database columns.</li><li><b>Static vs. Instance:</b> Always <u>underline</u> Singleton instances or utility methods to distinguish stateful objects from stateless helpers.</li></ul>"
+    }
+  ]
+},
+
+  "Cardinality": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Definition:</b></p><ul><li><b>Concept:</b> Defines \"How many\" instances of one class are linked to instances of another class.</li><li><b>Synonym:</b> Often called \"Multiplicity\" in UML, while \"Cardinality\" is more common in Database Design.</li><li><b>Direction:</b> It is read from \"Source\" to \"Target.\"</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Notation Cheat Sheet:</b></p><table><thead><tr><th>Notation</th><th>Meaning</th><th>Description</th></tr></thead><tbody><tr><td><code>1</code></td><td><b>Exactly One</b></td><td>Mandatory. (e.g., An Order must have exactly 1 Customer).</td></tr><tr><td><code>0..1</code></td><td><b>Zero or One</b></td><td>Optional. (e.g., A User might have a Referral Code).</td></tr><tr><td><code>*</code> or <code>0..*</code></td><td><b>Zero to Many</b></td><td>Optional List. (e.g., A Library has many Books).</td></tr><tr><td><code>1..*</code></td><td><b>One to Many</b></td><td>Mandatory List. (e.g., An Order must have at least 1 Item).</td></tr><tr><td><code>m..n</code></td><td><b>Range</b></td><td>Bounded. (e.g., A Car has 2..4 Doors).</td></tr></tbody></table>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// Mapping to Code (Java)\n// Cardinality dictates whether you use a single Object or a Collection.\n\nclass Department {\n    // 1..* (One to Many)\n    // \"Many\" implies a Collection\n    private List<Employee> employees; \n}\n\nclass Employee {\n    // 1 (Many to One)\n    // \"One\" implies a direct Object reference\n    private Department department;\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Relationship Types (Symmetry):</b></p><ul><li><b>One-to-One (1:1):</b> User ──── Profile. Usually merged into one table unless lazy loading is needed.</li><li><b>One-to-Many (1:N):</b> Team ──── Player. The most common type. Parent has a List; Child has a Parent reference.</li><li><b>Many-to-Many (M:N):</b> Student ──── Course. Requires a <b>Join Table</b> in the DB.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>Database Design Implication:</b><ul><li><b>1..*:</b> Interviewer assumes a <b>Foreign Key</b> on the \"Many\" side.</li><li><b>*..*:</b> Interviewer assumes a hidden <b>Join Table</b> (Bridge Table).</li></ul></li><li><b>Constraint Handling:</b> If you write <code>1..*</code> (1 to Many), you must enforce it in the constructor (e.g., <code>if (items.isEmpty()) throw error</code>). Don't just draw it; validate it.</li><li><b>Unidirectional vs. Bidirectional:</b> In LLD, prefer <b>Unidirectional</b> (Source $\\rightarrow$ Target) to reduce coupling. Only make it Bidirectional if absolutely necessary for performance.</li></ul>"
+    }
+  ]
+},
+
+  "Use Case": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Purpose:</b></p><ul><li><b>Definition:</b> A high-level view of <i>what</i> the system does (Functional Requirements), not <i>how</i> it does it.</li><li><b>Audience:</b> Non-technical stakeholders (PMs, Clients) and Developers.</li><li><b>Focus:</b> Interaction between \"Actors\" (Users/External Systems) and the \"System\" functions.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Core Components:</b></p><ul><li><b>Actor (Stick Figure):</b> Represents a <b>Role</b> (not a person). Can be Human (User) or System (External API, Timer).</li><li><b>Use Case (Oval):</b> Represents a distinct functionality or goal. <b>Naming:</b> Verb + Noun (e.g., <i>Place Order</i>).</li><li><b>System Boundary (Rectangle):</b> A box defining the scope. Inside = Your Code. Outside = Actors.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Relationships (The Critical Part):</b></p><table><thead><tr><th>Relationship</th><th>Notation</th><th>Meaning</th><th>Example</th></tr></thead><tbody><tr><td><b>Association</b></td><td>Solid Line</td><td>Interaction. Actor to Use Case.</td><td>Customer —— Login</td></tr><tr><td><b>Include</b></td><td>Dashed Arrow + <code>&lt;&lt;include&gt;&gt;</code></td><td><b>Mandatory.</b> Base always calls Included. (Reuse).</td><td>Checkout $\\rightarrow$ Verify Payment</td></tr><tr><td><b>Extend</b></td><td>Dashed Arrow + <code>&lt;&lt;extend&gt;&gt;</code></td><td><b>Optional.</b> Runs only if specific conditions met.</td><td>Order Food $\\leftarrow$ Use Coupon</td></tr><tr><td><b>Generalization</b></td><td>Solid Line + Hollow Triangle</td><td><b>Inheritance.</b> \"Is-A\".</td><td>Admin $\\rightarrow$ User</td></tr></tbody></table>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Include vs. Extend (The Cheat Sheet):</b></p><ul><li><b>Include (Base $\\rightarrow$ Child):</b> \"I <b>need</b> this to finish my job.\" (Cannot bake cake without mixing).</li><li><b>Extend (Child $\\rightarrow$ Base):</b> \"I <b>might</b> add this to the job.\" (Baking a cake, maybe adding sprinkles).</li></ul><br><p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>Actors aren't just People:</b> External APIs (SendGrid) and Time (Cron Jobs) are also Actors.</li><li><b>Granularity:</b> Don't model UI steps. <b>Bad:</b> \"Click Submit\". <b>Good:</b> \"Register User\".</li><li><b>The \"Login\" Trap:</b> Don't link everything to \"Login\" via <code>&lt;&lt;include&gt;&gt;</code>. It clutters the diagram. Use a parent actor \"Authenticated User\" instead.</li></ul>"
+    },
+    {
+        "type": "gallery",
+        "urls": [
+          "images/usecase.png"
+        ],
+        "caption": ""
+      }
+  ]
+},
+
+  "Sequence Diagram": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Purpose:</b></p><ul><li><b>Definition:</b> Captures the <b>Dynamic Behavior</b> of the system. It shows Time-Ordered interactions between objects.</li><li><b>Focus:</b> \"Who talks to whom, and in what order?\"</li><li><b>Usage:</b> Perfect for modeling API flows, Service-to-Service communication, and Race Conditions.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<br><p><b>Core Components:</b></p><ul><li><b>Lifeline (Dashed Line):</b> Represents an object or actor existing over time. (e.g., <code>:OrderService</code>).</li><li><b>Activation Bar (Thin Rectangle):</b> Represents the period when the object is active (processing or waiting). Meaning: \"The CPU/Thread is busy here.\"</li><li><b>Messages (Arrows):</b><ul><li><b>Synchronous:</b> Solid line + <b>Filled</b> Arrowhead (Request & Wait).</li><li><b>Asynchronous:</b> Solid line + <b>Open</b> Arrowhead (Fire & Forget).</li><li><b>Return:</b> Dashed line + Open Arrowhead (Response).</li><li><b>Self Message:</b> Arrow looping back to same lifeline.</li></ul></li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Interaction Fragments (Logic in Diagrams):</b></p>Since diagrams are static, we use frames to represent code logic.<br><table><thead><tr><th>Fragment</th><th>Keyword</th><th>Code Equivalent</th><th>Meaning</th></tr></thead><tbody><tr><td><b>Alternative</b></td><td><code>alt</code></td><td><code>if (...) { } else { }</code></td><td>Mutually exclusive choices.</td></tr><tr><td><b>Option</b></td><td><code>opt</code></td><td><code>if (...) { }</code></td><td>Single choice. Runs only if true.</td></tr><tr><td><b>Loop</b></td><td><code>loop</code></td><td><code>for / while</code></td><td>Repeats the interaction inside.</td></tr><tr><td><b>Parallel</b></td><td><code>par</code></td><td>Threads / Futures</td><td>Interactions happen simultaneously.</td></tr></tbody></table>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "code",
+      "language": "text",
+      "content": "Example Flow (User Login)\n\nUser -> Controller : login(id, pwd) [Sync]\nactivate Controller\n\nController -> Service : validate(id) [Sync]\nactivate Service\n\nService -> Database : SELECT User [Sync]\nactivate Database\nDatabase --> Service : UserObject [Return]\ndeactivate Database\n\nalt [Password Match]\n    Service --> Controller : Token\nelse [Password Fail]\n    Service --> Controller : Error\nend\n\ndeactivate Service\nController --> User : Response\ndeactivate Controller"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>Sync vs. Async (The Arrowhead Rule):</b><ul><li><b>Filled Arrowhead ($\rightarrow$):</b> You are blocked waiting for an answer (HTTP GET).</li><li><b>Open Arrowhead ($\rightarrow$):</b> You send it and move on immediately (Kafka Event).</li></ul></li><li><b>Don't Model Everything:</b> Do not draw arrows for getters/setters (<code>getName()</code>). It clutters the diagram. Only model significant business logic.</li><li><b>Database as a Lifeline:</b> In LLD, always represent the Database (or Cache) as a separate Lifeline. It clarifies latency and I/O boundaries.</li></ul>"
+    },
+    {
+        "type": "gallery",
+        "urls": [
+          "images/sequencediagram.png"
+        ],
+        "caption": ""
+      }
+  ]
+},
+  "Activity Diagram": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Purpose:</b></p><ul><li><b>Definition:</b> Describes the <b>Flow of Control (Workflow)</b> within a system. It models the sequence of activities step-by-step.</li><li><b>Analogy:</b> It is \"Flowchart 2.0\" (Object-Oriented Flowchart).</li><li><b>Key Difference:</b> Activity Diagrams support <b>Concurrency (Parallel processing)</b>, whereas traditional flowcharts are strictly sequential.</li><li><b>Focus:</b> \"What happens next?\" (Algorithm logic or Business Process).</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Core Symbols:</b></p><table><thead><tr><th>Symbol</th><th>Name</th><th>Function</th></tr></thead><tbody><tr><td>&#9679;</td><td><b>Start Node</b></td><td>The entry point.</td></tr><tr><td>[Rounded Rect]</td><td><b>Action</b></td><td>Represents a step (e.g., \"Validate Order\").</td></tr><tr><td>&rarr;</td><td><b>Control Flow</b></td><td>Shows order of execution.</td></tr><tr><td>&diams;</td><td><b>Decision/Merge</b></td><td><b>Decision:</b> Splits flow (If/Else). <br><b>Merge:</b> Recombines paths.</td></tr><tr><td>&#128280;</td><td><b>End Node</b></td><td>\"Bullseye\". Termination point.</td></tr></tbody></table>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Concurrency (The \"Superpower\"):</b></p>This is the main reason we use Activity Diagrams in LLD over simple flowcharts.<br><ul><li><b>Fork (Split):</b><ul><li><b>Notation:</b> Thick black bar with 1 input and <b>Multiple outputs</b>.</li><li><b>Meaning:</b> \"Do these things simultaneously\" (Multi-threading).</li><li><i>Example:</i> After Order Placed $\\rightarrow$ Send Email AND Update Inventory.</li></ul></li><li><b>Join (Sync):</b><ul><li><b>Notation:</b> Thick black bar with Multiple inputs and <b>1 output</b>.</li><li><b>Meaning:</b> \"Wait for <b>all</b> threads to finish before continuing.\"</li></ul></li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Swimlanes (Partitioning):</b></p><ul><li><b>Definition:</b> Vertical or horizontal columns that divide activities based on <b>Responsibility</b> (Who does it?).</li><li><b>Usage:</b> Separates actions by Class, System, or Actor.</li><li><i>Example:</i> <b>User</b> (Click Checkout) | <b>System</b> (Validate) | <b>Bank</b> (Process Payment).</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>Activity vs. Sequence:</b><ul><li><b>Sequence Diagram:</b> Focuses on <b>Objects talking</b> (Time & Messages). Use for API contracts.</li><li><b>Activity Diagram:</b> Focuses on <b>Internal Logic</b> (If/Else, Parallelism). Use for complex algorithms.</li></ul></li><li><b>Concurrency Modeling:</b> In multi-threaded designs (e.g., Web Crawler), explicitly use <b>Fork and Join</b> bars. It proves you understand parallel computing constraints.</li><li><b>Missing \"Else\":</b> When drawing a Decision Diamond, always draw the outgoing arrow for <b>both</b> outcomes (Yes and No). Leaving a \"dead end\" is a logical error.</li></ul>"
+    },
+    {
+        "type": "gallery",
+        "urls": [
+          "images/activitydiagram.jpg"
+        ],
+        "caption": ""
+      }
+  ]
+},
+
+  "State Machine": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Purpose:</b></p><ul><li><b>Definition:</b> Models the <b>lifecycle of a single object</b> as it changes states in response to events.</li><li><b>Focus:</b> \"How does an object change over time?\" (Status updates).</li><li><b>Usage:</b> Mandatory for objects with complex lifecycles like <b>Orders, Payments, TCP Connections</b>, or Game Characters.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Core Components:</b></p><ul><li><b>State (Rounded Rectangle):</b> Represents a condition (e.g., <code>Pending</code>, <code>Shipped</code>).</li><li><b>Initial State:</b> Solid black circle (&#9679;). Birth of the object.</li><li><b>Final State:</b> Bullseye symbol. Death of the object.</li><li><b>Transition (Arrow):</b> Movement from one state to another.<br><b>Syntax:</b> <code>Trigger [Guard] / Action</code><ul><li><b>Trigger:</b> The event (e.g., <code>paymentReceived</code>).</li><li><b>Guard:</b> Boolean condition (e.g., <code>[amount &gt; 0]</code>).</li><li><b>Action:</b> Operation executed during move (e.g., <code>sendEmail()</code>).</li></ul></li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Internal State Activities:</b></p>A state is not just a label; logic happens inside it.<br><ul><li><b>entry / action:</b> Executed immediately upon entering.</li><li><b>do / activity:</b> Executed continuously while inside.</li><li><b>exit / action:</b> Executed immediately before leaving.</li></ul><br><b>Example: \"Ringing\" State (Phone)</b><pre>State: Ringing\n  entry / playSound()   (Starts ringing immediately)\n  do / flashLight()     (Keeps flashing while ringing)\n  exit / stopSound()    (Stops sound when picked up)</pre>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Composite States (Superstates):</b></p><ul><li><b>Definition:</b> A state that contains other sub-states.</li><li><b>Usage:</b> Groups related states to simplify the diagram.</li><li><b>Example:</b> A <code>PaymentProcessing</code> state might internally contain <code>Validating</code>, <code>Charging</code>, and <code>Refunding</code>. Cancelling transitions out of the entire container.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>Activity vs. State Machine (#1 Confusion):</b><ul><li><b>Activity Diagram:</b> Models a <b>Process/Workflow</b> (Steps of a job). Focus = Control Flow.</li><li><b>State Machine:</b> Models an <b>Object</b> (Status of an entity). Focus = Data/Status Change.</li><li><i>Rule:</i> Use Activity for \"Checkout Flow\", State Machine for \"Order Status\".</li></ul></li><li><b>The State Design Pattern:</b> If asked to code this, <b>do not</b> use massive if-else/switch statements. Use the <b>State Design Pattern (GOF)</b>, where each state is a separate class.</li><li><b>Completeness:</b> Ensure every state has a way out (except Final). A state with entry but no exit is a \"Dead State\" (Bug).</li></ul>"
+    },
+    {
+        "type": "gallery",
+        "urls": [
+          "images/statediagram.png"
+        ],
+        "caption": ""
+      }
+  ]
+},
+
+  "System Boundary": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Purpose:</b></p><ul><li><b>Definition:</b> A visual line (box) that separates the <b>Internal System</b> (what you are building) from the <b>External Environment</b> (Users, 3rd Party APIs).</li><li><b>Goal:</b> Explicitly define the <b>Scope</b> of the project.</li><li><b>Interpretation:</b><ul><li><b>Inside the Box:</b> Your responsibility. You design and code this.</li><li><b>Outside the Box:</b> External entities (Actors) that interact with your system but are not controlled by it.</li></ul></li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Notation & Structure:</b></p><ul><li><b>Shape:</b> A large rectangle.</li><li><b>Content:</b><ul><li><b>System Name:</b> Written at the top (e.g., \"ATM System\").</li><li><b>Inside:</b> All Use Cases (Ovals).</li><li><b>Outside:</b> All Actors (Stick figures).</li></ul></li><li><b>Crossing the Line:</b> Lines connecting Actors to Use Cases must cross the boundary. This represents an <b>Interface</b> (UI or API).</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Example: ATM System</b></p><ul><li><b>Box:</b> Labeled \"ATM Banking System\".</li><li><b>Outside:</b> Actors (Customer, Bank Mainframe, Technician).</li><li><b>Inside:</b> Use Cases (Withdraw Cash, Check Balance).</li><li><b>Flow:</b> Customer connects to <i>Withdraw Cash</i> (Crossing the boundary). <i>Withdraw Cash</i> connects to <i>Bank Mainframe</i> (Crossing again).</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>Scope Creep Defense:</b> The System Boundary is your tool to define limits. If a stakeholder asks to fix an external API, point to the boundary: \"That is an external actor; we can only interface with it.\"</li><li><b>Interface Identification:</b> Every line crossing the boundary represents a requirement:<ul><li>Line to User $\\rightarrow$ <b>UI</b> (Screen/App).</li><li>Line to System $\\rightarrow$ <b>API Contract</b> (REST/gRPC).</li></ul></li><li><b>Microservices:</b> In large systems, you can have nested boundaries. The \"Payment Service\" is a boundary inside the larger \"E-Commerce Platform\".</li></ul>"
+    },
+    {
+        "type": "gallery",
+        "urls": [
+          "images/systemboundary.svg"
+        ],
+        "caption": ""
+      }
+  ]
+},
+
+  "Sync vs Async": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Core Difference:</b></p><ul><li><b>Synchronous (Blocking):</b><ul><li><b>Behavior:</b> The caller sends a request and <b>waits</b> (blocks the thread) until the response arrives.</li><li><b>Flow:</b> Serial execution (Step A $\\rightarrow$ Step B).</li><li><b>Analogy:</b> <b>A Phone Call.</b> You cannot do anything else until the other person stops talking.</li></ul></li><li><b>Asynchronous (Non-Blocking):</b><ul><li><b>Behavior:</b> The caller sends a request and <b>immediately moves on</b>. The response is handled later (via Callback, Future, or Event).</li><li><b>Flow:</b> Parallel execution.</li><li><b>Analogy:</b> <b>Email.</b> You send a mail and go back to work. You check the inbox later.</li></ul></li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Architecture Patterns:</b></p><table><thead><tr><th>Feature</th><th>Synchronous</th><th>Asynchronous</th></tr></thead><tbody><tr><td><b>Protocol</b></td><td>HTTP (REST), gRPC</td><td>Message Queues (Kafka, RabbitMQ), Webhooks</td></tr><tr><td><b>Coupling</b></td><td><b>Tight.</b> Caller needs Callee to be online now.</td><td><b>Loose.</b> Callee can be down; message waits in Queue.</td></tr><tr><td><b>Latency</b></td><td><b>Additive.</b> Total = $T_1 + T_2 + T_3$.</td><td><b>Parallel.</b> Total = $Max(T_1, T_2, T_3)$.</td></tr><tr><td><b>Use Case</b></td><td>Real-time feedback (Login, Search).</td><td>Background tasks (Email, Reports).</td></tr></tbody></table>"
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// 1. Synchronous (Blocking the Thread)\n// The thread STOPS here for 2 seconds waiting for payment\nPaymentResult result = paymentService.process(order); \nsendEmail(result); // This line cannot run until payment is done\n\n// 2. Asynchronous (Non-Blocking)\n// Fire and Forget / Future\nCompletableFuture.supplyAsync(() -> paymentService.process(order))\n    .thenAccept(result -> sendEmail(result)); // Callback\n\n// The main thread continues IMMEDIATELY to this line\nSystem.out.println(\"Order submitted!\"); "
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Failure Models:</b></p><ul><li><b>Sync:</b> If Service B is down, Service A receives an Exception immediately. (<b>Fail Fast</b>).</li><li><b>Async:</b> If Service B is down, the message sits in the Queue. Service A thinks \"Everything is fine.\" (<b>Eventual Consistency</b>).</li></ul><br><p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>Thread Pool Exhaustion (The Sync Killer):</b> In Synchronous systems (Spring MVC), every request holds a thread. If the Database slows down, all threads get stuck waiting, and the server hangs. Async frameworks (WebFlux) solve this by releasing the thread during I/O.</li><li><b>Eventual Consistency:</b> In Async systems, the user might see \"Processing...\" instead of \"Done.\" You must design the UI to handle this lag.</li><li><b>Dead Letter Queues (DLQ):</b> In Async, since there is no immediate caller to catch an exception, failed messages must go to a generic \"Error Queue\" (DLQ) for manual inspection or retry.</li></ul>"
+    },
+    {
+        "type": "gallery",
+        "urls": [
+          "images/syncasync.png"
+        ],
+        "caption": ""
+      }
+  ]
 }
+
+  
+
+  
+  
 
 
 
   
 }
+
 
 
 
