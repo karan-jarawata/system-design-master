@@ -244,7 +244,7 @@
         "name": "Testing",
         "topics": [
           { "title": "Unit Tests", "priority": "high", "note": "Fast feedback loop. JUnit/Mockito." },
-          { "title": "DI", "priority": "high", "note": "Dependency Injection makes testing possible." },
+          { "title": "Dependency Injection (DI)", "priority": "high", "note": "Dependency Injection makes testing possible." },
           { "title": "Mocking", "priority": "medium", "note": "Fake external dependencies." },
           { "title": "Test Seams", "priority": "low", "note": "Places to inject mocks." },
           { "title": "Over-Engineering", "priority": "medium", "note": "YAGNI applies to tests too." },
@@ -309,5 +309,6 @@
     ]
   }
 ]
+
 
 
