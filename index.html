@@ -977,29 +977,44 @@
                     let title, priority, note;
                     if (typeof item === 'object') {
                         title = item.title;
-                        priority = item.priority || 'none'; 
+                        priority = item.priority || 'none';
                         note = item.note || '';
                     } else {
-                        title = item; 
+                        title = item;
                         priority = 'none';
                         note = '';
                     }
-
-                    const safeId = 'card-' + title.replace(/[^a-zA-Z0-9]/g, ''); 
-                    const isDone = state.completed[title]; 
-
+                
+                    const safeId = 'card-' + title.replace(/[^a-zA-Z0-9]/g, '');
+                    const isDone = state.completed[title];
+                
                     // === STAR LOGIC ===
                     let starHtml = '';
                     if (priority === 'high') {
-                        // 2 Stars for Most Imp (Gold)
                         starHtml = `<div class="star-badge high"><i class="fas fa-star"></i> <i class="fas fa-star"></i></div>`;
                     } else if (priority === 'medium') {
-                        // 1 Star for Imp (Blue)
                         starHtml = `<div class="star-badge medium"><i class="fas fa-star"></i></div>`;
                     }
-                    // Low priority gets nothing (Clean)
-
-                    // === NOTE LOGIC (With Divider) ===
+                
+                    // === NEW LOGIC: CONDITIONAL BUTTON ===
+                    // Check if we have details in our JSON for this specific title
+                    const hasContent = TOPIC_DETAILS[title] && 
+                                       TOPIC_DETAILS[title].blocks && 
+                                       TOPIC_DETAILS[title].blocks.length > 0;
+                
+                    let actionButtonHtml = '';
+                    
+                    // Only generate the button HTML if content exists
+                    if (hasContent) {
+                        actionButtonHtml = `
+                            <div class="card-actions">
+                                <div class="btn-action" onclick="openModal(event, '${title}')" title="Read Notes">
+                                    <i class="fas fa-file-lines"></i>
+                                </div>
+                            </div>`;
+                    }
+                
+                    // === NOTE LOGIC ===
                     let noteSection = '';
                     if (note) {
                         noteSection = `
@@ -1010,7 +1025,7 @@
                             </div>
                         </div>`;
                     }
-
+                
                     // === RENDER ===
                     html += `
                     <div id="${safeId}" class="topic-card ${isDone ? 'completed' : ''} prio-${priority}" onclick="handleTopicClick(event, '${title}', '${safeId}')">
@@ -1021,16 +1036,12 @@
                                 <div class="checkbox"></div>
                                 <span class="topic-text">${title}</span>
                             </div>
-
-                            <div class="card-actions">
-                                <div class="btn-action" onclick="openModal(event, '${title}')" title="Read Notes">
-                                    <i class="fas fa-file-lines"></i>
-                                </div>
-                            </div>
+                
+                            ${actionButtonHtml}
                         </div>
-
+                
                         ${noteSection}
-
+                
                     </div>`;
                 });
                 html += `</div></div>`;
@@ -1398,6 +1409,7 @@ function copyToClipboard(elementId) {
 </script>
 </body>
 </html>
+
 
 
 
