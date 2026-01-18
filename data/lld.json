@@ -100,31 +100,31 @@
       {
         "name": "Creational",
         "topics": [
-          { "title": "Singleton (DD)", "priority": "high", "note": "DB Connections, Config Loaders. Watch out for thread safety." },
-          { "title": "Factory Method (DD)", "priority": "high", "note": "Decouples creation logic. heavily used in libraries." },
-          { "title": "Builder (DD)", "priority": "high", "note": "Essential for complex objects (e.g., HTTP Requests)." }
+          { "title": "Singleton", "priority": "high", "note": "DB Connections, Config Loaders. Watch out for thread safety." },
+          { "title": "Factory Method", "priority": "high", "note": "Decouples creation logic. heavily used in libraries." },
+          { "title": "Builder", "priority": "high", "note": "Essential for complex objects (e.g., HTTP Requests)." }
         ]
       },
       {
         "name": "Structural",
         "topics": [
-          { "title": "Adapter (DD)", "priority": "high", "note": "Connecting incompatible interfaces (Legacy code)." },
-          { "title": "Facade (FA)", "priority": "medium", "note": "Simple interface to a complex subsystem." },
-          { "title": "Decorator (FA)", "priority": "medium", "note": "Adding wrappers (e.g., I/O Streams, UI components)." },
-          { "title": "Composite (GK)", "priority": "low", "note": "Tree structures (File systems, UI trees)." },
-          { "title": "Proxy (FA)", "priority": "high", "note": "Lazy loading, Access control, Spring AOP." }
+          { "title": "Adapter", "priority": "high", "note": "Connecting incompatible interfaces (Legacy code)." },
+          { "title": "Facade", "priority": "medium", "note": "Simple interface to a complex subsystem." },
+          { "title": "Decorator", "priority": "medium", "note": "Adding wrappers (e.g., I/O Streams, UI components)." },
+          { "title": "Composite", "priority": "low", "note": "Tree structures (File systems, UI trees)." },
+          { "title": "Proxy", "priority": "high", "note": "Lazy loading, Access control, Spring AOP." }
         ]
       },
       {
         "name": "Behavioral",
         "topics": [
-          { "title": "Strategy (DD)", "priority": "high", "note": "Swappable algorithms (Payment methods, Sort strategies)." },
-          { "title": "Observer (DD)", "priority": "high", "note": "Event listeners, Pub/Sub mechanisms." },
-          { "title": "Command (GK)", "priority": "medium", "note": "Encapsulate requests (Undo/Redo logic)." },
-          { "title": "State (GK)", "priority": "medium", "note": "Managing object states (Order processing)." },
-          { "title": "Template Method (FA)", "priority": "medium", "note": "Skeleton algorithms. Hooks for subclasses." },
-          { "title": "Chain of Resp (FA)", "priority": "medium", "note": "Middleware pipelines, Logging filters." },
-          { "title": "Iterator (GK)", "priority": "low", "note": "Traversing collections without exposing internals." }
+          { "title": "Strategy", "priority": "high", "note": "Swappable algorithms (Payment methods, Sort strategies)." },
+          { "title": "Observer", "priority": "high", "note": "Event listeners, Pub/Sub mechanisms." },
+          { "title": "Command", "priority": "medium", "note": "Encapsulate requests (Undo/Redo logic)." },
+          { "title": "State", "priority": "medium", "note": "Managing object states (Order processing)." },
+          { "title": "Template Method", "priority": "medium", "note": "Skeleton algorithms. Hooks for subclasses." },
+          { "title": "Chain of Resp", "priority": "medium", "note": "Middleware pipelines, Logging filters." },
+          { "title": "Iterator", "priority": "low", "note": "Traversing collections without exposing internals." }
         ]
       }
     ]
@@ -309,3 +309,4 @@
     ]
   }
 ]
+
