@@ -1374,6 +1374,41 @@
   ]
 },
 
+  "Open/Closed": {
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>The Definition:</b></p><ul><li><b>The Principle:</b> Software entities (classes, modules) should be <b>Open for Extension</b> but <b>Closed for Modification</b>.</li><li><b>The Goal:</b> You should be able to add new features to the system without editing existing, tested source code.</li><li><b>The Benefit:</b> <b>Stability.</b> If you don't touch the old code, you can't break the old code (Zero Regression Bugs).</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": ""
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Violation (The \"Switch\" Statement):</b></p>This is the most common violation. If you see a generic class checking \"types\" with <code>if/else</code> or <code>switch</code>, it violates OCP.<br><br><b>Scenario:</b> Adding a new shape (Triangle) requires opening and modifying the <code>AreaCalculator</code> class."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// Bad Code: Rigid and Fragile\npublic class AreaCalculator {\n    public double calculate(Object shape) {\n        if (shape instanceof Circle) {\n            return 3.14 * ((Circle)shape).radius * ((Circle)shape).radius;\n        } else if (shape instanceof Square) {\n            return ((Square)shape).side * ((Square)shape).side;\n        }\n        // If I want to add Triangle, I MUST modify this file.\n        return 0;\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>The Solution (Polymorphism):</b></p>Move the behavior into the specific classes using an Interface. The calculator no longer cares what the shape is.<br><br><b>Scenario:</b> Adding a <code>Triangle</code> class. We create a new file <code>Triangle.java</code>. We do not touch <code>AreaCalculator.java</code>."
+    },
+    {
+      "type": "code",
+      "language": "java",
+      "content": "// Good Code: Extensible and Robust\ninterface Shape {\n    double calculateArea();\n}\n\npublic class Circle implements Shape {\n    public double calculateArea() { return 3.14 * radius * radius; }\n}\n\npublic class AreaCalculator {\n    // This code is CLOSED. It never needs to change again.\n    public double calculate(Shape shape) {\n        return shape.calculateArea();\n    }\n}"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>LLD Interview Key Takeaways:</b></p><ul><li><b>Polymorphism is Key:</b> OCP is usually implemented using Interfaces or Abstract Classes. If you use the Strategy Pattern, you are likely following OCP.</li><li><b>Plugin Architecture:</b> Mention this term. OCP is the foundation of plugins. Eclipse/IntelliJ doesn't rewrite their source code when you install a plugin; they just load your new class that implements their interface.</li><li><b>Bug Reduction:</b> Emphasize that OCP reduces the cost of QA (Testing). Since <code>AreaCalculator</code> wasn't touched, you theoretically don't need to re-test it when adding a Triangle.</li></ul>"
+    }
+  ]
+},
+
   "Liskov Substitution": {
   "blocks": [
     {
@@ -1494,7 +1529,10 @@
   
 
   
+
+  
 }
+
 
 
 
