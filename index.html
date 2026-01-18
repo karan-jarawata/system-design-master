@@ -275,7 +275,7 @@
             transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
             
             /* CHANGED: Changed from hidden to visible so the star can pop out */
-            overflow: visible; 
+            overflow: visible !important;
         }
 
         .topic-card:hover { transform: translateY(-2px); border-color: var(--accent); box-shadow: var(--shadow); }
@@ -544,22 +544,20 @@
         
         /* --- THE STARS (Tilted Top Right) --- */
         .star-badge {
-                position: absolute;
-                /* CHANGED: More negative values to move it up and out */
-                top: -10px;    
-                right: -8px;   
-                padding: 4px 8px;
-                transform: rotate(15deg);
-                font-size: 0.85rem;
-                pointer-events: none; 
-                z-index: 2;
-                background: var(--bg-card);
-                border-bottom-left-radius: 8px;
-                /* OPTIONAL: Add a tiny border to separate it from background if needed */
-                border: 1px solid var(--border); 
-                border-top: none;
-                border-right: none;
-            }
+            position: absolute;
+            top: -12px;   /* Pulls it UP outside the card */
+            right: -10px; /* Pulls it RIGHT outside the card */
+            padding: 4px 10px;
+            transform: rotate(15deg); /* Tilted look */
+            font-size: 0.8rem;
+            pointer-events: none;
+            z-index: 10;  /* Ensures it sits on top of the border */
+            
+            background: var(--bg-card); /* Matches card color so it covers the border line */
+            border: 1px solid var(--border);
+            border-radius: 6px; 
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1); /* Adds a tiny shadow for depth */
+        }
         
         /* 2 Stars (High - Gold) */
         .star-badge.high {
@@ -1409,6 +1407,7 @@ function copyToClipboard(elementId) {
 </script>
 </body>
 </html>
+
 
 
 
