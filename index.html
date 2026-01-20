@@ -20,7 +20,13 @@
         <div class="mobile-close-btn" onclick="toggleSidebar()">
             <i class="fas fa-arrow-left"></i>
         </div>
-        <div class="logo-text" id="logoTitle" title="">MASTER</div>
+        <div class="brand-container">
+            <div class="brand-switch">
+                <div class="brand-opt active" id="brand-lld" onclick="setMode('LLD')">LLD</div>
+                <div class="brand-opt" id="brand-hld" onclick="setMode('HLD')">HLD</div>
+            </div>
+            <span class="brand-static">MASTER</span>
+        </div>
         <div class="mastery-container">
             <div class="mastery-label">
                 <span>Total Mastery</span>
@@ -85,6 +91,7 @@
 <script src="script.js"></script>
 </body>
 </html>
+
 
 
 
