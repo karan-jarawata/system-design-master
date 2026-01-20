@@ -761,3 +761,47 @@ header {
         z-index: 9999 !important;
     }
 }
+
+
+/* --- MODE SWITCH (PILL TOGGLE) --- */
+.mode-switch {
+    display: flex;
+    background: var(--bg-body);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 3px;
+    margin-right: 8px; /* Space between switch and search */
+    height: 36px;
+    align-items: center;
+}
+
+.mode-option {
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 6px;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.mode-option:hover {
+    color: var(--text-primary);
+}
+
+/* Active State */
+.mode-option.active {
+    background: var(--accent);
+    color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Mobile Adjustment */
+@media (max-width: 768px) {
+    .mode-switch {
+        margin-right: 0;
+        margin-bottom: 10px; /* Stack nicely on mobile if needed */
+        width: fit-content;
+    }
+}
