@@ -2916,80 +2916,54 @@
 },
 
   "Object Duplication": {
-    "blocks": [
-      {
-        "type": "text",
-        "content": "### Friendly Explanation\n\n**The Analogy: The Spotify Playlist**\n\n* **Shallow Copy:** You \"Share\" your playlist with a friend. You both have the playlist on your own phones, but if you delete a song, it disappears from their phone too. You are two people looking at the same list of songs (references).\n* **Deep Copy:** Your friend manually writes down every song name and creates their own, brand-new playlist from scratch. If you delete a song from your list, their list is untouched. They are completely independent."
-      },
-      {
-        "type": "text",
-        "content": ""
-      },
-      {
-        "type": "text",
-        "content": "### Actual Explanation & Details\n\nThis is about how deep the \"cloning\" goes in the Heap memory.\n\n#### 1. Shallow Copy\n* **The Physics:** The system creates a new \"Outer Shell\" object (Stack reference is new). However, for any non-primitive data inside (like Lists or other Objects), it just copies the memory addresses.\n* **The Result:** The main objects look different on the Stack, but they point to the <b>same inner objects (children)</b> in the Heap.\n* **The Risk:** If you modify a child object (like changing a user's address inside a cloned profile), that change appears in both copies instantly."
-      },
-      {
-        "type": "text",
-        "content": ""
-      },
-      {
-        "type": "text",
-        "content": "#### 2. Deep Copy\n* **The Physics:** The system creates a new \"Outer Shell\" AND recursively creates new copies of every single object nested inside it.\n* **The Result:** You get a <b>completely fresh tree of objects</b>.\n* **The Safety:** The two Stack variables point to two entirely separate universes in the Heap. Nothing is shared, ensuring total isolation."
-      },
-      {
-        "type": "text",
-        "content": ""
-      },
-      {
-        "type": "text",
-        "content": "---\n\n### Important LLD Takeaway\n\n**Defensive Copying (The \"Getter\" Trap):**\n* **The Scenario:** You have a `User` class with a private `List` of orders.\n* **The Mistake:** If you return that list directly (`return this.orders`), external code can `clear()` or modify your private data because they hold a reference to the actual Heap object.\n* **The Fix:** Always return a **Deep Copy** (or an `unmodifiableList`) in your getter methods.\n\n**When to use which?**\n* **Shallow Copy:** Use for speed and memory efficiency. It's safe for **Immutable** data (objects that cannot be changed anyway, like Strings).\n* **Deep Copy:** Use for safety. It is **mandatory in Multi-threaded environments** (like banking or inventory systems) where one thread must not accidentally corrupt another thread's data.\n\n> **Machine Coding Tip:** In an interview (like designing a Cache), if you are storing an object, always store a Deep Copy. If the user changes the original object after putting it in the cache, your cached version should remain consistent and unchanged."
-      }
-    ]
-  }
-,
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Friendly Explanation (The Analogy):</b></p><p>Think of a Playlist on Spotify.</p><ul><li><b>Shallow Copy:</b> You \"Share\" your playlist with a friend. You both have the playlist on your own phones, but if you delete a song, it disappears from their phone too. You are two people looking at the same list of songs.</li><li><b>Deep Copy:</b> Your friend manually writes down every song name and creates their own, brand-new playlist from scratch. If you delete a song from your list, their list is untouched. They are completely independent.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Actual Explanation & Details:</b></p><p>This is about how deep the \"cloning\" goes in the Heap memory.</p><ul><li><b>1. Shallow Copy:</b><ul><li><b>The Physics:</b> The system creates a new \"Outer Shell\" (Stack reference is new). However, for the data inside, it just copies the addresses.</li><li><b>The Result:</b> The main objects look different, but they point to the same inner objects (children).</li><li><b>The Risk:</b> If you modify a child object (like changing a name inside a list), that change appears in both copies instantly.</li></ul></li><li><b>2. Deep Copy:</b><ul><li><b>The Physics:</b> The system creates a new \"Outer Shell\" AND recursively creates new copies of every single object inside it.</li><li><b>The Result:</b> You get a completely fresh tree of objects.</li><li><b>The Safety:</b> The two Stack variables point to two entirely separate universes in the Heap. Nothing is shared.</li></ul></li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Important LLD Takeaway: Defensive Copying (The \"Getter\" Trap):</b></p><ul><li><b>The Scenario:</b> You have a <code>User</code> class with a private list of orders.</li><li><b>The Mistake:</b> If you return that list directly (<code>return this.orders</code>), anyone can clear or change your private data.</li><li><b>The Fix:</b> Always return a Deep Copy (or an unmodifiable copy) in your getter methods.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>When to use which?</b></p><table><thead><tr><th>Type</th><th>Focus</th><th>Usage Context</th></tr></thead><tbody><tr><td><b>Shallow Copy</b></td><td>Speed</td><td>Good for \"ReadOnly\" data or when objects are immutable (cannot be changed anyway).</td></tr><tr><td><b>Deep Copy</b></td><td>Safety</td><td>Mandatory in Multi-threaded environments (like banking apps) where one thread shouldn't accidentally corrupt another thread's data.</td></tr></tbody></table>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Machine Coding Tip:</b></p><p>In an interview (like designing a Cache), if you are storing an object, always store a <b>Deep Copy</b>. If the user changes the object after putting it in the cache, your cache shouldn't secretly change too!</p>"
+    }
+  ]
+},
 
   "The HashCode Contract": {
-    "blocks": [
-      {
-        "type": "text",
-        "content": "### Context: Where does this fit?\n\nThis topic belongs to **Data Structures** (HashMaps & Sets). When you use a Key-Value store (HashMap) or a unique list (HashSet), the computer needs a way to find items instantly without scanning the whole list. It uses a \"Two-Step Search\":\n\n1.  **HashCode:** Tells the computer roughly where to look (**Which bucket?**).\n2.  **Equals:** Tells the computer exactly which item it is (**Is this the one?**)."
-      },
-      {
-        "type": "text",
-        "content": ""
-      },
-      {
-        "type": "text",
-        "content": "### Friendly Explanation\n\n**The Analogy: The Supermarket**\n\n* **HashCode:** This is the **Aisle Number** (e.g., \"Dairy Aisle\").\n* **Equals:** This is the **Product Name** (e.g., \"Strawberry Yogurt\").\n\n**The Rule:**\nIf two tubs of yogurt are identical (`.equals()` is True), they **MUST** be in the same aisle (`hashCode()` must be the same).\n\n**Why?** If you tell a customer, \"Go to Aisle 4 for Yogurt,\" but you accidentally shelved the yogurt in Aisle 9, the customer will go to Aisle 4, see empty shelves, and conclude you are out of stock. The yogurt exists, but it is **lost**."
-      },
-      {
-        "type": "text",
-        "content": "### Actual Explanation & Details\n\nThe \"Contract\" is a strict rule to ensure hash-based collections function correctly. \n\n**The Physics of the Search:**\n1.  **Step 1 (The Hash):** The Map calculates the `hashCode` and converts it into a **Bucket Number** (like a drawer index). It jumps straight to that physical location.\n2.  **Step 2 (The Equals):** It opens the drawer. If there are multiple items (a **Collision**), it iterates through them using `.equals()` until a match is found."
-      },
-      {
-        "type": "text",
-        "content": ""
-      },
-      {
-        "type": "text",
-        "content": "**The 3 Simple Rules:**\n* **Consistency:** The `hashCode` must not be random; it must return the same value every time for the same object state.\n* **Equal = Same Bucket:** If `A.equals(B)`, then `A.hashCode()` **must** equal `B.hashCode()`.\n* **Collisions are Okay:** Two different objects can have the same `hashCode`. It’s not an error, but it makes the drawer crowded and slows down the search from $O(1)$ to $O(n)$ in that bucket."
-      },
-      {
-        "type": "text",
-        "content": "---\n\n### Important LLD Takeaway\n\n**The Golden Rule:**\n**If you override `.equals()`, you MUST override `hashCode()`.** If you break this, you create a \"Phantom Object.\" You can put it in a Map, but `map.get(key)` will return null because the Map is looking in the wrong bucket.\n\n**The \"Do Not Change\" Rule (Immutability):**\n* **The Trap:** Never use a field that changes (like `age` or `lastLogin`) for hashing.\n* **The Disaster:** If an object is placed in \"Bucket 5\" and its state changes such that the hash now points to \"Bucket 6,\" the object becomes **retrieval-proof**. It stays in Bucket 5 forever, causing a **Memory Leak**."
-      },
-      {
-        "type": "text",
-        "content": ""
-      },
-      {
-        "type": "text",
-        "content": "> **Machine Coding Tip:** When building systems like a Cache, always calculate `hashCode` using only the **Primary Key (ID)** to ensure the hash remains stable throughout the object's lifecycle.\n> `return Objects.hash(this.userId);`"
-      }
-    ]
-  }
-
+  "blocks": [
+    {
+      "type": "text",
+      "content": "<p><b>Context: Where does this fit?</b></p><p>This topic belongs to Data Structures (HashMaps & Sets). When you use a HashMap (Key-Value store) or a HashSet (Unique list), the computer needs a super-fast way to find items without checking every single one. It uses a \"Two-Step Search\":</p><ul><li><b>HashCode:</b> Tells the computer roughly where to look (Which bucket?).</li><li><b>Equals:</b> Tells the computer exactly which item it is (Is this the one?).</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Friendly Explanation (The Analogy):</b></p><p>Imagine a Supermarket.</p><ul><li><b>HashCode:</b> This is the Aisle Number (e.g., \"Dairy Aisle\").</li><li><b>Equals:</b> This is the Product Name (e.g., \"Strawberry Yogurt\").</li></ul><p><b>The Rule:</b> If two tubs of yogurt are identical (<code>.equals()</code> is True), they MUST be in the same aisle (<code>hashCode()</code> must be the same).</p><p><b>Why?</b> If you tell a customer, \"Go to Aisle 4 for Yogurt,\" but you accidentally shelved the yogurt in Aisle 9, the customer will go to Aisle 4, see empty shelves, and tell you \"We are out of stock.\" The yogurt exists, but it is lost.</p>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Actual Explanation & Details:</b></p><p>The \"Contract\" is just a strict rule to make sure HashMaps work correctly.</p><p><b>The Physics of the Search:</b></p><ul><li><b>Step 1 (The Hash):</b> You ask for an object. The Map calculates the hashCode. It converts this code into a \"Bucket Number\" (like a drawer number). It jumps straight to that drawer.</li><li><b>Step 2 (The Equals):</b> It opens the drawer. There might be 5 items inside (Collisions). It picks them up one by one and asks, \"Are you equal to what I'm looking for?\" until it finds a match.</li></ul><p><b>The 3 Simple Rules:</b></p><ul><li><b>Consistency:</b> If you ask for the hash of \"User123\" five times, it must return the same number five times. It cannot be random.</li><li><b>The \"Equal = Same Bucket\" Rule:</b> If Object A and Object B are \"Equal\", they must have the same HashCode.</li><li><b>The \"Collision\" Reality:</b> Two different objects (like \"Apple\" and \"Orange\") can have the same HashCode. This is called a Collision. It's allowed, but it makes the drawer crowded and searching slower.</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Important LLD Takeaway:</b></p><p><b>The Golden Rule:</b> If you override <code>.equals()</code>, you must override <code>hashCode()</code>.</p><p>If you break this: You will create a \"Phantom Object.\" You can put it into a Map, but you will never be able to get it out, because the Map is looking in the wrong bucket.</p><p><b>The \"Do Not Change\" Rule (Immutability):</b></p><ul><li><b>The Trap:</b> Never use a field that changes (like age or lastLoginTime) to calculate the HashCode.</li><li><b>The Disaster:</b> If you put a User in \"Bucket 5\" because they are 25 years old, and then they turn 26... their HashCode changes to \"Bucket 6\". The Map looks in Bucket 6, but the object is still sitting in Bucket 5. It is now lost forever (Memory Leak).</li></ul>"
+    },
+    {
+      "type": "text",
+      "content": "<p><b>Machine Coding Tip:</b></p><p>When building systems (like a Cache or User Store), always calculate HashCode using only the Primary Key (ID).</p><p><code>return Objects.hash(this.userId);</code> -> Safe, Simple, Fast.</p>"
+    }
+  ]
+}
   
   
 
@@ -3001,6 +2975,7 @@
 
   
 }
+
 
 
 
