@@ -440,51 +440,45 @@ function toggleSidebar() {
 // }
 
 // ================= MODE SWITCH LOGIC =================
-
-// Replace the old toggleMode with this explicit setter
 function setMode(selectedMode) {
-    if (CONFIG.mode === selectedMode) return; // Don't reload if already active
+    if (CONFIG.mode === selectedMode) return; 
 
-    // 1. Update Config & Storage
     CONFIG.mode = selectedMode;
     localStorage.setItem('app_mode', CONFIG.mode);
 
-    // 2. Visual Feedback (Fade out)
+    // Fade effect
     document.body.style.opacity = '0';
     
-    // 3. Wait for fade, then re-init
     setTimeout(() => {
-        initDashboard();
-        updateModeToggleUI(); // Ensure the toggle looks correct
+        initDashboard(); // Re-render content
         document.body.style.opacity = '1';
         
-        // Optional: Small confetti burst on switch
+        // Confetti Burst
         confetti({ 
-            particleCount: 60, 
-            spread: 70, 
-            origin: { y: 0.1 }, 
+            particleCount: 60, spread: 70, origin: { x: 0.1, y: 0.1 }, // Top Left origin
             colors: CONFIG.mode === 'LLD' ? ['#2563eb'] : ['#8b5cf6'] 
         });
     }, 250);
 }
 
-// Call this inside initDashboard() to ensure UI matches state on load
 function updateModeToggleUI() {
-    const lldBtn = document.getElementById('btn-lld');
-    const hldBtn = document.getElementById('btn-hld');
+    const lldBtn = document.getElementById('brand-lld');
+    const hldBtn = document.getElementById('brand-hld');
     
-    // Reset classes
-    lldBtn.className = 'mode-option';
-    hldBtn.className = 'mode-option';
+    // Safety check in case element isn't found
+    if(!lldBtn || !hldBtn) return;
 
-    // Set active class
+    // Reset
+    lldBtn.classList.remove('active');
+    hldBtn.classList.remove('active');
+
+    // Set Active
     if (CONFIG.mode === 'LLD') {
         lldBtn.classList.add('active');
     } else {
         hldBtn.classList.add('active');
     }
 }
-
 // ================= BOOTSTRAP =================
 // TIER 1: Small Burst at Mouse Position
 function triggerSmallConfetti(x, y) {
