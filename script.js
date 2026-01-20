@@ -45,7 +45,6 @@ function saveState() {
 // ================= DASHBOARD LOGIC =================
 function initDashboard() {
     document.body.setAttribute('data-mode', CONFIG.mode);
-    document.getElementById('logoTitle').innerText = `${CONFIG.mode} MASTER`;
 
     // If screen is small (mobile), close sidebar by default
         if (window.innerWidth <= 768) {
