@@ -85,6 +85,11 @@ aside.closed {
     align-items: center; 
 }
 
+/* 1. HIDE ON DESKTOP BY DEFAULT */
+.mobile-close-btn {
+    display: none;
+}
+
 .sidebar-header {
     padding: 1.5rem 1.25rem;
     border-bottom: 1px solid var(--border);
@@ -747,13 +752,32 @@ header {
         opacity: 1;
     }
 
-    /* Show on Mobile */
+    /* 2. POSITION & STYLE FOR MOBILE */
     .mobile-close-btn {
-        display: block;
+        display: flex;             /* Show it now */
+        align-items: center;
+        justify-content: center;
+        
+        position: absolute;        /* Float it */
+        top: 20px;                 /* Align with top padding */
+        right: 20px;               /* Stick to right corner */
+        
+        width: 32px;
+        height: 32px;
         font-size: 1.2rem;
         color: var(--text-secondary);
-        margin-bottom: 1rem;
         cursor: pointer;
+        z-index: 1002;             /* Ensure it's above everything */
+        transition: color 0.2s;
+    }
+
+    .mobile-close-btn:hover {
+        color: var(--accent);      /* Highlight on touch */
+    }
+
+    /* Make sure sidebar header handles the absolute button */
+    .sidebar-header {
+        position: relative; 
     }
 
     /* Fix Sidebar Z-Index to be definitely on top */
