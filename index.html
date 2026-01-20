@@ -48,10 +48,16 @@
         </div>
         
         <div class="controls">
+            <div class="mode-switch">
+                <div class="mode-option active" id="btn-lld" onclick="setMode('LLD')">LLD</div>
+                <div class="mode-option" id="btn-hld" onclick="setMode('HLD')">HLD</div>
+            </div>
+        
             <div class="search-box">
                 <div class="search-icon"></div>
                 <input type="text" class="search-input" id="searchInput" placeholder="Find topic..." oninput="renderContent()">
             </div>
+        
             <div class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
                 <i class="fas fa-moon"></i>
             </div>
@@ -79,5 +85,6 @@
 <script src="script.js"></script>
 </body>
 </html>
+
 
 
