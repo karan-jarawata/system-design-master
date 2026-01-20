@@ -274,57 +274,58 @@
     "title": "9. Machine Coding",
     "subtitle": "The Gauntlet",
     "groups": [
-      {
+        {
         "name": "Easy",
         "topics": [
-          { "title": "Tic-Tac-Toe", "priority": "medium", "note": "Good for checking Strategy pattern." },
-          { "title": "Snake & Ladder", "priority": "medium", "note": "Basic state management." },
-          { "title": "LRU Cache", "priority": "high", "note": "Classic HashMap + DoublyLinkedList." },
-          { "title": "Parking Lot", "priority": "high", "note": "The 'Hello World' of LLD." },
-          { "title": "Task Manager", "priority": "low", "note": "Basic CRUD + Status tracking." }
+          { "title": "Tic-Tac-Toe", "priority": "medium", "note": "Good for checking Strategy pattern. Hints: Strategy (Winning Logic), Observer (Board Updates)." },
+          { "title": "Snake & Ladder", "priority": "medium", "note": "Basic state management. Hints: Strategy (Dice Movement), Singleton (Game Manager)." },
+          { "title": "LRU Cache", "priority": "high", "note": "Classic HashMap + DoublyLinkedList. Hints: Strategy (Eviction Policy)." },
+          { "title": "Parking Lot", "priority": "high", "note": "The 'Hello World' of LLD. Hints: Factory (Vehicle Type), Strategy (Pricing/Spot Selection), Singleton." },
+          { "title": "Task Manager", "priority": "low", "note": "Basic CRUD + Status tracking. Hints: Observer (Status Changes), Command (Undo/Redo), Builder." }
         ]
       },
       {
         "name": "Medium",
         "topics": [
-          { "title": "Stack Overflow", "priority": "medium", "note": "Tags, Search, Voting logic." },
-          { "title": "ATM", "priority": "high", "note": "State pattern & Transaction handling." },
-          { "title": "Logger", "priority": "medium", "note": "Chain of Responsibility pattern." },
-          { "title": "PubSub", "priority": "high", "note": "Observer pattern & Queue management." },
-          { "title": "Elevator", "priority": "high", "note": "Scheduling algorithms (SCAN/LOOK)." },
-          { "title": "Splitwise", "priority": "high", "note": "Graph simplifications & Strategy pattern." },
-          { "title": "Vending Machine", "priority": "high", "note": "State pattern heavy." },
-          { "title": "Car Rental", "priority": "medium", "note": "Reservation system & Inventory." },
-          { "title": "Hotel Mgmt", "priority": "medium", "note": "Booking dates and Room types." },
-          { "title": "Digital Wallet", "priority": "medium", "note": "Concurrency & Transactions." },
-          { "title": "Airline Mgmt", "priority": "medium", "note": "Complex search & Booking." },
-          { "title": "Library Mgmt", "priority": "low", "note": "Simple inventory tracking." },
-          { "title": "Traffic Signal", "priority": "low", "note": "Observer/State pattern." },
-          { "title": "Concert Ticket", "priority": "medium", "note": "Concurrency (Locking seats)." },
-          { "title": "Social Network", "priority": "medium", "note": "Graph connections & Feeds." }
+          { "title": "Stack Overflow", "priority": "medium", "note": "Tags, Search, Voting logic. Hints: State (Question Status), Observer (Subscriptions), Strategy (Search)." },
+          { "title": "ATM", "priority": "high", "note": "State pattern & Transaction handling. Hints: State (ATM State), Chain of Responsibility (Cash Dispenser)." },
+          { "title": "Logger", "priority": "medium", "note": "Chain of Responsibility pattern. Hints: Chain of Responsibility (Log Levels), Singleton." },
+          { "title": "PubSub", "priority": "high", "note": "Observer pattern & Queue management. Hints: Observer (Topic Subscribers), Singleton (Broker)." },
+          { "title": "Elevator", "priority": "high", "note": "Scheduling algorithms (SCAN/LOOK). Hints: State (Moving/Idle), Strategy (Dispatcher Algorithm)." },
+          { "title": "Splitwise", "priority": "high", "note": "Graph simplifications & Strategy pattern. Hints: Strategy (Expense Splitting), Observer (User Notifications)." },
+          { "title": "Vending Machine", "priority": "high", "note": "State pattern heavy. Hints: State (Selection/Dispensing), Chain of Responsibility (Coin Counting)." },
+          { "title": "Car Rental", "priority": "medium", "note": "Reservation system & Inventory. Hints: Decorator (Add-ons), Strategy (Pricing), Observer (Availability)." },
+          { "title": "Hotel Mgmt", "priority": "medium", "note": "Booking dates and Room types. Hints: Builder (Room Creation), Strategy (Seasonal Pricing)." },
+          { "title": "Digital Wallet", "priority": "medium", "note": "Concurrency & Transactions. Hints: Command (Transactions), Observer (Balance Updates), Strategy (Payment Modes)." },
+          { "title": "Airline Mgmt", "priority": "medium", "note": "Complex search & Booking. Hints: Observer (Flight Status), Strategy (Fare Calculation), Builder (Booking)." },
+          { "title": "Library Mgmt", "priority": "low", "note": "Simple inventory tracking. Hints: State (Book Availability), Observer (Overdue Notifications)." },
+          { "title": "Traffic Signal", "priority": "low", "note": "Observer/State pattern. Hints: State (Red/Green), Mediator (Junction Controller)." },
+          { "title": "Concert Ticket", "priority": "medium", "note": "Concurrency (Locking seats). Hints: State (Seat Status), Observer (Booking Alerts)." },
+          { "title": "Social Network", "priority": "medium", "note": "Graph connections & Feeds. Hints: Observer (Followers/Feed), Strategy (Feed Ranking), Builder (Post)." }
         ]
       },
       {
         "name": "Hard",
         "topics": [
-          { "title": "Spotify", "priority": "medium", "note": "Streaming logic & Offline mode." },
-          { "title": "Amazon", "priority": "high", "note": "Search, Cart, Order, Inventory." },
-          { "title": "LinkedIn", "priority": "medium", "note": "Connections & Notifications." },
-          { "title": "CricInfo", "priority": "low", "note": "Live score updates." },
-          { "title": "Chess", "priority": "medium", "note": "Complex rules & Move validation." },
-          { "title": "Coffee Vending", "priority": "low", "note": "Decorator pattern." },
-          { "title": "Restaurant Mgmt", "priority": "medium", "note": "Orders, Kitchen, Table mgmt." },
-          { "title": "Stock Exchange", "priority": "high", "note": "Extreme concurrency & Matching engine." },
-          { "title": "Course Registration", "priority": "low", "note": "Constraints & Prerequisites." },
-          { "title": "BookMyShow", "priority": "high", "note": "Concurrency (Seat locking)." },
-          { "title": "Online Auction", "priority": "medium", "note": "Real-time bidding & Timers." },
-          { "title": "Food Delivery", "priority": "high", "note": "Geospatial & Order assignment." },
-          { "title": "Ride-Sharing", "priority": "high", "note": "Driver matching & Location tracking." }
+          { "title": "Spotify", "priority": "medium", "note": "Streaming logic & Offline mode. Hints: State (Player State), Strategy (Shuffle/Repeat), Observer (Playlist)." },
+          { "title": "Amazon", "priority": "high", "note": "Search, Cart, Order, Inventory. Hints: State (Order Status), Strategy (Shipping/Discount), Observer (Inventory), Decorator (Gift Wrap)." },
+          { "title": "LinkedIn", "priority": "medium", "note": "Connections & Notifications. Hints: Observer (Connection Request), Strategy (Job Recommendation), Factory." },
+          { "title": "CricInfo", "priority": "low", "note": "Live score updates. Hints: Observer (Score Broadcaster), Strategy (Stats Calculation)." },
+          { "title": "Chess", "priority": "medium", "note": "Complex rules & Move validation. Hints: Strategy (Movement Logic), Flyweight (Tiles), Command (Move History)." },
+          { "title": "Coffee Vending", "priority": "low", "note": "Decorator pattern. Hints: Decorator (Ingredients/Toppings), Factory (Coffee Types)." },
+          { "title": "Restaurant Mgmt", "priority": "medium", "note": "Orders, Kitchen, Table mgmt. Hints: Command (Order Tokens), State (Table Occupancy), Observer (Order Ready)." },
+          { "title": "Stock Exchange", "priority": "high", "note": "Extreme concurrency & Matching engine. Hints: Observer (Ticker), Command (Buy/Sell), Singleton (Matching Engine)." },
+          { "title": "Course Registration", "priority": "low", "note": "Constraints & Prerequisites. Hints: Observer (Waitlist), Strategy (Prerequisite Check)." },
+          { "title": "BookMyShow", "priority": "high", "note": "Concurrency (Seat locking). Hints: State (Seat Lock), Observer (New Shows), Strategy (Dynamic Pricing)." },
+          { "title": "Online Auction", "priority": "medium", "note": "Real-time bidding & Timers. Hints: Observer (Bid Updates), State (Auction Status), Mediator (Bidder-Seller)." },
+          { "title": "Food Delivery", "priority": "high", "note": "Geospatial & Order assignment. Hints: State (Delivery Status), Strategy (Driver Assignment), Observer (Location)." },
+          { "title": "Ride-Sharing", "priority": "high", "note": "Driver matching & Location tracking. Hints: Strategy (Pricing/Matching), Observer (Driver Position), State (Ride Status)." }
         ]
       }
     ]
   }
 ]
+
 
 
 
