@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Design Master</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="styles.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+</head>
+<body data-mode="LLD">
+
+<aside>
+    <div class="sidebar-header">
+        <div class="mobile-close-btn" onclick="toggleSidebar()">
+            <i class="fas fa-arrow-left"></i>
+        </div>
+        <div class="logo-text" id="logoTitle" title="Click 3 times to switch modes">LLD MASTER</div>
+        <div class="mastery-container">
+            <div class="mastery-label">
+                <span>Total Mastery</span>
+                <span id="masteryPercent">0%</span>
+            </div>
+            <div class="mastery-track">
+                <div class="mastery-fill" id="masteryBar"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="nav-scroller" id="navContainer"></div>
+</aside>
+
+<div id="mobileOverlay" class="mobile-overlay" onclick="toggleSidebar()"></div>
+
+<main>
+    <header>
+        <div class="header-left">
+            <div class="menu-btn" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </div>
+            <h1 id="headerTitle">Loading...</h1>
+            <p id="headerSubtitle" style="margin-left: 15px;">Select a topic to begin the grind</p>
+        </div>
+        
+        <div class="controls">
+            <div class="search-box">
+                <div class="search-icon"></div>
+                <input type="text" class="search-input" id="searchInput" placeholder="Find topic..." oninput="renderContent()">
+            </div>
+            <div class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
+                <i class="fas fa-moon"></i>
+            </div>
+        </div>
+    </header>
+
+    <div class="content-scroll">
+        <div class="content-wrapper" id="contentArea"></div>
+    </div>
+</main>
+
+<div id="noteModal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="modal-title" id="modalTitle">Topic Name</span>
+            <button class="modal-close" onclick="closeModal(event)">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body" id="modalBody">
+            </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
