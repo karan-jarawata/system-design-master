@@ -26,7 +26,7 @@ async function loadDataAndInit() {
         TOPIC_DETAILS = await detailsRes.json();
 
         initDashboard();
-        initSecretSwitch();
+      
 
     } catch (error) {
         console.error("Error loading data:", error);
@@ -51,7 +51,7 @@ function initDashboard() {
         if (window.innerWidth <= 768) {
             document.querySelector('aside').classList.add('closed');
         }
-    
+    updateModeToggleUI();
     renderNav();
     renderContent();
 }
@@ -413,30 +413,76 @@ function toggleSidebar() {
 }
 
 // --- SECRET SWITCH ---
-let clickCount = 0;
-let clickTimer = null;
-function initSecretSwitch() {
-    const title = document.getElementById('logoTitle');
-    title.addEventListener('click', () => {
-        clickCount++;
-        title.style.transform = 'scale(0.95)';
-        setTimeout(() => title.style.transform = 'scale(1)', 100);
-        if (clickTimer) clearTimeout(clickTimer);
-        clickTimer = setTimeout(() => { clickCount = 0; }, 500);
-        if (clickCount === 3) toggleMode();
-    });
-}
+// let clickCount = 0;
+// let clickTimer = null;
+// function initSecretSwitch() {
+//     const title = document.getElementById('logoTitle');
+//     title.addEventListener('click', () => {
+//         clickCount++;
+//         title.style.transform = 'scale(0.95)';
+//         setTimeout(() => title.style.transform = 'scale(1)', 100);
+//         if (clickTimer) clearTimeout(clickTimer);
+//         clickTimer = setTimeout(() => { clickCount = 0; }, 500);
+//         if (clickCount === 3) toggleMode();
+//     });
+// }
 
-function toggleMode() {
-    CONFIG.mode = CONFIG.mode === 'LLD' ? 'HLD' : 'LLD';
+// function toggleMode() {
+//     CONFIG.mode = CONFIG.mode === 'LLD' ? 'HLD' : 'LLD';
+//     localStorage.setItem('app_mode', CONFIG.mode);
+//     document.body.style.opacity = '0';
+//     setTimeout(() => {
+//         initDashboard();
+//         document.body.style.opacity = '1';
+//         confetti({ particleCount: 100, spread: 70, origin: { y: 0.1 }, colors: CONFIG.mode === 'LLD' ? ['#2563eb'] : ['#8b5cf6'] });
+//     }, 300);
+//     clickCount = 0;
+// }
+
+// ================= MODE SWITCH LOGIC =================
+
+// Replace the old toggleMode with this explicit setter
+function setMode(selectedMode) {
+    if (CONFIG.mode === selectedMode) return; // Don't reload if already active
+
+    // 1. Update Config & Storage
+    CONFIG.mode = selectedMode;
     localStorage.setItem('app_mode', CONFIG.mode);
+
+    // 2. Visual Feedback (Fade out)
     document.body.style.opacity = '0';
+    
+    // 3. Wait for fade, then re-init
     setTimeout(() => {
         initDashboard();
+        updateModeToggleUI(); // Ensure the toggle looks correct
         document.body.style.opacity = '1';
-        confetti({ particleCount: 100, spread: 70, origin: { y: 0.1 }, colors: CONFIG.mode === 'LLD' ? ['#2563eb'] : ['#8b5cf6'] });
-    }, 300);
-    clickCount = 0;
+        
+        // Optional: Small confetti burst on switch
+        confetti({ 
+            particleCount: 60, 
+            spread: 70, 
+            origin: { y: 0.1 }, 
+            colors: CONFIG.mode === 'LLD' ? ['#2563eb'] : ['#8b5cf6'] 
+        });
+    }, 250);
+}
+
+// Call this inside initDashboard() to ensure UI matches state on load
+function updateModeToggleUI() {
+    const lldBtn = document.getElementById('btn-lld');
+    const hldBtn = document.getElementById('btn-hld');
+    
+    // Reset classes
+    lldBtn.className = 'mode-option';
+    hldBtn.className = 'mode-option';
+
+    // Set active class
+    if (CONFIG.mode === 'LLD') {
+        lldBtn.classList.add('active');
+    } else {
+        hldBtn.classList.add('active');
+    }
 }
 
 // ================= BOOTSTRAP =================
