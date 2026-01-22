@@ -38,7 +38,7 @@
 body[data-mode="HLD"] {
     --accent: #8b5cf6;
     --accent-hover: #7c3aed;
-    --accent-light: #f5f3ff;
+    --accent-light: #eff6ff;
 }
 body[data-mode="HLD"].dark {
     --accent: #a78bfa;
