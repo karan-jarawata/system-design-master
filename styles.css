@@ -38,12 +38,12 @@
 body[data-mode="HLD"] {
     --accent: #8b5cf6;
     --accent-hover: #7c3aed;
-    --accent-light: #eff6ff;
+    --accent-light: #f5f3ff;
 }
 body[data-mode="HLD"].dark {
     --accent: #a78bfa;
     --accent-hover: #c4b5fd;
-    --accent-light: rgba(139, 92, 246, 0.1);
+    --accent-light: rgba(59, 130, 246, 0.1);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
