@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "title": "Core",
+    "title": "1. Core",
     "subtitle": "The Foundation",
     "groups": [
       {
@@ -53,7 +53,7 @@
   },
   {
     "id": 2,
-    "title": "Networking",
+    "title": "2. Networking",
     "subtitle": "How Data Moves",
     "groups": [
       {
@@ -105,7 +105,7 @@
   },
   {
     "id": 3,
-    "title": "API",
+    "title": "3. API",
     "subtitle": "Communication",
     "groups": [
       {
@@ -157,7 +157,7 @@
   },
   {
     "id": 4,
-    "title": "Database",
+    "title": "4. Database",
     "subtitle": "Storage",
     "groups": [
       {
@@ -214,7 +214,7 @@
   },
   {
     "id": 5,
-    "title": "Caching",
+    "title": "5. Caching",
     "subtitle": "Speed Layer",
     "groups": [
       {
@@ -251,7 +251,7 @@
   },
   {
     "id": 6,
-    "title": "Async Comm",
+    "title": "6. Async Comm",
     "subtitle": "Decoupling",
     "groups": [
       {
@@ -278,7 +278,7 @@
   },
   {
     "id": 7,
-    "title": "Dist. Systems",
+    "title": "7. Dist. Systems",
     "subtitle": "Advanced Architecture",
     "groups": [
       {
@@ -335,7 +335,7 @@
   },
   {
     "id": 8,
-    "title": "Architectural Patterns",
+    "title": "8. Architectural Patterns",
     "subtitle": "Blueprints",
     "groups": [
       {
@@ -372,7 +372,7 @@
   },
   {
     "id": 9,
-    "title": "Tradeoffs",
+    "title": "9. Tradeoffs",
     "subtitle": "Decision Making",
     "groups": [
       {
@@ -439,7 +439,7 @@
   },
   {
     "id": 10,
-    "title": "Design Problems",
+    "title": "10. Design Problems",
     "subtitle": "The Gauntlet",
     "groups": [
       {
@@ -509,7 +509,7 @@
   },
   {
     "id": 11,
-    "title": "Articles",
+    "title": "11. Articles",
     "subtitle": "Case Studies",
     "groups": [
       {
@@ -551,7 +551,7 @@
   },
   {
     "id": 12,
-    "title": "Papers",
+    "title": "12. Papers",
     "subtitle": "The Academic Source",
     "groups": [
       {
@@ -612,4 +612,5 @@
     ]
   }
 ]
+
 
