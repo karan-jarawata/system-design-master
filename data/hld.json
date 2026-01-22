@@ -2,34 +2,56 @@
   {
     "id": 1,
     "title": "1. Foundations",
-    "subtitle": "Distributed Systems",
+    "subtitle": "The Building Blocks",
     "groups": [
       {
-        "name": "Architecture",
+        "name": "Network & Comms",
         "topics": [
-          "Client-Server",
-          "Monolithic vs Microservices",
-          "Serverless (FaaS)"
+          {
+            "title": "OSI Model & TCP/IP",
+            "priority": "high",
+            "note": "The 7 layers vs 4 layers. Understand where HTTP (L7) and TCP (L4) sit and why it matters for Load Balancing."
+          },
+          {
+            "title": "TCP vs UDP",
+            "priority": "high",
+            "note": "Reliability (Three-way handshake) vs Speed (Fire and forget). Use cases: Streaming vs Banking."
+          },
+          {
+            "title": "DNS Resolution",
+            "priority": "high",
+            "note": "How a URL becomes an IP. A/AAAA records, TTL, and why DNS is the first layer of load balancing."
+          },
+          {
+            "title": "HTTP/1.1 vs HTTP/2 vs HTTP/3",
+            "priority": "medium",
+            "note": "Keep-alive connections, Multiplexing (HOL blocking), and QUIC (UDP-based web)."
+          },
+          {
+            "title": "WebSockets & Polling",
+            "priority": "medium",
+            "note": "Real-time comms: Short Polling (bad) vs Long Polling vs Full-duplex WebSockets (Chat apps)."
+          }
         ]
       },
       {
-        "name": "Scaling",
+        "name": "API Paradigms",
         "topics": [
-          "Vertical vs Horizontal Scaling",
-          "Latency vs Throughput",
-          "Stateless vs Stateful"
-        ]
-      },
-      {
-        "name": "Comms",
-        "topics": [
-          "HTTP/1.1 vs HTTP/2",
-          "TCP vs UDP",
-          "WebSocket",
-          "REST",
-          "GraphQL",
-          "gRPC",
-          "Polling vs SSE"
+          {
+            "title": "REST vs GraphQL vs gRPC",
+            "priority": "high",
+            "note": "Resource-based (REST) vs Query-based (GraphQL) vs Procedure-based (gRPC/Protobufs)."
+          },
+          {
+            "title": "Idempotency",
+            "priority": "high",
+            "note": "Ensuring retrying a payment request doesn't charge the user twice (Idempotency Keys)."
+          },
+          {
+            "title": "Webhooks",
+            "priority": "medium",
+            "note": "Don't call us, we'll call you. Event-driven updates between decoupled systems (e.g., Stripe payments)."
+          }
         ]
       }
     ]
@@ -37,30 +59,46 @@
   {
     "id": 2,
     "title": "2. The Rules",
-    "subtitle": "Principles & Theorems",
+    "subtitle": "Theorems & Trade-offs",
     "groups": [
       {
-        "name": "Consistency",
+        "name": "Core Theorems",
         "topics": [
-          "CAP Theorem",
-          "PACELC Theorem",
-          "Strong vs Eventual Consistency",
-          "BASE Properties"
+          {
+            "title": "CAP Theorem",
+            "priority": "high",
+            "note": "Pick two: Consistency, Availability, Partition Tolerance. (Spoiler: In distributed systems, P is mandatory)."
+          },
+          {
+            "title": "PACELC Theorem",
+            "priority": "medium",
+            "note": "An extension of CAP: If there is no Partition (P), how do you trade off Latency (L) vs Consistency (C)?"
+          }
         ]
       },
       {
-        "name": "Transactions",
+        "name": "Critical Trade-offs",
         "topics": [
-          "ACID Transactions"
-        ]
-      },
-      {
-        "name": "Reliability",
-        "topics": [
-          "Single Point of Failure",
-          "Fallacies of Distributed Computing",
-          "Amdahl's Law",
-          "Backpressure"
+          {
+            "title": "Strong vs Eventual Consistency",
+            "priority": "high",
+            "note": "Banking needs Strong (ACID); Social Media feeds can survive with Eventual (BASE)."
+          },
+          {
+            "title": "Latency vs Throughput",
+            "priority": "high",
+            "note": "Speed of one request (Latency) vs volume of requests handled (Throughput)."
+          },
+          {
+            "title": "Push vs Pull Architecture",
+            "priority": "medium",
+            "note": "Push: Low latency but can overwhelm clients. Pull: Client controls rate but data is stale."
+          },
+          {
+            "title": "Stateful vs Stateless",
+            "priority": "high",
+            "note": "Stateless scales horizontally easily (JWT). Stateful sticks users to servers (Sessions)."
+          }
         ]
       }
     ]
@@ -71,38 +109,48 @@
     "subtitle": "Components",
     "groups": [
       {
-        "name": "Load Balancing",
+        "name": "Traffic Management",
         "topics": [
-          "L4 vs L7 LB",
-          "Round Robin",
-          "Consistent Hashing",
-          "Health Checks"
+          {
+            "title": "Load Balancing Algorithms",
+            "priority": "high",
+            "note": "Round Robin, Least Connections, and Weighted Round Robin."
+          },
+          {
+            "title": "Consistent Hashing",
+            "priority": "high",
+            "note": "Adding/removing servers without remapping all keys. Critical for distributed caches (DynamoDB, Cassandra)."
+          },
+          {
+            "title": "Rate Limiting",
+            "priority": "high",
+            "note": "Protecting services from DDOS or noisy neighbors. Token Bucket vs Leaky Bucket algorithms."
+          },
+          {
+            "title": "API Gateway vs Reverse Proxy",
+            "priority": "medium",
+            "note": "Gateway handles auth, rate limiting, routing (business logic). Proxy just forwards traffic."
+          }
         ]
       },
       {
-        "name": "Caching",
+        "name": "Caching & Delivery",
         "topics": [
-          "Write-through",
-          "Write-back",
-          "Cache-aside",
-          "Eviction (LRU/LFU)",
-          "Redis/Memcached",
-          "CDN"
-        ]
-      },
-      {
-        "name": "Messaging",
-        "topics": [
-          "Pub-Sub vs P2P",
-          "Kafka vs RabbitMQ",
-          "Dead Letter Queues"
-        ]
-      },
-      {
-        "name": "Proxies",
-        "topics": [
-          "Forward vs Reverse Proxy",
-          "API Gateway vs LB"
+          {
+            "title": "Caching Strategies",
+            "priority": "high",
+            "note": "Cache-aside (Lazy), Write-through (Consistency), Write-back (Performance risk)."
+          },
+          {
+            "title": "Eviction Policies (LRU/LFU)",
+            "priority": "medium",
+            "note": "How to decide what to delete when memory is full. LRU is standard, LFU for frequency."
+          },
+          {
+            "title": "CDNs",
+            "priority": "medium",
+            "note": "Serving static assets (images, CSS) from the edge, closer to the user."
+          }
         ]
       }
     ]
@@ -110,32 +158,46 @@
   {
     "id": 4,
     "title": "4. Data Architecture",
-    "subtitle": "Storage",
+    "subtitle": "Storage & Movement",
     "groups": [
       {
-        "name": "DB Types",
+        "name": "Database Internals",
         "topics": [
-          "RDBMS (MySQL)",
-          "NoSQL (Mongo, Dynamo)",
-          "Columnar (Cassandra)",
-          "Graph (Neo4j)"
+          {
+            "title": "ACID Transactions",
+            "priority": "high",
+            "note": "Atomicity, Consistency, Isolation, Durability. The holy grail of Relational DBs."
+          },
+          {
+            "title": "Indexes (B-Tree vs LSM)",
+            "priority": "medium",
+            "note": "B-Tree (Read heavy, MySQL) vs LSM Tree (Write heavy, Cassandra/Kafka)."
+          },
+          {
+            "title": "Bloom Filters",
+            "priority": "medium",
+            "note": "Probabilistic structure to quickly tell if an item definitely DOES NOT exist (saves disk lookups)."
+          }
         ]
       },
       {
         "name": "Scaling Data",
         "topics": [
-          "Replication (Master-Slave)",
-          "Sharding & Keys",
-          "Federation"
-        ]
-      },
-      {
-        "name": "Advanced",
-        "topics": [
-          "B-Trees vs LSM Trees",
-          "Bloom Filters",
-          "Quorum Consensus",
-          "Paxos & Raft"
+          {
+            "title": "Sharding & Partitioning",
+            "priority": "high",
+            "note": "Horizontal scaling for DBs. Choosing a Shard Key to avoid 'Hot Partitions'."
+          },
+          {
+            "title": "Replication (Master-Slave vs Multi-Master)",
+            "priority": "high",
+            "note": "Reading from Slaves (eventual consistency) vs Writing to Master. Multi-master handles conflict resolution."
+          },
+          {
+            "title": "CDC (Change Data Capture)",
+            "priority": "medium",
+            "note": "Turning the DB into an event stream (Debezium). Syncing DB to Search/Cache in real-time."
+          }
         ]
       }
     ]
@@ -143,33 +205,46 @@
   {
     "id": 5,
     "title": "5. Advanced Arch",
-    "subtitle": "Resilience & Security",
+    "subtitle": "Resilience & Distributed Consensus",
     "groups": [
       {
-        "name": "Transactions",
+        "name": "Distributed Coordination",
         "topics": [
-          "2-Phase Commit",
-          "3-Phase Commit",
-          "Saga Pattern"
+          {
+            "title": "Distributed Locking",
+            "priority": "high",
+            "note": "Ensuring only one process modifies a resource at a time (Redis Redlock, ZooKeeper)."
+          },
+          {
+            "title": "Consensus Algorithms (Paxos/Raft)",
+            "priority": "medium",
+            "note": "How distributed nodes agree on a single source of truth (Leader Election)."
+          },
+          {
+            "title": "Gossip Protocol",
+            "priority": "medium",
+            "note": "How nodes spread information (like heartbeats) in a cluster (Cassandra/Dynamo) without a master."
+          }
         ]
       },
       {
-        "name": "Resilience",
+        "name": "Resilience Patterns",
         "topics": [
-          "Circuit Breaker",
-          "Bulkhead",
-          "Retry & Jitter",
-          "Rate Limiting",
-          "Idempotency"
-        ]
-      },
-      {
-        "name": "Security",
-        "topics": [
-          "OAuth 2.0 / JWT",
-          "SSL/TLS Handshake",
-          "Encryption",
-          "DDoS Mitigation"
+          {
+            "title": "Circuit Breaker",
+            "priority": "high",
+            "note": "Stop calling a failing service to prevent cascading failures (Resilience4j)."
+          },
+          {
+            "title": "Bulkhead Pattern",
+            "priority": "medium",
+            "note": "Isolating resources (thread pools) so a crash in 'Image Service' doesn't kill 'Auth Service'."
+          },
+          {
+            "title": "Saga Pattern",
+            "priority": "high",
+            "note": "Managing long-running transactions in microservices (Chreography vs Orchestration)."
+          }
         ]
       }
     ]
@@ -177,95 +252,125 @@
   {
     "id": 6,
     "title": "6. Observability",
-    "subtitle": "Ops & Metrics",
+    "subtitle": "Keeping the Lights On",
     "groups": [
       {
-        "name": "Monitoring",
+        "name": "The Three Pillars",
         "topics": [
-          "Metrics (Prometheus)",
-          "Dashboards (Grafana)"
+          {
+            "title": "Metrics (Prometheus/Grafana)",
+            "priority": "high",
+            "note": "Aggregatable data. 'What is the current CPU usage?' or 'Requests per second'."
+          },
+          {
+            "title": "Logging (ELK Stack)",
+            "priority": "high",
+            "note": "Discrete events. 'Why did this specific request fail?' Structured logging is key."
+          },
+          {
+            "title": "Distributed Tracing",
+            "priority": "medium",
+            "note": "Visualizing the path of a request across 20 microservices (Jaeger/Zipkin)."
+          }
         ]
       },
       {
-        "name": "Logging",
+        "name": "Health",
         "topics": [
-          "ELK Stack",
-          "Structured Logging"
-        ]
-      },
-      {
-        "name": "Tracing",
-        "topics": [
-          "Distributed Tracing",
-          "Span Context"
-        ]
-      },
-      {
-        "name": "Deploy",
-        "topics": [
-          "Blue-Green",
-          "Canary",
-          "Rolling Updates"
+          {
+            "title": "Heartbeats & Health Checks",
+            "priority": "high",
+            "note": "Liveness (Am I running?) vs Readiness (Can I accept traffic?)."
+          }
         ]
       }
     ]
   },
   {
     "id": 7,
-    "title": "7. Patterns",
-    "subtitle": "Architectural Patterns",
+    "title": "7. The Gauntlet",
+    "subtitle": "Interview Problems",
     "groups": [
       {
-        "name": "Modern Patterns",
+        "name": "Essential (Must Know)",
         "topics": [
-          "Sidecar",
-          "Ambassador",
-          "Strangler Fig",
-          "CQRS",
-          "Event Sourcing",
-          "Service Discovery"
+          {
+            "title": "Design URL Shortener (TinyURL)",
+            "priority": "high",
+            "note": "Focus on: Unique ID generation (Base62), Database choice (NoSQL vs SQL), and heavy Read ratio."
+          },
+          {
+            "title": "Design a Rate Limiter",
+            "priority": "high",
+            "note": "Focus on: Algorithms (Token Bucket), distributed counters (Redis), and where to place it (Gateway/Sidecar)."
+          },
+          {
+            "title": "Design a Chat System (WhatsApp)",
+            "priority": "high",
+            "note": "Focus on: WebSockets, preserving message order, offline storage, and 'Sent/Delivered/Read' status."
+          },
+          {
+            "title": "Design a Notification Service",
+            "priority": "medium",
+            "note": "Focus on: Pluggable providers (Email/SMS/Push), queues (RabbitMQ), and preventing spam."
+          }
+        ]
+      },
+      {
+        "name": "Advanced (Differentiators)",
+        "topics": [
+          {
+            "title": "Design Uber/Lyft",
+            "priority": "high",
+            "note": "Focus on: Geospatial Indexing (QuadTrees/Geohash), high-frequency location updates, and matching logic."
+          },
+          {
+            "title": "Design YouTube/Netflix",
+            "priority": "high",
+            "note": "Focus on: Chunked video streaming (HLS/DASH), CDNs, and transcoding pipeline."
+          },
+          {
+            "title": "Design a Web Crawler",
+            "priority": "medium",
+            "note": "Focus on: Politeness, handling cycles, DNS resolution, and massive deduplication (Bloom Filters)."
+          },
+          {
+            "title": "Design Google Drive/Dropbox",
+            "priority": "medium",
+            "note": "Focus on: Block-level storage (chunking), synchronization logic, and revision history."
+          },
+          {
+            "title": "Design a Payment System",
+            "priority": "high",
+            "note": "Focus on: Idempotency, ACID compliance, Reconciliation (Audit logs), and security."
+          }
         ]
       }
     ]
   },
   {
     "id": 8,
-    "title": "8. The Gauntlet",
-    "subtitle": "Interview Questions",
+    "title": "8. Hall of Fame",
+    "subtitle": "Classic Papers & Case Studies",
     "groups": [
       {
-        "name": "Easy",
+        "name": "The Papers",
         "topics": [
-          "URL Shortener",
-          "Key-Value Store",
-          "ID Generator",
-          "Pastebin"
-        ]
-      },
-      {
-        "name": "Medium",
-        "topics": [
-          "Chat System",
-          "Social Feed",
-          "Notification Service",
-          "Rate Limiter",
-          "Typeahead/Search",
-          "Web Crawler",
-          "Google Drive"
-        ]
-      },
-      {
-        "name": "Hard",
-        "topics": [
-          "Video Streaming (Netflix)",
-          "Ride Hailing (Uber)",
-          "E-Commerce (Amazon)",
-          "Location Service (Yelp)",
-          "Distributed Search",
-          "Payment System",
-          "Metrics Monitoring",
-          "Live Streaming",
-          "Ticket Booking"
+          {
+            "title": "Google File System (GFS)",
+            "priority": "medium",
+            "note": "The grandfather of HDFS. Defined how we handle Big Data storage."
+          },
+          {
+            "title": "MapReduce",
+            "priority": "medium",
+            "note": "Simplified distributed data processing. The basis for Hadoop."
+          },
+          {
+            "title": "Dynamo (Amazon)",
+            "priority": "high",
+            "note": "Introduced the world to 'Consistent Hashing' and 'Vector Clocks' for high availability."
+          }
         ]
       }
     ]
